@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Details - Organic Chemistry</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .mobile-container {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .header {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #667eea;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            flex: 1;
+        }
+
+        .session-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .session-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .overview-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .metric-value.focus { color: #28a745; }
+        .metric-value.attention { color: #ffc107; }
+        .metric-value.materials { color: #17a2b8; }
+        .metric-value.artifacts { color: #6f42c1; }
+
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            font-size: 16px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .section-content {
+            padding: 15px 20px;
+        }
+
+        .focus-chart-placeholder {
+            height: 180px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 3px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .artifact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .artifact-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .artifact-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .artifact-type {
+            background: #667eea;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .artifact-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .artifact-preview {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        .timeline-time {
+            color: #667eea;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 45px;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .timeline-desc {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .insights-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .insight-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #28a745;
+        }
+
+        .insight-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #28a745;
+        }
+
+        .insight-desc {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .action-bar {
+            background: white;
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        /* Custom scrollbar */
+        .scrollable-content::-webkit-scrollbar {
+            width: 2px;
+        }
+
+        .scrollable-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .scrollable-content::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="status-bar">
+            <div class="status-left">
+                <span>9:41</span>
+            </div>
+            <div class="status-right">
+                <span>100%</span>
+                <span>🔋</span>
+                <span>📶</span>
+            </div>
+        </div>
+
+        <div class="header">
+            <div class="header-top">
+                <button class="back-btn">‹</button>
+                <div class="header-title">Organic Chemistry Review</div>
+                <div class="session-badge">Completed</div>
+            </div>
+            <div class="session-meta">
+                <span>📅 Today, 2:30 PM</span>
+                <span>⏱️ 2h 15m</span>
+            </div>
+        </div>
+
+        <div class="scrollable-content">
+            <div class="overview-metrics">
+                <div class="metric-card">
+                    <div class="metric-value focus">88%</div>
+                    <div class="metric-label">Focus Score</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value attention">78%</div>
+                    <div class="metric-label">Attention</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value materials">34</div>
+                    <div class="metric-label">Materials</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value artifacts">15</div>
+                    <div class="metric-label">Artifacts</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-icon">📊</span>
+                    <span class="section-title">Focus Analytics</span>
+                </div>
+                <div class="section-content">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active">Focus</button>
+                        <button class="tab-btn">Attention</button>
+                        <button class="tab-btn">Events</button>
+                    </div>
+                    <div class="focus-chart-placeholder">
+                        Focus Chart<br>
+                        88% average<br>
+                        Range: 65% - 95%
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-icon">🎯</span>
+                    <span class="section-title">Study Artifacts</span>
+                </div>
+                <div class="section-content">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active">All</button>
+                        <button class="tab-btn">Cards</button>
+                        <button class="tab-btn">Summaries</button>
+                    </div>
+                    <div class="artifact-list">
+                        <div class="artifact-item">
+                            <div class="artifact-header">
+                                <div class="artifact-type">Flashcard</div>
+                            </div>
+                            <div class="artifact-title">Alkene Reactions</div>
+                            <div class="artifact-preview">
+                                Q: What is the major product of hydrobromination of 2-methylpropene?
+                                A: 2-bromo-2-methylpropane...
+                            </div>
+                        </div>
+                        <div class="artifact-item">
+                            <div class="artifact-header">
+                                <div class="artifact-type">Summary</div>
+                            </div>
+                            <div class="artifact-title">Stereochemistry Principles</div>
+                            <div class="artifact-preview">
+                                Covers chirality, optical activity, and R/S nomenclature...
+                            </div>
+                        </div>
+                        <div class="artifact-item">
+                            <div class="artifact-header">
+                                <div class="artifact-type">Flashcard</div>
+                            </div>
+                            <div class="artifact-title">Elimination vs Substitution</div>
+                            <div class="artifact-preview">
+                                Q: When does E2 elimination occur preferentially over SN2?
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-icon">⏰</span>
+                    <span class="section-title">Session Timeline</span>
+                </div>
+                <div class="section-content">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-time">2:30</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Session Started</div>
+                                <div class="timeline-desc">All cameras initialized</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">2:45</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">High Focus Period</div>
+                                <div class="timeline-desc">95% focus on alkene reactions</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">3:20</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Break Detected</div>
+                                <div class="timeline-desc">5 minute study break</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">4:10</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Focus Dip</div>
+                                <div class="timeline-desc">Attention decreased to 65%</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">4:45</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Session Ended</div>
+                                <div class="timeline-desc">Review completed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-icon">💡</span>
+                    <span class="section-title">AI Insights</span>
+                </div>
+                <div class="section-content">
+                    <div class="insights-list">
+                        <div class="insight-item">
+                            <div class="insight-title">Strong Performance</div>
+                            <div class="insight-desc">Your focus was consistently high during reaction mechanism practice. Consider similar deep-focus sessions for complex topics.</div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="insight-title">Attention Pattern</div>
+                            <div class="insight-desc">Attention decreased after 90 minutes. Consider taking shorter, more frequent breaks.</div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="insight-title">Material Coverage</div>
+                            <div class="insight-desc">You spent 60% of time on new material and 40% reviewing. Good balance for retention.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button class="action-btn btn-secondary">Export</button>
+            <button class="action-btn btn-primary">Review Cards</button>
+        </div>
+    </div>
+</body>
+</html>
