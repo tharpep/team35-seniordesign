@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognitive Coach - Mobile Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .mobile-container {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .quick-stats {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-value.sessions { color: #667eea; }
+        .stat-value.time { color: #28a745; }
+        .stat-value.focus { color: #ffc107; }
+        .stat-value.cards { color: #6f42c1; }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .session-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .session-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .session-card:active {
+            transform: scale(0.98);
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .session-info h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .session-date {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .session-duration {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .focus-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .focus-label {
+            font-size: 14px;
+            color: #666;
+            min-width: 70px;
+        }
+
+        .focus-bar {
+            flex: 1;
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .focus-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .focus-score {
+            font-size: 14px;
+            font-weight: 600;
+            min-width: 35px;
+            text-align: right;
+        }
+
+        .session-preview {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .topic-tag {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 0 30px 0;
+            border-top: 1px solid #eee;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-item:not(.active) {
+            color: #999;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .mobile-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+
+        /* Custom scrollbar for mobile */
+        .scrollable-content::-webkit-scrollbar {
+            width: 2px;
+        }
+
+        .scrollable-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .scrollable-content::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="status-bar">
+            <div class="status-left">
+                <span>9:41</span>
+            </div>
+            <div class="status-right">
+                <span>100%</span>
+                <span>🔋</span>
+                <span>📶</span>
+            </div>
+        </div>
+
+        <div class="header">
+            <h1>Cognitive Coach</h1>
+            <p>Your study companion</p>
+        </div>
+
+        <div class="scrollable-content">
+            <div class="content">
+                <div class="quick-stats">
+                    <div class="stats-title">This Week</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value sessions">12</div>
+                            <div class="stat-label">Sessions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value time">18h</div>
+                            <div class="stat-label">Study Time</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value focus">85%</div>
+                            <div class="stat-label">Avg Focus</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value cards">89</div>
+                            <div class="stat-label">Flashcards</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">Recent Sessions</div>
+                <div class="session-list">
+                    <div class="session-card">
+                        <div class="session-header">
+                            <div class="session-info">
+                                <h3>Organic Chemistry Review</h3>
+                                <div class="session-date">Today, 2:30 PM</div>
+                            </div>
+                            <div class="session-duration">2h 15m</div>
+                        </div>
+
+                        <div class="focus-indicator">
+                            <span class="focus-label">Focus:</span>
+                            <div class="focus-bar">
+                                <div class="focus-fill" style="width: 88%; background: linear-gradient(90deg, #dc3545 0%, #ffc107 50%, #28a745 100%);"></div>
+                            </div>
+                            <span class="focus-score" style="color: #28a745;">88%</span>
+                        </div>
+
+                        <div class="session-metrics" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #ffc107;">78%</div>
+                                <div style="font-size: 10px; color: #666;">Attention</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #17a2b8;">34</div>
+                                <div style="font-size: 10px; color: #666;">Materials</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #6f42c1;">12</div>
+                                <div style="font-size: 10px; color: #666;">Flashcards</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #6f42c1;">3</div>
+                                <div style="font-size: 10px; color: #666;">Summaries</div>
+                            </div>
+                        </div>
+
+                        <div class="session-preview">
+                            <span class="topic-tag">Alkenes</span>
+                            <span class="topic-tag">Stereochemistry</span>
+                            <span class="topic-tag">Reactions</span>
+                        </div>
+                    </div>
+
+                    <div class="session-card">
+                        <div class="session-header">
+                            <div class="session-info">
+                                <h3>Calculus Problem Solving</h3>
+                                <div class="session-date">Yesterday, 7:45 PM</div>
+                            </div>
+                            <div class="session-duration">1h 45m</div>
+                        </div>
+
+                        <div class="focus-indicator">
+                            <span class="focus-label">Focus:</span>
+                            <div class="focus-bar">
+                                <div class="focus-fill" style="width: 92%; background: linear-gradient(90deg, #dc3545 0%, #ffc107 50%, #28a745 100%);"></div>
+                            </div>
+                            <span class="focus-score" style="color: #28a745;">92%</span>
+                        </div>
+
+                        <div class="session-metrics" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #ffc107;">89%</div>
+                                <div style="font-size: 10px; color: #666;">Attention</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #17a2b8;">28</div>
+                                <div style="font-size: 10px; color: #666;">Materials</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #6f42c1;">15</div>
+                                <div style="font-size: 10px; color: #666;">Flashcards</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #6f42c1;">2</div>
+                                <div style="font-size: 10px; color: #666;">Summaries</div>
+                            </div>
+                        </div>
+
+                        <div class="session-preview">
+                            <span class="topic-tag">Integration</span>
+                            <span class="topic-tag">U-substitution</span>
+                        </div>
+                    </div>
+
+                    <div class="session-card">
+                        <div class="session-header">
+                            <div class="session-info">
+                                <h3>World History Reading</h3>
+                                <div class="session-date">2 days ago, 3:15 PM</div>
+                            </div>
+                            <div class="session-duration">3h 20m</div>
+                        </div>
+
+                        <div class="focus-indicator">
+                            <span class="focus-label">Focus:</span>
+                            <div class="focus-bar">
+                                <div class="focus-fill" style="width: 76%; background: linear-gradient(90deg, #dc3545 0%, #ffc107 50%, #28a745 100%);"></div>
+                            </div>
+                            <span class="focus-score" style="color: #ffc107;">76%</span>
+                        </div>
+
+                        <div class="session-metrics" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #ffc107;">72%</div>
+                                <div style="font-size: 10px; color: #666;">Attention</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #17a2b8;">45</div>
+                                <div style="font-size: 10px; color: #666;">Materials</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #6f42c1;">18</div>
+                                <div style="font-size: 10px; color: #666;">Flashcards</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #6f42c1;">5</div>
+                                <div style="font-size: 10px; color: #666;">Summaries</div>
+                            </div>
+                        </div>
+
+                        <div class="session-preview">
+                            <span class="topic-tag">WWI</span>
+                            <span class="topic-tag">Treaties</span>
+                            <span class="topic-tag">Timeline</span>
+                        </div>
+                    </div>
+
+                    <div class="session-card">
+                        <div class="session-header">
+                            <div class="session-info">
+                                <h3>Physics Lab Analysis</h3>
+                                <div class="session-date">3 days ago, 1:00 PM</div>
+                            </div>
+                            <div class="session-duration">2h 50m</div>
+                        </div>
+
+                        <div class="focus-indicator">
+                            <span class="focus-label">Focus:</span>
+                            <div class="focus-bar">
+                                <div class="focus-fill" style="width: 94%; background: linear-gradient(90deg, #dc3545 0%, #ffc107 50%, #28a745 100%);"></div>
+                            </div>
+                            <span class="focus-score" style="color: #28a745;">94%</span>
+                        </div>
+
+                        <div class="session-metrics" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #ffc107;">91%</div>
+                                <div style="font-size: 10px; color: #666;">Attention</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #17a2b8;">31</div>
+                                <div style="font-size: 10px; color: #666;">Materials</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #6f42c1;">9</div>
+                                <div style="font-size: 10px; color: #666;">Flashcards</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; font-weight: 600; color: #6f42c1;">4</div>
+                                <div style="font-size: 10px; color: #666;">Summaries</div>
+                            </div>
+                        </div>
+
+                        <div class="session-preview">
+                            <span class="topic-tag">Momentum</span>
+                            <span class="topic-tag">Collisions</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-items">
+                <div class="nav-item active">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">🎯</div>
+                    <div class="nav-label">Study</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">📊</div>
+                    <div class="nav-label">Analytics</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">⚙️</div>
+                    <div class="nav-label">Settings</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
