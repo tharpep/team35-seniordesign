@@ -4,28 +4,49 @@ Routes requests to AI providers (currently Purdue GenAI Studio)
 Designed to be easily extended for additional providers
 """
 
-from typing import Dict, Any
-from .purdue_api import PurdueGenAI
+import os
+from typing import Dict, Any, Optional
+from purdue_api import PurdueGenAI
+
+# Load environment variables from .env file
+def load_env_file():
+    """Load environment variables from .env file"""
+    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+    if os.path.exists(env_path):
+        with open(env_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key.strip()] = value.strip()
+
+load_env_file()
 
 
 class AIGateway:
     """Simple gateway for AI requests"""
     
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
         """
         Initialize gateway with configuration
         
         Args:
             config: Dictionary with provider configurations
                    Example: {"purdue": {"api_key": "your-key"}}
+                   If None, will try to load from environment variables
         """
         self.providers = {}
-        self._setup_providers(config)
+        self._setup_providers(config or {})
     
     def _setup_providers(self, config: Dict[str, Any]):
         """Setup available AI providers"""
+        # Setup Purdue provider
         if "purdue" in config:
-            self.providers["purdue"] = PurdueGenAI(config["purdue"]["api_key"])
+            api_key = config["purdue"].get("api_key")
+            self.providers["purdue"] = PurdueGenAI(api_key)
+        elif os.getenv('PURDUE_API_KEY'):
+            # Auto-setup Purdue if API key is in environment
+            self.providers["purdue"] = PurdueGenAI()
         
         # Future providers can be added here:
         # if "openai" in config:
@@ -62,17 +83,13 @@ class AIGateway:
 
 # Example usage
 if __name__ == "__main__":
-    # Configuration
-    config = {
-        "purdue": {
-            "api_key": "your-purdue-api-key-here"
-        }
-    }
-    
-    # Initialize gateway
-    gateway = AIGateway(config)
+    # Gateway will auto-load from PURDUE_API_KEY environment variable
+    # or you can provide config: AIGateway({"purdue": {"api_key": "your-key"}})
     
     try:
+        # Initialize gateway (auto-loads from environment)
+        gateway = AIGateway()
+        
         # Simple chat
         response = gateway.chat("Hello! What is your name?")
         print(f"AI Response: {response}")

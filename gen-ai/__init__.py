@@ -3,7 +3,7 @@ GenAI Package
 Simple AI Gateway and Provider implementations
 """
 
-from .gateway import AIGateway
-from .purdue_api import PurdueGenAI
+from .src.gateway import AIGateway
+from .src.purdue_api import PurdueGenAI
 
 __all__ = ['AIGateway', 'PurdueGenAI']
