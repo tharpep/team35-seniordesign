@@ -334,6 +334,172 @@
             line-height: 1.4;
         }
 
+        .ai-chat-container {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .chat-messages {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #fafafa;
+        }
+
+        .ai-message {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .user-message {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .ai-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .user-avatar {
+            background: #28a745;
+            color: white;
+        }
+
+        .message-content {
+            flex: 1;
+            max-width: 80%;
+        }
+
+        .message-text {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin-bottom: 5px;
+        }
+
+        .user-message .message-text {
+            background: #667eea;
+            color: white;
+        }
+
+        .message-time {
+            font-size: 0.75em;
+            color: #666;
+            margin-left: 15px;
+        }
+
+        .chat-input-container {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .suggested-questions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .suggestion-btn {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 15px;
+            padding: 6px 12px;
+            font-size: 0.8em;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .suggestion-btn:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            font-size: 0.9em;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Custom scrollbar for chat */
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 2px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 2px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -491,6 +657,34 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="section">
+                    <h2><span class="section-icon">🤖</span>Ask AI About This Session</h2>
+                    <div class="ai-chat-container">
+                        <div class="chat-messages">
+                            <div class="ai-message">
+                                <div class="message-avatar ai-avatar">AI</div>
+                                <div class="message-content">
+                                    <div class="message-text">Hi! I can help answer questions about your Organic Chemistry session. Ask me anything about the topics you covered, clarify concepts, or get additional practice problems!</div>
+                                    <div class="message-time">Just now</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-input-container">
+                            <div class="suggested-questions">
+                                <button class="suggestion-btn">Explain Markovnikov's rule</button>
+                                <button class="suggestion-btn">Create a practice problem</button>
+                                <button class="suggestion-btn">What are common mistakes?</button>
+                            </div>
+                            <div class="chat-input-wrapper">
+                                <input type="text" class="chat-input" placeholder="Ask about alkenes, stereochemistry, reactions..." />
+                                <button class="send-btn">
+                                    <span>→</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="sidebar">
@@ -561,5 +755,89 @@
             <button class="btn btn-secondary">Share Session</button>
         </div>
     </main>
+
+    <script>
+        // Basic mockup functionality for AI chat
+        const chatInput = document.querySelector('.chat-input');
+        const sendBtn = document.querySelector('.send-btn');
+        const chatMessages = document.querySelector('.chat-messages');
+        const suggestionBtns = document.querySelectorAll('.suggestion-btn');
+
+        // Sample AI responses for mockup
+        const aiResponses = {
+            "explain markovnikov's rule": "Markovnikov's rule states that when a protic acid (like HBr) adds to an alkene, the hydrogen atom attaches to the carbon with more hydrogen atoms already attached, while the halide attaches to the more substituted carbon. This occurs because the reaction proceeds through the more stable carbocation intermediate.",
+            "create a practice problem": "Here's a practice problem: What is the major product when 2-methyl-2-butene reacts with HCl? Draw the mechanism and explain why this product forms preferentially.",
+            "what are common mistakes": "Common mistakes in alkene reactions include: 1) Forgetting about stereochemistry in addition reactions, 2) Not considering carbocation rearrangements, 3) Confusing Markovnikov vs anti-Markovnikov selectivity, 4) Missing the role of reaction conditions (temperature, solvent) in determining outcomes."
+        };
+
+        function addMessage(text, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = isUser ? 'user-message' : 'ai-message';
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar ${isUser ? 'user-avatar' : 'ai-avatar'}">
+                    ${isUser ? 'You' : 'AI'}
+                </div>
+                <div class="message-content">
+                    <div class="message-text">${text}</div>
+                    <div class="message-time">Just now</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function handleSendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, true);
+            chatInput.value = '';
+
+            // Simulate AI response
+            setTimeout(() => {
+                const lowercaseMessage = message.toLowerCase();
+                let response = "That's a great question about your organic chemistry session! Based on the topics you covered (alkenes, stereochemistry, and reaction mechanisms), I can help clarify concepts or provide additional examples. Could you be more specific about what you'd like to explore further?";
+                
+                // Check for specific topics
+                for (const [key, value] of Object.entries(aiResponses)) {
+                    if (lowercaseMessage.includes(key)) {
+                        response = value;
+                        break;
+                    }
+                }
+                
+                addMessage(response);
+            }, 1000);
+        }
+
+        // Event listeners
+        sendBtn.addEventListener('click', handleSendMessage);
+        
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleSendMessage();
+            }
+        });
+
+        suggestionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                chatInput.value = btn.textContent;
+                handleSendMessage();
+            });
+        });
+
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active from all tabs
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                // Add active to clicked tab
+                this.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>
