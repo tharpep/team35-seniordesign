@@ -1,0 +1,347 @@
+/* Material 3 Design System - Shared Styles */
+
+/* Typography */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Roboto:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons+Round');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #fafbff;
+    color: #202124;
+    line-height: 1.5;
+}
+
+/* Material 3 App Bar */
+.header {
+    background: #ffffff;
+    box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.08);
+    padding: 12px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid #e8eaed;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 48px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 20px;
+    font-weight: 500;
+    color: #1a73e8;
+    text-decoration: none;
+}
+
+.logo-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icon-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: none;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: #5f6368;
+}
+
+.icon-button:hover {
+    background-color: rgba(95, 99, 104, 0.1);
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Material 3 Cards */
+.card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.08), 0 4px 8px 3px rgba(60, 64, 67, 0.04);
+    border: 1px solid #e8eaed;
+    transition: all 0.2s;
+}
+
+.card:hover {
+    box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.08), 0 8px 10px 1px rgba(60, 64, 67, 0.16);
+    transform: translateY(-1px);
+}
+
+.card-large {
+    border-radius: 24px;
+    padding: 32px;
+}
+
+/* Material 3 Buttons */
+.primary-button {
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 16px 48px;
+    border-radius: 28px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px 0 rgba(26, 115, 232, 0.4);
+    min-width: 160px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.primary-button:hover {
+    background: #1557b0;
+    box-shadow: 0 1px 3px 0 rgba(26, 115, 232, 0.4), 0 4px 8px 3px rgba(26, 115, 232, 0.12);
+}
+
+.secondary-button {
+    background: #ffffff;
+    color: #5f6368;
+    border: 1px solid #dadce0;
+    padding: 12px 24px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.secondary-button:hover {
+    background: #f8f9fa;
+    border-color: #c4c7c5;
+    box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.08);
+}
+
+.icon-button-circular {
+    background: #ffffff;
+    color: #5f6368;
+    border: 1px solid #dadce0;
+    padding: 0;
+    border-radius: 28px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+}
+
+.icon-button-circular:hover {
+    background: #f8f9fa;
+    border-color: #c4c7c5;
+    box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.08);
+}
+
+/* Material 3 Form Elements */
+.form-field {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.form-field input {
+    width: 100%;
+    padding: 16px;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    font-size: 16px;
+    background: #ffffff;
+    transition: all 0.2s;
+    outline: none;
+}
+
+.form-field input:focus {
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 1px #1a73e8;
+}
+
+.form-field label {
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    color: #5f6368;
+    font-size: 16px;
+    transition: all 0.2s;
+    pointer-events: none;
+    background: white;
+    padding: 0 4px;
+}
+
+.form-field input:focus + label,
+.form-field input:not(:placeholder-shown) + label {
+    top: -8px;
+    font-size: 12px;
+    color: #1a73e8;
+}
+
+/* Material 3 Typography */
+.display-large {
+    font-size: 57px;
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.25px;
+}
+
+.display-medium {
+    font-size: 45px;
+    font-weight: 400;
+    line-height: 1.16;
+}
+
+.display-small {
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 1.22;
+}
+
+.headline-large {
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: -0.25px;
+}
+
+.headline-medium {
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.29;
+}
+
+.headline-small {
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1.33;
+}
+
+.title-large {
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.27;
+}
+
+.title-medium {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0.15px;
+}
+
+.title-small {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.43;
+    letter-spacing: 0.1px;
+}
+
+.body-large {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.5px;
+}
+
+.body-medium {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.43;
+    letter-spacing: 0.25px;
+}
+
+.body-small {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.33;
+    letter-spacing: 0.4px;
+}
+
+/* Material 3 Colors */
+.text-primary {
+    color: #202124;
+}
+
+.text-secondary {
+    color: #5f6368;
+}
+
+.text-link {
+    color: #1a73e8;
+}
+
+.text-success {
+    color: #34a853;
+}
+
+.text-warning {
+    color: #fbbc04;
+}
+
+.text-error {
+    color: #ea4335;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+    .header-content {
+        padding: 0 16px;
+    }
+    
+    .card {
+        padding: 16px;
+    }
+    
+    .card-large {
+        padding: 24px;
+    }
+}

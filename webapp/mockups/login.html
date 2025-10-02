@@ -3,132 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cognitive Coach - Login</title>
+    <title>Study Coach - Sign in</title>
+    <link rel="stylesheet" href="shared-styles.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #fafbff;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 24px;
         }
 
         .login-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.08), 0 4px 8px 3px rgba(60, 64, 67, 0.04);
+            border: 1px solid #e8eaed;
             overflow: hidden;
-            max-width: 900px;
+            max-width: 480px;
             width: 100%;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            min-height: 600px;
         }
 
         .login-form {
-            padding: 60px 40px;
+            padding: 48px 40px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
         }
 
         .brand {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
         }
 
         .brand h1 {
-            color: #333;
-            font-size: 2.2em;
-            font-weight: 700;
-            margin-bottom: 8px;
+            color: #202124;
+            font-size: 28px;
+            font-weight: 400;
+            margin-bottom: 4px;
         }
 
         .brand p {
-            color: #666;
-            font-size: 1.1em;
-            font-weight: 300;
+            color: #5f6368;
+            font-size: 14px;
         }
 
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        .form-section {
+            margin-bottom: 32px;
         }
 
         .privacy-notice {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 25px;
+            background: #e8f5e8;
+            border: 1px solid #c8e6c9;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
         }
 
         .privacy-notice h4 {
-            color: #28a745;
-            margin-bottom: 8px;
+            color: #2e7d32;
+            margin-bottom: 4px;
             font-size: 14px;
+            font-weight: 500;
             display: flex;
             align-items: center;
-        }
-
-        .privacy-notice h4::before {
-            content: "🔒";
-            margin-right: 8px;
+            gap: 8px;
         }
 
         .privacy-notice p {
             font-size: 12px;
-            color: #6c757d;
+            color: #2e7d32;
             line-height: 1.4;
+            opacity: 0.8;
         }
 
         .login-options {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 32px;
         }
 
         .remember-me {
             display: flex;
             align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #5f6368;
         }
 
         .remember-me input {
-            margin-right: 8px;
+            accent-color: #1a73e8;
         }
 
         .forgot-password {
-            color: #667eea;
+            color: #1a73e8;
             text-decoration: none;
             font-size: 14px;
         }
@@ -137,118 +126,35 @@
             text-decoration: underline;
         }
 
-        .login-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-            margin-bottom: 20px;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
+        .login-actions {
+            margin-bottom: 24px;
         }
 
         .signup-link {
             text-align: center;
-            color: #666;
+            color: #5f6368;
+            font-size: 14px;
         }
 
         .signup-link a {
-            color: #667eea;
+            color: #1a73e8;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .signup-link a:hover {
             text-decoration: underline;
         }
 
-        .info-panel {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
 
-        .info-panel::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>') repeat;
-            animation: float 20s infinite linear;
-        }
 
-        @keyframes float {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            100% { transform: translate(-100px, -100px) rotate(360deg); }
-        }
-
-        .info-content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .info-panel h2 {
-            font-size: 2em;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-
-        .info-panel p {
-            font-size: 1.1em;
-            line-height: 1.6;
-            margin-bottom: 30px;
-            opacity: 0.9;
-        }
-
-        .features {
-            list-style: none;
-        }
-
-        .features li {
-            margin-bottom: 15px;
-            padding-left: 25px;
-            position: relative;
-        }
-
-        .features li::before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #4caf50;
-            font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-            .login-container {
-                grid-template-columns: 1fr;
-                max-width: 400px;
-            }
-
-            .info-panel {
-                order: -1;
-                padding: 40px 30px;
-            }
-
+        @media (max-width: 480px) {
             .login-form {
-                padding: 40px 30px;
+                padding: 32px 24px;
             }
 
             .brand h1 {
-                font-size: 1.8em;
+                font-size: 24px;
             }
         }
     </style>
@@ -257,55 +163,54 @@
     <div class="login-container">
         <div class="login-form">
             <div class="brand">
-                <h1>Cognitive Coach</h1>
-                <p>Multi-Source Study Assistant</p>
+                <div class="brand-logo">
+                    <div class="brand-icon">
+                        <span class="material-icons-round">psychology</span>
+                    </div>
+                </div>
+                <h1>Study Coach</h1>
+                <p>Sign in to your account</p>
             </div>
 
-            <form>
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
-                </div>
+            <div class="form-section">
+                <form>
+                    <div class="form-field">
+                        <input type="email" id="email" name="email" placeholder=" " required>
+                        <label for="email">Email</label>
+                    </div>
 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                </div>
+                    <div class="form-field">
+                        <input type="password" id="password" name="password" placeholder=" " required>
+                        <label for="password">Password</label>
+                    </div>
 
-                <div class="privacy-notice">
-                    <h4>Privacy-First Design</h4>
-                    <p>All processing happens locally by default. Your study data never leaves your device unless you explicitly choose cloud features.</p>
-                </div>
+                    <div class="privacy-notice">
+                        <h4>
+                            <span class="material-icons-round" style="font-size: 16px;">shield</span>
+                            Privacy-first design
+                        </h4>
+                        <p>Your study data stays on your device unless you choose cloud features.</p>
+                    </div>
 
-                <div class="login-options">
-                    <label class="remember-me">
-                        <input type="checkbox" name="remember">
-                        <span>Remember me</span>
-                    </label>
-                    <a href="#" class="forgot-password">Forgot password?</a>
-                </div>
+                    <div class="login-options">
+                        <label class="remember-me">
+                            <input type="checkbox" name="remember">
+                            <span>Stay signed in</span>
+                        </label>
+                        <a href="#" class="forgot-password">Forgot password?</a>
+                    </div>
 
-                <button type="submit" class="login-btn">Start Studying</button>
-            </form>
+                    <div class="login-actions">
+                        <button type="submit" class="primary-button">
+                            <span class="material-icons-round">arrow_forward</span>
+                            Continue
+                        </button>
+                    </div>
+                </form>
+            </div>
 
             <div class="signup-link">
-                Don't have an account? <a href="signup.html">Sign up here</a>
-            </div>
-        </div>
-
-        <div class="info-panel">
-            <div class="info-content">
-                <h2>Study Smarter, Not Harder</h2>
-                <p>Transform your study sessions with AI-powered assistance that captures, processes, and organizes your learning materials in real-time.</p>
-                
-                <ul class="features">
-                    <li>Screen capture & OCR processing</li>
-                    <li>Webcam focus tracking</li>
-                    <li>USB camera for physical notes</li>
-                    <li>AI-generated summaries & flashcards</li>
-                    <li>Attention & focus analytics</li>
-                    <li>Local processing for privacy</li>
-                </ul>
+                New to Study Coach? <a href="signup.html">Create account</a>
             </div>
         </div>
     </div>

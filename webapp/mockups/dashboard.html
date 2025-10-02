@@ -3,625 +3,565 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cognitive Coach - Dashboard</title>
+    <title>Study Coach - Dashboard</title>
+    <link rel="stylesheet" href="shared-styles.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f8f9fa;
-            color: #333;
-        }
-
-        .header {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #667eea;
-        }
-
-        .nav {
-            display: flex;
-            gap: 30px;
-        }
-
-        .nav a {
-            text-decoration: none;
-            color: #666;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .nav a:hover, .nav a.active {
-            color: #667eea;
-        }
-
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
+        /* Dashboard-specific styles */
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 30px 20px;
+            padding: 32px 24px;
         }
 
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
+        /* Current Session Section */
         .current-session {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 32px;
         }
 
         .session-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
+            align-items: flex-start;
+            margin-bottom: 32px;
         }
 
-        .session-title h2 {
-            color: #333;
-            margin-bottom: 5px;
+        .session-title h1 {
+            font-size: 32px;
+            font-weight: 400;
+            color: #202124;
+            margin-bottom: 4px;
+            letter-spacing: -0.25px;
         }
 
         .session-status {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .start-btn {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .start-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .stop-btn {
-            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
-        }
-
-        .session-controls {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .control-card {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .control-card:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-        }
-
-        .control-card.active {
-            background: #e3f2fd;
-            border-color: #2196f3;
-        }
-
-        .control-icon {
-            font-size: 2em;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .control-label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .control-status {
-            font-size: 0.85em;
-            color: #666;
-        }
-
-        .quick-stats {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .stats-header {
-            margin-bottom: 20px;
-        }
-
-        .stats-header h3 {
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .stat-item {
+            color: #5f6368;
+            font-size: 14px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
+            gap: 8px;
         }
 
-        .stat-item:last-child {
-            border-bottom: none;
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #34a853;
+            border-radius: 50%;
         }
 
-        .stat-label {
-            color: #666;
+        /* Controls Section */
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 32px;
         }
 
-        .stat-value {
-            font-weight: 600;
-            color: #333;
+
+
+        .primary-button.stop {
+            background: #d93025;
         }
 
-        .sessions-section h2 {
-            margin-bottom: 25px;
-            color: #333;
+        .primary-button.stop:hover {
+            background: #b52d20;
         }
 
-        .sessions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
+        .primary-button.pause {
+            background: #f9ab00;
+            color: #202124;
         }
 
-        .session-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
+        .primary-button.pause:hover {
+            background: #e8900d;
         }
 
-        .session-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        .control-buttons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
+
+
+
+        /* Quick Metrics */
+        .quick-metrics {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .metric-chip {
+            background: #ffffff;
+            border: 1px solid #e8eaed;
+            border-radius: 24px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #202124;
+            box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.08);
+            transition: all 0.2s;
+        }
+
+        .metric-chip:hover {
+            box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.08), 0 4px 8px 3px rgba(60, 64, 67, 0.04);
+        }
+
+        .metric-chip.focus {
+            border-color: #34a853;
+            background: #e8f5e8;
+            color: #137333;
+        }
+
+        .metric-chip.emotion {
+            border-color: #fbbc04;
+            background: #fef7e0;
+            color: #b06000;
+        }
+
+        .metric-chip.stress {
+            border-color: #ea4335;
+            background: #fce8e6;
+            color: #c5221f;
+        }
+
+        .metric-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+
+        .metric-icon.focus {
+            background: #34a853;
+        }
+
+        .metric-icon.emotion {
+            background: #fbbc04;
+        }
+
+        .metric-icon.stress {
+            background: #ea4335;
+        }
+
+        /* Previous Sessions */
+        .sessions-header {
+            margin-bottom: 24px;
+        }
+
+        .sessions-header h2 {
+            font-size: 24px;
+            font-weight: 400;
+            color: #202124;
+            margin-bottom: 4px;
+        }
+
+        .sessions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+
 
         .session-card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .session-info h3 {
-            color: #333;
-            margin-bottom: 5px;
+            font-size: 18px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 4px;
         }
 
         .session-date {
-            color: #666;
-            font-size: 0.9em;
+            color: #5f6368;
+            font-size: 14px;
         }
 
         .session-duration {
-            background: #e3f2fd;
-            color: #1976d2;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .session-metrics {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .metric {
-            text-align: center;
-        }
-
-        .metric-value {
-            font-size: 1.5em;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .metric-value.focus { color: #28a745; }
-        .metric-value.attention { color: #ffc107; }
-        .metric-value.materials { color: #17a2b8; }
-        .metric-value.artifacts { color: #6f42c1; }
-
-        .metric-label {
-            font-size: 0.85em;
-            color: #666;
-        }
-
-        .session-preview {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-        }
-
-        .preview-title {
-            font-size: 0.9em;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-        }
-
-        .preview-topics {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .topic-tag {
-            background: #667eea;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 0.75em;
+            background: #e8f0fe;
+            color: #1a73e8;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
             font-weight: 500;
         }
 
-        .focus-indicator {
+        .session-metrics {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+
+        .session-focus-score {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 8px;
+        }
+
+        .focus-score {
+            font-size: 18px;
+            font-weight: 500;
+            color: #34a853;
         }
 
         .focus-bar {
-            flex: 1;
-            height: 8px;
-            background: #eee;
-            border-radius: 4px;
+            width: 120px;
+            height: 6px;
+            background: #e8eaed;
+            border-radius: 3px;
             overflow: hidden;
         }
 
         .focus-fill {
             height: 100%;
-            background: linear-gradient(90deg, #dc3545 0%, #ffc107 50%, #28a745 100%);
-            border-radius: 4px;
+            background: linear-gradient(90deg, #ea4335 0%, #fbbc04 50%, #34a853 100%);
+            border-radius: 3px;
             transition: width 0.3s ease;
         }
 
+        .session-metrics-chips {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            justify-content: flex-end;
+        }
+
+        .session-metric-chip {
+            background: #f8f9fa;
+            border: 1px solid #e8eaed;
+            border-radius: 16px;
+            padding: 4px 8px;
+            font-size: 12px;
+            color: #5f6368;
+            white-space: nowrap;
+        }
+
+        .session-artifacts {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .artifact-chip {
+            background: #f1f3f4;
+            border: 1px solid #dadce0;
+            border-radius: 16px;
+            padding: 4px 12px;
+            font-size: 12px;
+            color: #3c4043;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .artifact-chip.equation {
+            background: #e8f5e8;
+            border-color: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .artifact-chip.flashcard {
+            background: #fff3e0;
+            border-color: #ffcc02;
+            color: #e65100;
+        }
+
+        .artifact-chip.question {
+            background: #e3f2fd;
+            border-color: #bbdefb;
+            color: #1565c0;
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
+            .container {
+                padding: 16px;
             }
 
-            .session-controls {
-                grid-template-columns: 1fr;
+            .current-session {
+                padding: 24px;
             }
 
-            .sessions-grid {
-                grid-template-columns: 1fr;
+            .session-header h1 {
+                font-size: 28px;
+            }
+
+            .control-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .configure-button {
+                width: 56px;
+                height: 56px;
+            }
+
+            .quick-metrics {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .metric-chip {
+                justify-content: center;
             }
 
             .session-metrics {
-                grid-template-columns: repeat(2, 1fr);
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
             }
+
+            .session-focus-score {
+                justify-content: space-between;
+            }
+
+            .session-metrics-chips {
+                justify-content: flex-start;
+            }
+        }
+
+        /* Hover and interaction states */
+        .metric-chip {
+            cursor: pointer;
+        }
+
+        .artifact-chip {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .artifact-chip:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
     <header class="header">
         <div class="header-content">
-            <div class="logo">Cognitive Coach</div>
-            <nav class="nav">
-                <a href="#" class="active">Dashboard</a>
-                <a href="#">Sessions</a>
-                <a href="#">Materials</a>
-                <a href="#">Analytics</a>
-                <a href="#">Settings</a>
-            </nav>
-            <div class="user-menu">
-                <div class="user-avatar">JD</div>
+            <a href="#" class="logo">
+                <div class="logo-icon">
+                    <span class="material-icons-round">psychology</span>
+                </div>
+                Study Coach
+            </a>
+            <div class="header-actions">
+                <button class="icon-button" title="Notifications">
+                    <span class="material-icons-round">notifications</span>
+                </button>
+                <button class="icon-button" title="Settings">
+                    <span class="material-icons-round">settings</span>
+                </button>
+                <div class="user-avatar" title="Profile">JD</div>
             </div>
         </div>
     </header>
 
     <main class="container">
-        <div class="dashboard-grid">
-            <div class="current-session">
-                <div class="session-header">
-                    <div class="session-title">
-                        <h2>Current Study Session</h2>
-                        <div class="session-status">Ready to start • 3 cameras detected</div>
-                    </div>
-                    <button class="start-btn">Start Session</button>
-                </div>
-
-                <div class="session-controls">
-                    <div class="control-card">
-                        <span class="control-icon">🖥️</span>
-                        <div class="control-label">Screen Capture</div>
-                        <div class="control-status">Ready</div>
-                    </div>
-                    <div class="control-card">
-                        <span class="control-icon">👁️</span>
-                        <div class="control-label">Focus Tracking</div>
-                        <div class="control-status">Webcam detected</div>
-                    </div>
-                    <div class="control-card">
-                        <span class="control-icon">📝</span>
-                        <div class="control-label">Note Capture</div>
-                        <div class="control-status">USB camera connected</div>
+        <!-- Current Session Section -->
+        <div class="current-session card card-large">
+            <div class="session-header">
+                <div class="session-title">
+                    <h1 class="headline-large">Current Session</h1>
+                    <div class="session-status body-medium text-secondary">
+                        <div class="status-dot"></div>
+                        All systems ready • 3 cameras detected
                     </div>
                 </div>
             </div>
 
-            <div class="quick-stats">
-                <div class="stats-header">
-                    <h3>This Week</h3>
+            <div class="controls-container">
+                <div class="control-buttons">
+                    <button class="primary-button">
+                        <span class="material-icons-round">play_arrow</span>
+                        Start Session
+                    </button>
+                    <button class="icon-button-circular" title="Configure cameras">
+                        <span class="material-icons-round">settings</span>
+                    </button>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-label">Study Sessions</span>
-                    <span class="stat-value">12</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Total Study Time</span>
-                    <span class="stat-value">18h 30m</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Average Focus</span>
-                    <span class="stat-value">85%</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Materials Captured</span>
-                    <span class="stat-value">247</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Flashcards Created</span>
-                    <span class="stat-value">89</span>
+
+                <div class="quick-metrics">
+                    <div class="metric-chip focus">
+                        <div class="metric-icon focus"></div>
+                        Focus: Good
+                    </div>
+                    <div class="metric-chip emotion">
+                        <div class="metric-icon emotion"></div>
+                        Emotion: Calm
+                    </div>
+                    <div class="metric-chip stress">
+                        <div class="metric-icon stress"></div>
+                        Stress: Low
+                    </div>
                 </div>
             </div>
         </div>
 
-        <section class="sessions-section">
-            <h2>Recent Study Sessions</h2>
-            <div class="sessions-grid">
-                <div class="session-card">
-                    <div class="session-card-header">
-                        <div class="session-info">
-                            <h3>Organic Chemistry Review</h3>
-                            <div class="session-date">Today, 2:30 PM</div>
-                        </div>
-                        <div class="session-duration">2h 15m</div>
+        <!-- Previous Sessions Section -->
+        <div class="sessions-header">
+            <h2 class="headline-small">Previous sessions</h2>
+        </div>
+        <div class="sessions-list">
+            <div class="session-card card">
+                <div class="session-card-header">
+                    <div class="session-info">
+                        <h3 class="title-large">Organic Chemistry Review</h3>
+                        <div class="session-date body-small text-secondary">Today, 2:30 PM</div>
                     </div>
+                    <div class="session-duration">2h 15m</div>
+                </div>
 
-                    <div class="focus-indicator">
-                        <span style="font-size: 0.9em; color: #666;">Focus Score:</span>
+                <div class="session-metrics">
+                    <div class="session-focus-score">
+                        <span class="focus-score">88%</span>
                         <div class="focus-bar">
                             <div class="focus-fill" style="width: 88%;"></div>
                         </div>
-                        <span style="font-size: 0.9em; font-weight: 600; color: #28a745;">88%</span>
                     </div>
-
-                    <div class="session-metrics">
-                        <div class="metric">
-                            <div class="metric-value attention">78%</div>
-                            <div class="metric-label">Attention</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value materials">34</div>
-                            <div class="metric-label">Materials</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value artifacts">12</div>
-                            <div class="metric-label">Flashcards</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value artifacts">3</div>
-                            <div class="metric-label">Summaries</div>
-                        </div>
-                    </div>
-
-                    <div class="session-preview">
-                        <div class="preview-title">Topics Covered:</div>
-                        <div class="preview-topics">
-                            <span class="topic-tag">Alkenes</span>
-                            <span class="topic-tag">Stereochemistry</span>
-                            <span class="topic-tag">Reactions</span>
-                        </div>
+                    <div class="session-metrics-chips">
+                        <div class="session-metric-chip">34 materials</div>
+                        <div class="session-metric-chip">78% attention</div>
                     </div>
                 </div>
 
-                <div class="session-card">
-                    <div class="session-card-header">
-                        <div class="session-info">
-                            <h3>Calculus Problem Solving</h3>
-                            <div class="session-date">Yesterday, 7:45 PM</div>
-                        </div>
-                        <div class="session-duration">1h 45m</div>
+                <div class="session-artifacts">
+                    <div class="artifact-chip equation">
+                        <span class="material-icons-round" style="font-size: 12px;">functions</span>
+                        12 equations
                     </div>
-
-                    <div class="focus-indicator">
-                        <span style="font-size: 0.9em; color: #666;">Focus Score:</span>
-                        <div class="focus-bar">
-                            <div class="focus-fill" style="width: 92%;"></div>
-                        </div>
-                        <span style="font-size: 0.9em; font-weight: 600; color: #28a745;">92%</span>
+                    <div class="artifact-chip flashcard">
+                        <span class="material-icons-round" style="font-size: 12px;">quiz</span>
+                        15 flashcards
                     </div>
-
-                    <div class="session-metrics">
-                        <div class="metric">
-                            <div class="metric-value attention">89%</div>
-                            <div class="metric-label">Attention</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value materials">28</div>
-                            <div class="metric-label">Materials</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value artifacts">15</div>
-                            <div class="metric-label">Flashcards</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value artifacts">2</div>
-                            <div class="metric-label">Summaries</div>
-                        </div>
-                    </div>
-
-                    <div class="session-preview">
-                        <div class="preview-title">Topics Covered:</div>
-                        <div class="preview-topics">
-                            <span class="topic-tag">Integration</span>
-                            <span class="topic-tag">U-substitution</span>
-                            <span class="topic-tag">Area</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="session-card">
-                    <div class="session-card-header">
-                        <div class="session-info">
-                            <h3>World History Reading</h3>
-                            <div class="session-date">2 days ago, 3:15 PM</div>
-                        </div>
-                        <div class="session-duration">3h 20m</div>
-                    </div>
-
-                    <div class="focus-indicator">
-                        <span style="font-size: 0.9em; color: #666;">Focus Score:</span>
-                        <div class="focus-bar">
-                            <div class="focus-fill" style="width: 76%;"></div>
-                        </div>
-                        <span style="font-size: 0.9em; font-weight: 600; color: #ffc107;">76%</span>
-                    </div>
-
-                    <div class="session-metrics">
-                        <div class="metric">
-                            <div class="metric-value attention">72%</div>
-                            <div class="metric-label">Attention</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value materials">45</div>
-                            <div class="metric-label">Materials</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value artifacts">18</div>
-                            <div class="metric-label">Flashcards</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value artifacts">5</div>
-                            <div class="metric-label">Summaries</div>
-                        </div>
-                    </div>
-
-                    <div class="session-preview">
-                        <div class="preview-title">Topics Covered:</div>
-                        <div class="preview-topics">
-                            <span class="topic-tag">WWI</span>
-                            <span class="topic-tag">Treaties</span>
-                            <span class="topic-tag">Causes</span>
-                            <span class="topic-tag">Timeline</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="session-card">
-                    <div class="session-card-header">
-                        <div class="session-info">
-                            <h3>Physics Lab Analysis</h3>
-                            <div class="session-date">3 days ago, 1:00 PM</div>
-                        </div>
-                        <div class="session-duration">2h 50m</div>
-                    </div>
-
-                    <div class="focus-indicator">
-                        <span style="font-size: 0.9em; color: #666;">Focus Score:</span>
-                        <div class="focus-bar">
-                            <div class="focus-fill" style="width: 94%;"></div>
-                        </div>
-                        <span style="font-size: 0.9em; font-weight: 600; color: #28a745;">94%</span>
-                    </div>
-
-                    <div class="session-metrics">
-                        <div class="metric">
-                            <div class="metric-value attention">91%</div>
-                            <div class="metric-label">Attention</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value materials">31</div>
-                            <div class="metric-label">Materials</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value artifacts">9</div>
-                            <div class="metric-label">Flashcards</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value artifacts">4</div>
-                            <div class="metric-label">Summaries</div>
-                        </div>
-                    </div>
-
-                    <div class="session-preview">
-                        <div class="preview-title">Topics Covered:</div>
-                        <div class="preview-topics">
-                            <span class="topic-tag">Momentum</span>
-                            <span class="topic-tag">Collisions</span>
-                            <span class="topic-tag">Energy</span>
-                        </div>
+                    <div class="artifact-chip question">
+                        <span class="material-icons-round" style="font-size: 12px;">help</span>
+                        3 questions
                     </div>
                 </div>
             </div>
-        </section>
+
+            <div class="session-card card">
+                <div class="session-card-header">
+                    <div class="session-info">
+                        <h3 class="title-large">Calculus Problem Solving</h3>
+                        <div class="session-date body-small text-secondary">Yesterday, 7:45 PM</div>
+                    </div>
+                    <div class="session-duration">1h 45m</div>
+                </div>
+
+                <div class="session-metrics">
+                    <div class="session-focus-score">
+                        <span class="focus-score">92%</span>
+                        <div class="focus-bar">
+                            <div class="focus-fill" style="width: 92%;"></div>
+                        </div>
+                    </div>
+                    <div class="session-metrics-chips">
+                        <div class="session-metric-chip">28 materials</div>
+                        <div class="session-metric-chip">89% attention</div>
+                    </div>
+                </div>
+
+                <div class="session-artifacts">
+                    <div class="artifact-chip equation">
+                        <span class="material-icons-round" style="font-size: 12px;">functions</span>
+                        18 equations
+                    </div>
+                    <div class="artifact-chip flashcard">
+                        <span class="material-icons-round" style="font-size: 12px;">quiz</span>
+                        15 flashcards
+                    </div>
+                    <div class="artifact-chip question">
+                        <span class="material-icons-round" style="font-size: 12px;">help</span>
+                        2 questions
+                    </div>
+                </div>
+            </div>
+
+            <div class="session-card card">
+                <div class="session-card-header">
+                    <div class="session-info">
+                        <h3 class="title-large">World History Reading</h3>
+                        <div class="session-date body-small text-secondary">2 days ago, 3:15 PM</div>
+                    </div>
+                    <div class="session-duration">3h 20m</div>
+                </div>
+
+                <div class="session-metrics">
+                    <div class="session-focus-score">
+                        <span class="focus-score">76%</span>
+                        <div class="focus-bar">
+                            <div class="focus-fill" style="width: 76%;"></div>
+                        </div>
+                    </div>
+                    <div class="session-metrics-chips">
+                        <div class="session-metric-chip">45 materials</div>
+                        <div class="session-metric-chip">72% attention</div>
+                    </div>
+                </div>
+
+                <div class="session-artifacts">
+                    <div class="artifact-chip flashcard">
+                        <span class="material-icons-round" style="font-size: 12px;">quiz</span>
+                        18 flashcards
+                    </div>
+                    <div class="artifact-chip question">
+                        <span class="material-icons-round" style="font-size: 12px;">help</span>
+                        5 questions
+                    </div>
+                </div>
+            </div>
+
+            <div class="session-card card">
+                <div class="session-card-header">
+                    <div class="session-info">
+                        <h3 class="title-large">Physics Lab Analysis</h3>
+                        <div class="session-date body-small text-secondary">3 days ago, 1:00 PM</div>
+                    </div>
+                    <div class="session-duration">2h 50m</div>
+                </div>
+
+                <div class="session-metrics">
+                    <div class="session-focus-score">
+                        <span class="focus-score">94%</span>
+                        <div class="focus-bar">
+                            <div class="focus-fill" style="width: 94%;"></div>
+                        </div>
+                    </div>
+                    <div class="session-metrics-chips">
+                        <div class="session-metric-chip">31 materials</div>
+                        <div class="session-metric-chip">91% attention</div>
+                    </div>
+                </div>
+
+                <div class="session-artifacts">
+                    <div class="artifact-chip equation">
+                        <span class="material-icons-round" style="font-size: 12px;">functions</span>
+                        8 equations
+                    </div>
+                    <div class="artifact-chip flashcard">
+                        <span class="material-icons-round" style="font-size: 12px;">quiz</span>
+                        9 flashcards
+                    </div>
+                    <div class="artifact-chip question">
+                        <span class="material-icons-round" style="font-size: 12px;">help</span>
+                        4 questions
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 </body>
 </html>
