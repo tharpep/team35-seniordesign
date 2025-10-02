@@ -1,7 +1,219 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './Dashboard.css';
+
+interface Session {
+    id: string;
+    title: string;
+    date: string;
+    duration: string;
+    focusScore: number;
+    materials: number;
+    attention: number;
+    artifacts: {
+        equations?: number;
+        flashcards?: number;
+        questions?: number;
+    };
+}
+
 export default function Dashboard() {
+    const navigate = useNavigate();
+    const [isSessionActive, setIsSessionActive] = useState(false);
+
+    const sessions: Session[] = [
+        {
+            id: '1',
+            title: 'Organic Chemistry Review',
+            date: 'Today, 2:30 PM',
+            duration: '2h 15m',
+            focusScore: 88,
+            materials: 34,
+            attention: 78,
+            artifacts: { equations: 12, flashcards: 15, questions: 3 }
+        },
+        {
+            id: '2',
+            title: 'Calculus Problem Solving',
+            date: 'Yesterday, 7:45 PM',
+            duration: '1h 45m',
+            focusScore: 92,
+            materials: 28,
+            attention: 89,
+            artifacts: { equations: 18, flashcards: 15, questions: 2 }
+        },
+        {
+            id: '3',
+            title: 'World History Reading',
+            date: '2 days ago, 3:15 PM',
+            duration: '3h 20m',
+            focusScore: 76,
+            materials: 45,
+            attention: 72,
+            artifacts: { flashcards: 18, questions: 5 }
+        },
+        {
+            id: '4',
+            title: 'Physics Lab Analysis',
+            date: '3 days ago, 1:00 PM',
+            duration: '2h 50m',
+            focusScore: 94,
+            materials: 31,
+            attention: 91,
+            artifacts: { equations: 8, flashcards: 9, questions: 4 }
+        }
+    ];
+
+    const handleStartSession = () => {
+        setIsSessionActive(true);
+        // TODO: Implement session start logic
+    };
+
+    const handleSessionClick = () => {
+        navigate(`/session`);
+    };
+
+    const renderArtifacts = (artifacts: Session['artifacts']) => {
+        const items = [];
+        if (artifacts.equations) {
+            items.push(
+                <div key="equations" className="artifact-chip equation">
+                    <span className="material-icons-round" style={{fontSize: '12px'}}>functions</span>
+                    {artifacts.equations} equations
+                </div>
+            );
+        }
+        if (artifacts.flashcards) {
+            items.push(
+                <div key="flashcards" className="artifact-chip flashcard">
+                    <span className="material-icons-round" style={{fontSize: '12px'}}>quiz</span>
+                    {artifacts.flashcards} flashcards
+                </div>
+            );
+        }
+        if (artifacts.questions) {
+            items.push(
+                <div key="questions" className="artifact-chip question">
+                    <span className="material-icons-round" style={{fontSize: '12px'}}>help</span>
+                    {artifacts.questions} questions
+                </div>
+            );
+        }
+        return items;
+    };
+
     return (
         <>
-            <h1>Dashboard Page</h1>
+            <header className="header">
+                <div className="header-content">
+                    <a href="#" className="logo">
+                        <div className="logo-icon">
+                            <span className="material-icons-round">psychology</span>
+                        </div>
+                        Study Coach
+                    </a>
+                    <div className="header-actions">
+                        <button className="icon-button" title="Notifications">
+                            <span className="material-icons-round">notifications</span>
+                        </button>
+                        <button className="icon-button" title="Settings">
+                            <span className="material-icons-round">settings</span>
+                        </button>
+                        <div className="user-avatar" title="Profile">JD</div>
+                    </div>
+                </div>
+            </header>
+
+            <main className="dashboard-container">
+                {/* Current Session Section */}
+                <div className="current-session card card-large">
+                    <div className="session-title">
+                        <h1>Current Session</h1>
+                        <div className="session-status">
+                            <div className="status-dot"></div>
+                            All systems ready • 3 cameras detected
+                        </div>
+                    </div>
+
+                    <div className="controls-container">
+                        <div className="control-buttons">
+                            <button 
+                                className={`primary-button ${isSessionActive ? 'stop' : ''}`}
+                                onClick={handleStartSession}
+                            >
+                                <span className="material-icons-round">
+                                    {isSessionActive ? 'stop' : 'play_arrow'}
+                                </span>
+                                {isSessionActive ? 'Stop Session' : 'Start Session'}
+                            </button>
+                            <button className="icon-button-circular" title="Configure cameras">
+                                <span className="material-icons-round">settings</span>
+                            </button>
+                        </div>
+
+                        <div className="quick-metrics">
+                            <div className="metric-chip focus">
+                                <div className="metric-icon focus"></div>
+                                Focus: Good
+                            </div>
+                            <div className="metric-chip emotion">
+                                <div className="metric-icon emotion"></div>
+                                Emotion: Calm
+                            </div>
+                            <div className="metric-chip stress">
+                                <div className="metric-icon stress"></div>
+                                Stress: Low
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Previous Sessions Section */}
+                <div className="sessions-header">
+                    <h2>Previous sessions</h2>
+                </div>
+                <div className="sessions-list">
+                    {sessions.map((session) => (
+                        <div 
+                            key={session.id} 
+                            className="session-card"
+                            onClick={handleSessionClick}
+                        >
+                            <div className="session-card-header">
+                                <div className="session-info">
+                                    <h3>{session.title}</h3>
+                                    <div className="session-date">{session.date}</div>
+                                </div>
+                                <div className="session-duration">{session.duration}</div>
+                            </div>
+
+                            <div className="session-metrics">
+                                <div className="session-focus-score">
+                                    <span className="focus-score">{session.focusScore}%</span>
+                                    <div className="focus-bar">
+                                        <div 
+                                            className="focus-fill" 
+                                            style={{width: `${session.focusScore}%`}}
+                                        ></div>
+                                    </div>
+                                </div>
+                                <div className="session-metrics-chips">
+                                    <div className="session-metric-chip">
+                                        {session.materials} materials
+                                    </div>
+                                    <div className="session-metric-chip">
+                                        {session.attention}% attention
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="session-artifacts">
+                                {renderArtifacts(session.artifacts)}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </main>
         </>
     );
 }

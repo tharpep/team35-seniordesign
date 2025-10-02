@@ -8,7 +8,7 @@ export default function AppRouter() {
     <Routes>
       <Route path="/" element={<Dashboard />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/session/" element={<SessionDetail />} />
+      <Route path="/session" element={<SessionDetail />} />
     </Routes>
   );
 }
