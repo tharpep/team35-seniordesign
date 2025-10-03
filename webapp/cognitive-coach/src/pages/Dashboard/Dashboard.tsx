@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
-import ConfigurePopup from './ConfigurePopup';
-import CurrentSession from './CurrentSession';
+import ConfigurePopup from '../../components/ConfigurePopup/ConfigurePopup';
+import CurrentSession from '../../components/CurrentSession/CurrentSession';
 
 interface Session {
     id: string;

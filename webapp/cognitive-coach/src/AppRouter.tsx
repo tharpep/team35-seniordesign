@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
-import Dashboard from './Dashboard';
-import Login from './Login';
-import SessionDetail from './SessionDetail';
+import Dashboard from './pages/Dashboard/Dashboard';
+import Login from './pages/Login/Login';
+import SessionDetail from './pages/SessionDetail/SessionDetail';
 
 export default function AppRouter() {
   return (
