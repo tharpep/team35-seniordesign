@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
+import ConfigurePopup from '../../components/ConfigurePopup/ConfigurePopup';
+import CurrentSession from '../../components/CurrentSession/CurrentSession';
 
 interface Session {
     id: string;
@@ -19,7 +21,7 @@ interface Session {
 
 export default function Dashboard() {
     const navigate = useNavigate();
-    const [isSessionActive, setIsSessionActive] = useState(false);
+    const [isConfigurePopupOpen, setIsConfigurePopupOpen] = useState(false);
 
     const sessions: Session[] = [
         {
@@ -64,13 +66,16 @@ export default function Dashboard() {
         }
     ];
 
-    const handleStartSession = () => {
-        setIsSessionActive(true);
-        // TODO: Implement session start logic
-    };
-
     const handleSessionClick = () => {
         navigate(`/session`);
+    };
+
+    const handleConfigureClick = () => {
+        setIsConfigurePopupOpen(true);
+    };
+
+    const handleCloseConfigurePopup = () => {
+        setIsConfigurePopupOpen(false);
     };
 
     const renderArtifacts = (artifacts: Session['artifacts']) => {
@@ -126,47 +131,7 @@ export default function Dashboard() {
 
             <main className="dashboard-container">
                 {/* Current Session Section */}
-                <div className="current-session card card-large">
-                    <div className="session-title">
-                        <h1>Current Session</h1>
-                        <div className="session-status">
-                            <div className="status-dot"></div>
-                            All systems ready • 3 cameras detected
-                        </div>
-                    </div>
-
-                    <div className="controls-container">
-                        <div className="control-buttons">
-                            <button 
-                                className={`primary-button ${isSessionActive ? 'stop' : ''}`}
-                                onClick={handleStartSession}
-                            >
-                                <span className="material-icons-round">
-                                    {isSessionActive ? 'stop' : 'play_arrow'}
-                                </span>
-                                {isSessionActive ? 'Stop Session' : 'Start Session'}
-                            </button>
-                            <button className="icon-button-circular" title="Configure cameras">
-                                <span className="material-icons-round">settings</span>
-                            </button>
-                        </div>
-
-                        <div className="quick-metrics">
-                            <div className="metric-chip focus">
-                                <div className="metric-icon focus"></div>
-                                Focus: Good
-                            </div>
-                            <div className="metric-chip emotion">
-                                <div className="metric-icon emotion"></div>
-                                Emotion: Calm
-                            </div>
-                            <div className="metric-chip stress">
-                                <div className="metric-icon stress"></div>
-                                Stress: Low
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <CurrentSession onConfigureClick={handleConfigureClick} />
 
                 {/* Previous Sessions Section */}
                 <div className="sessions-header">
@@ -214,6 +179,11 @@ export default function Dashboard() {
                     ))}
                 </div>
             </main>
+            
+            <ConfigurePopup 
+                isOpen={isConfigurePopupOpen}
+                onClose={handleCloseConfigurePopup}
+            />
         </>
     );
 }

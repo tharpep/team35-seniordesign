@@ -1,0 +1,341 @@
+/* Configure Popup Styles */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.popup-container {
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(60, 64, 67, 0.15);
+    border: 1px solid #e8eaed;
+    max-width: 800px;
+    width: 90vw;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-container:has(.video-preview),
+.popup-container:has(.webcam-video) {
+    max-height: 85vh;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32px 32px 24px 32px;
+    border-bottom: 1px solid #e8eaed;
+    background: #fafbff;
+}
+
+.popup-header h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 400;
+    color: #202124;
+    flex: 1;
+}
+
+.close-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #5f6368;
+    transition: all 0.2s ease;
+}
+
+.close-button:hover {
+    background: rgba(95, 99, 104, 0.1);
+}
+
+.popup-content {
+    flex: 1;
+    padding: 0px 32px 32px 32px;
+    overflow-y: auto;
+}
+
+/* Preview Selector Styles */
+.preview-selector {
+    margin: 24px 0;
+}
+
+.button-group {
+    display: flex;
+    gap: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #dadce0;
+    background: #ffffff;
+}
+
+.preview-button {
+    flex: 1;
+    padding: 16px 20px;
+    border: none;
+    background: #ffffff;
+    color: #5f6368;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border-right: 1px solid #dadce0;
+}
+
+.preview-button:last-child {
+    border-right: none;
+}
+
+.preview-button:hover {
+    background: #f8f9fa;
+}
+
+.preview-button.active {
+    background: #1a73e8;
+    color: #ffffff;
+}
+
+.preview-button.active:hover {
+    background: #1557b0;
+}
+
+.preview-button .material-icons-round {
+    font-size: 20px;
+}
+
+/* Camera Preview Styles */
+.camera-preview {
+    margin-top: 24px;
+}
+
+.preview-container {
+    background: #f8f9fa;
+    border: 2px dashed #dadce0;
+    border-radius: 16px;
+    text-align: center;
+    padding: 64px 32px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-icon {
+    font-size: 64px;
+    color: #5f6368;
+    margin-bottom: 16px;
+}
+
+.preview-container h4 {
+    color: #202124;
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 8px 0;
+}
+
+.preview-container p {
+    color: #5f6368;
+    font-size: 14px;
+    margin: 0 0 24px 0;
+}
+
+/* Screen Recording Specific Styles */
+.start-recording-button {
+    background: #1a73e8;
+    color: #ffffff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 8px;
+}
+
+.start-recording-button:hover {
+    background: #1557b0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+}
+
+.stop-recording-button {
+    background: #ea4335;
+    color: #ffffff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stop-recording-button:hover {
+    background: #d33b2c;
+}
+
+/* Video Preview Styles */
+.video-preview {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000000;
+}
+
+.preview-container:has(.video-preview) {
+    padding: 16px;
+}
+
+.screen-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000000;
+}
+
+.webcam-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000000;
+    transform: scaleX(-1); /* Mirror the webcam video */
+}
+
+.video-controls {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+}
+
+/* Animation Styles */
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.preview-icon.error {
+    color: #ea4335;
+}
+
+/* Animation */
+@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.popup-container {
+    animation: popupFadeIn 0.2s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .popup-container {
+        width: 95vw;
+        max-height: 90vh;
+        border-radius: 16px;
+    }
+    
+    .popup-container:has(.video-preview) {
+        max-height: 95vh;
+    }
+    
+    .popup-header {
+        padding: 24px 24px 20px 24px;
+    }
+    
+    .popup-header h2 {
+        font-size: 24px;
+    }
+    
+    .popup-content {
+        padding: 24px;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .preview-button {
+        border-right: none;
+        border-bottom: 1px solid #dadce0;
+    }
+    
+    .preview-button:last-child {
+        border-bottom: none;
+    }
+    
+    .preview-container {
+        padding: 48px 24px;
+        min-height: 200px;
+    }
+    
+    .preview-container:has(.video-preview) {
+        padding: 12px;
+    }
+    
+    .preview-icon {
+        font-size: 48px;
+    }
+    
+    .start-recording-button {
+        padding: 14px 20px;
+        font-size: 16px;
+    }
+    
+    .video-controls {
+        bottom: 12px;
+    }
+    
+    .stop-recording-button {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+}

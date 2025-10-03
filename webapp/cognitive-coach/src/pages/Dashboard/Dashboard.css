@@ -5,33 +5,7 @@
     padding: 32px 24px;
 }
 
-/* Current Session Section */
-.current-session {
-    margin-bottom: 32px;
-}
-
-.session-title h1 {
-    font-size: 32px;
-    font-weight: 400;
-    color: #202124;
-    margin-bottom: 4px;
-    letter-spacing: -0.25px;
-}
-
-.session-status {
-    color: #5f6368;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-    background: #34a853;
-    border-radius: 50%;
-}
+/* Dashboard specific styles - Current Session styles moved to CurrentSession.css */
 
 /* Controls Section */
 .controls-container {
@@ -65,71 +39,17 @@
     gap: 12px;
 }
 
-
-
-/* Quick Metrics */
-.quick-metrics {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    flex-wrap: wrap;
+/* Session control button sizing */
+.control-buttons .primary-button.pause,
+.control-buttons .primary-button.stop {
+    flex: 1;
+    min-width: 0;
+    max-width: calc(50% - 6px); /* Account for half the gap between buttons */
 }
 
-.metric-chip {
-    background: #ffffff;
-    border: 1px solid #e8eaed;
-    border-radius: 24px;
-    padding: 12px 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #202124;
-    box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.08);
-    transition: all 0.2s;
-    cursor: pointer;
-}
 
-.metric-chip:hover {
-    box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.08), 0 4px 8px 3px rgba(60, 64, 67, 0.04);
-}
 
-.metric-chip.focus {
-    border-color: #34a853;
-    background: #e8f5e8;
-    color: #137333;
-}
-
-.metric-chip.emotion {
-    border-color: #fbbc04;
-    background: #fef7e0;
-    color: #b06000;
-}
-
-.metric-chip.stress {
-    border-color: #ea4335;
-    background: #fce8e6;
-    color: #c5221f;
-}
-
-.metric-icon {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-}
-
-.metric-icon.focus {
-    background: #34a853;
-}
-
-.metric-icon.emotion {
-    background: #fbbc04;
-}
-
-.metric-icon.stress {
-    background: #ea4335;
-}
+/* Current Session styles moved to CurrentSession.css */
 
 /* Previous Sessions */
 .sessions-header {
@@ -324,5 +244,14 @@
 
     .session-metrics-chips {
         justify-content: flex-start;
+    }
+
+    .session-timer {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin-top: 8px;
+        font-size: 16px;
+        align-self: flex-start;
     }
 }
