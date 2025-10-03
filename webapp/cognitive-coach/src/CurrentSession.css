@@ -1,0 +1,167 @@
+/* Current Session Component Styles */
+.current-session {
+    margin-bottom: 32px;
+}
+
+.session-title {
+    position: relative;
+}
+
+.session-title h1 {
+    font-size: 32px;
+    font-weight: 400;
+    color: #202124;
+    margin-bottom: 4px;
+    letter-spacing: -0.25px;
+}
+
+.session-status {
+    color: #5f6368;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background: #34a853;
+    border-radius: 50%;
+}
+
+.session-timer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #1a73e8;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 18px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+}
+
+/* Controls Section */
+.controls-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.control-buttons {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.primary-button.pause {
+    background: #f9ab00;
+}
+
+.primary-button.pause:hover {
+    background: #e8a317;
+}
+
+.primary-button.stop {
+    background: #d93025;
+}
+
+.primary-button.stop:hover {
+    background: #b52d20;
+}
+
+.quick-metrics {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.metric-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #202124;
+}
+
+.metric-chip.focus {
+    background: rgba(52, 168, 83, 0.1);
+    color: #137333;
+}
+
+.metric-chip.emotion {
+    background: rgba(26, 115, 232, 0.1);
+    color: #1a73e8;
+}
+
+.metric-chip.stress {
+    background: rgba(251, 188, 4, 0.1);
+    color: #f29900;
+}
+
+.metric-icon {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.metric-icon.focus {
+    background: #34a853;
+}
+
+.metric-icon.emotion {
+    background: #1a73e8;
+}
+
+.metric-icon.stress {
+    background: #fbbc04;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .controls-container {
+        gap: 20px;
+    }
+
+    .control-buttons {
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .control-buttons .primary-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .control-buttons .icon-button-circular {
+        align-self: center;
+    }
+
+    .quick-metrics {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .metric-chip {
+        justify-content: center;
+    }
+
+    .session-timer {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin-top: 8px;
+        font-size: 16px;
+        align-self: flex-start;
+    }
+}
