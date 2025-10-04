@@ -66,8 +66,9 @@ export default function Dashboard() {
         }
     ];
 
-    const handleSessionClick = () => {
-        navigate(`/session`);
+    // Updated to navigate with sessionId
+    const handleSessionClick = (sessionId: string) => {
+        navigate(`/session/${sessionId}`);
     };
 
     const handleConfigureClick = () => {
@@ -142,7 +143,8 @@ export default function Dashboard() {
                         <div 
                             key={session.id} 
                             className="session-card"
-                            onClick={handleSessionClick}
+                            onClick={() => handleSessionClick(session.id)}
+                            style={{ cursor: 'pointer' }}
                         >
                             <div className="session-card-header">
                                 <div className="session-info">

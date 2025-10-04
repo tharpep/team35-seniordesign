@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './SessionDetail.css';
+import { api } from '../../services/api';
+import { subscribeToMaterials, unsubscribeFromMaterials } from '../../services/socket';
 
 interface TimelineEvent {
     time: string;
@@ -27,20 +29,54 @@ export default function SessionDetail() {
     const [activeTab, setActiveTab] = useState('focus');
     const [activeArtifactTab, setActiveArtifactTab] = useState('all');
     const [chatMessage, setChatMessage] = useState('');
+    
+    // New state for fetched materials
+    const [materials, setMaterials] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Fetch materials on mount and subscribe to real-time updates
+    useEffect(() => {
+        if (!sessionId) return;
+
+        const fetchMaterials = async () => {
+            try {
+                setIsLoading(true);
+                const data = await api.getMaterials(sessionId);
+                setMaterials(data);
+                console.log(`Fetched ${data.length} materials for session ${sessionId}`);
+            } catch (error) {
+                console.error('Error fetching materials:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchMaterials();
+
+        // Subscribe to real-time material updates
+        subscribeToMaterials(sessionId, (newMaterial: any) => {
+            console.log('Received new material via WebSocket:', newMaterial);
+            setMaterials(prev => [...prev, newMaterial]);
+        });
+
+        // Cleanup on unmount
+        return () => {
+            unsubscribeFromMaterials(sessionId);
+        };
+    }, [sessionId]);
 
     // Mock data - in real app, this would come from API based on sessionId
-    console.log('Session ID:', sessionId); // TODO: Use sessionId to fetch actual data
     const sessionData = {
         title: 'Organic Chemistry Review',
         date: 'Today, 2:30 PM - 4:45 PM',
         duration: '2h 15m',
-        sessionId: '#2847',
+        sessionId: `#${sessionId}`,
         status: 'Completed',
         metrics: {
             focusScore: 88,
             attention: 78,
-            materials: 34,
-            artifacts: 15
+            materials: materials.length,
+            artifacts: materials.length
         }
     };
 
@@ -99,7 +135,6 @@ export default function SessionDetail() {
 
     const handleSendMessage = () => {
         if (chatMessage.trim()) {
-            // TODO: Implement AI chat functionality
             console.log('Sending message:', chatMessage);
             setChatMessage('');
         }
@@ -190,6 +225,81 @@ export default function SessionDetail() {
 
                 <div className="content-grid">
                     <div className="main-content">
+                        {/* NEW SECTION: Display Raw Materials from Database */}
+                        <div className="section card">
+                            <h2>
+                                <span className="material-icons-round section-icon">storage</span>
+                                Generated Materials from Database (Raw Data)
+                            </h2>
+                            
+                            {isLoading ? (
+                                <div style={{ padding: '20px', textAlign: 'center', color: '#5f6368' }}>
+                                    Loading materials...
+                                </div>
+                            ) : materials.length === 0 ? (
+                                <div style={{ 
+                                    padding: '20px', 
+                                    textAlign: 'center', 
+                                    color: '#5f6368',
+                                    background: '#f8f9fa',
+                                    borderRadius: '8px'
+                                }}>
+                                    No materials generated yet. Materials will appear here in real-time when generated.
+                                </div>
+                            ) : (
+                                <div style={{
+                                    background: '#f8f9fa',
+                                    padding: '16px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #e8eaed',
+                                    maxHeight: '500px',
+                                    overflow: 'auto'
+                                }}>
+                                    <div style={{ 
+                                        marginBottom: '12px', 
+                                        color: '#34a853',
+                                        fontWeight: 500,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px'
+                                    }}>
+                                        <span className="material-icons-round" style={{fontSize: '16px'}}>check_circle</span>
+                                        {materials.length} material(s) loaded from database
+                                    </div>
+                                    <pre style={{
+                                        margin: 0,
+                                        padding: '12px',
+                                        background: '#ffffff',
+                                        borderRadius: '4px',
+                                        fontSize: '12px',
+                                        lineHeight: '1.5',
+                                        overflow: 'auto',
+                                        border: '1px solid #dadce0'
+                                    }}>
+                                        {JSON.stringify(materials, null, 2)}
+                                    </pre>
+                                </div>
+                            )}
+                            
+                            <div style={{
+                                marginTop: '16px',
+                                padding: '12px',
+                                background: '#e8f0fe',
+                                borderRadius: '8px',
+                                fontSize: '13px',
+                                color: '#1a73e8',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}>
+                                <span className="material-icons-round" style={{fontSize: '16px'}}>info</span>
+                                <span>
+                                    This displays raw data from the database. WebSocket is listening for new materials in real-time.
+                                    New materials will automatically appear here when added to the database.
+                                </span>
+                            </div>
+                        </div>
+
                         <div className="section card">
                             <h2>
                                 <span className="material-icons-round section-icon">analytics</span>
@@ -224,7 +334,7 @@ export default function SessionDetail() {
                         <div className="section card">
                             <h2>
                                 <span className="material-icons-round section-icon">auto_awesome</span>
-                                Study Artifacts
+                                Study Artifacts (Mock UI)
                             </h2>
                             <div className="tabs">
                                 <button 

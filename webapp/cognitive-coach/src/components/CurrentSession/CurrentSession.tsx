@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import './CurrentSession.css';
+import { api } from '../../services/api';
 
 type SessionState = 'idle' | 'active' | 'paused';
 
@@ -9,8 +10,9 @@ interface CurrentSessionProps {
 
 export default function CurrentSession({ onConfigureClick }: CurrentSessionProps) {
     const [sessionState, setSessionState] = useState<SessionState>('idle');
-    const [sessionTime, setSessionTime] = useState(0); // in seconds
+    const [sessionTime, setSessionTime] = useState(0);
     const [captureCount, setCaptureCount] = useState(0);
+    const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
     
     const timerIntervalRef = useRef<number | null>(null);
     const captureIntervalRef = useRef<number | null>(null);
@@ -18,7 +20,6 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
     const webcamStreamRef = useRef<MediaStream | null>(null);
     const captureCountRef = useRef<number>(0);
 
-    // Timer effect - runs every second when session is active
     useEffect(() => {
         if (sessionState === 'active') {
             timerIntervalRef.current = window.setInterval(() => {
@@ -38,32 +39,28 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
         };
     }, [sessionState]);
 
-    // Capture effect - runs every 5 seconds when session is active
     useEffect(() => {
-        if (sessionState === 'active') {
+        if (sessionState === 'active' && currentSessionId) {
             captureIntervalRef.current = window.setInterval(async () => {
-                // Update ref and state
                 captureCountRef.current += 1;
                 const newCount = captureCountRef.current;
                 const timestamp = new Date().toLocaleTimeString();
                 
-                // Get current session time from state
                 setSessionTime(currentTime => {
                     console.log(`Capture ${newCount} at ${timestamp} - Session time: ${formatTime(currentTime)}`);
-                    return currentTime; // Don't modify, just access
+                    return currentTime;
                 });
                 
-                // Capture photos asynchronously
                 try {
-                    const webcamSuccess = await captureWebcamPhoto();
-                    const screenSuccess = await captureScreenPhoto();
+                    const webcamSuccess = await captureAndUploadWebcam();
+                    const screenSuccess = await captureAndUploadScreen();
                     
                     if (webcamSuccess && screenSuccess) {
-                        console.log(`✓ Both webcam and screen photos captured successfully`);
+                        console.log(`✓ Both webcam and screen photos captured & uploaded`);
                     } else if (webcamSuccess) {
-                        console.log(`✓ Webcam photo captured, ✗ Screen capture failed`);
+                        console.log(`✓ Webcam captured, ✗ Screen capture failed`);
                     } else if (screenSuccess) {
-                        console.log(`✗ Webcam capture failed, ✓ Screen photo captured`);
+                        console.log(`✗ Webcam failed, ✓ Screen captured`);
                     } else {
                         console.log(`✗ Both captures failed`);
                     }
@@ -71,7 +68,6 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
                     console.error('Error during photo capture:', error);
                 }
                 
-                // Update the state for UI
                 setCaptureCount(newCount);
             }, 5000);
         } else {
@@ -86,16 +82,14 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
                 clearInterval(captureIntervalRef.current);
             }
         };
-    }, [sessionState]);
+    }, [sessionState, currentSessionId]);
 
-    // Cleanup on component unmount
     useEffect(() => {
         return () => {
             cleanupStreams();
         };
     }, []);
 
-    // Format time helper function
     const formatTime = (seconds: number): string => {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
@@ -108,53 +102,67 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
         }
     };
 
-    // Initialize camera streams
     const initializeStreams = async () => {
-        try {
-            // Initialize webcam stream
-            if (!webcamStreamRef.current) {
+        let hasAtLeastOneStream = false;
+
+        // Try to initialize webcam (optional)
+        if (!webcamStreamRef.current) {
+            try {
                 const webcamStream = await navigator.mediaDevices.getUserMedia({
                     video: true,
                     audio: false
                 });
                 webcamStreamRef.current = webcamStream;
+                hasAtLeastOneStream = true;
+                console.log('✓ Webcam initialized');
+            } catch (error) {
+                console.warn('⚠ Webcam not available:', error.message);
             }
+        } else {
+            hasAtLeastOneStream = true;
+        }
 
-            // Initialize screen capture stream
-            if (!screenStreamRef.current) {
+        // Try to initialize screen capture (optional)
+        if (!screenStreamRef.current) {
+            try {
                 const screenStream = await navigator.mediaDevices.getDisplayMedia({
                     video: true,
                     audio: false
                 });
                 screenStreamRef.current = screenStream;
+                hasAtLeastOneStream = true;
+                console.log('✓ Screen capture initialized');
 
-                // Handle screen share ending
                 screenStream.getVideoTracks()[0].addEventListener('ended', () => {
                     screenStreamRef.current = null;
                     console.log('Screen sharing ended by user');
                 });
+            } catch (error) {
+                console.warn('⚠ Screen capture not available:', error.message);
             }
+        } else {
+            hasAtLeastOneStream = true;
+        }
 
-            return true;
-        } catch (error) {
-            console.error('Failed to initialize camera streams:', error);
+        if (!hasAtLeastOneStream) {
+            console.error('No camera or screen capture available');
+            alert('Please allow access to at least a webcam or screen sharing to start a session.');
             return false;
         }
+
+        return true;
     };
 
-    // Capture photo from webcam
-    const captureWebcamPhoto = async (): Promise<boolean> => {
+    const captureAndUploadWebcam = async (): Promise<boolean> => {
         try {
-            if (!webcamStreamRef.current) {
-                return false;
-            }
+            if (!webcamStreamRef.current || !currentSessionId) return false;
 
             const video = document.createElement('video');
             video.srcObject = webcamStreamRef.current;
             video.play();
 
             return new Promise((resolve) => {
-                video.onloadedmetadata = () => {
+                video.onloadedmetadata = async () => {
                     const canvas = document.createElement('canvas');
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
@@ -162,9 +170,23 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
                     const ctx = canvas.getContext('2d');
                     if (ctx) {
                         ctx.drawImage(video, 0, 0);
-                        // Photo captured successfully (not storing, just discarding)
-                        video.remove();
-                        resolve(true);
+                        
+                        // Convert canvas to blob
+                        canvas.toBlob(async (blob) => {
+                            if (blob && currentSessionId) {
+                                try {
+                                    await api.uploadFrame(currentSessionId, blob, 'webcam');
+                                    console.log('Webcam frame uploaded successfully');
+                                    resolve(true);
+                                } catch (error) {
+                                    console.error('Failed to upload webcam frame:', error);
+                                    resolve(false);
+                                }
+                            } else {
+                                resolve(false);
+                            }
+                            video.remove();
+                        }, 'image/jpeg', 0.9);
                     } else {
                         video.remove();
                         resolve(false);
@@ -177,19 +199,16 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
         }
     };
 
-    // Capture photo from screen
-    const captureScreenPhoto = async (): Promise<boolean> => {
+    const captureAndUploadScreen = async (): Promise<boolean> => {
         try {
-            if (!screenStreamRef.current) {
-                return false;
-            }
+            if (!screenStreamRef.current || !currentSessionId) return false;
 
             const video = document.createElement('video');
             video.srcObject = screenStreamRef.current;
             video.play();
 
             return new Promise((resolve) => {
-                video.onloadedmetadata = () => {
+                video.onloadedmetadata = async () => {
                     const canvas = document.createElement('canvas');
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
@@ -197,9 +216,23 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
                     const ctx = canvas.getContext('2d');
                     if (ctx) {
                         ctx.drawImage(video, 0, 0);
-                        // Photo captured successfully (not storing, just discarding)
-                        video.remove();
-                        resolve(true);
+                        
+                        // Convert canvas to blob
+                        canvas.toBlob(async (blob) => {
+                            if (blob && currentSessionId) {
+                                try {
+                                    await api.uploadFrame(currentSessionId, blob, 'screen');
+                                    console.log('Screen frame uploaded successfully');
+                                    resolve(true);
+                                } catch (error) {
+                                    console.error('Failed to upload screen frame:', error);
+                                    resolve(false);
+                                }
+                            } else {
+                                resolve(false);
+                            }
+                            video.remove();
+                        }, 'image/jpeg', 0.9);
                     } else {
                         video.remove();
                         resolve(false);
@@ -212,7 +245,6 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
         }
     };
 
-    // Cleanup streams
     const cleanupStreams = () => {
         if (webcamStreamRef.current) {
             webcamStreamRef.current.getTracks().forEach(track => track.stop());
@@ -227,11 +259,22 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
     const handleStartSession = async () => {
         const streamsInitialized = await initializeStreams();
         if (streamsInitialized) {
-            setSessionState('active');
-            setSessionTime(0);
-            setCaptureCount(0);
-            captureCountRef.current = 0;
-            console.log('Session started - streams initialized');
+            try {
+                // Create session in backend
+                const session = await api.createSession({
+                    title: 'Study Session ' + new Date().toLocaleString()
+                });
+                
+                setCurrentSessionId(session.id);
+                setSessionState('active');
+                setSessionTime(0);
+                setCaptureCount(0);
+                captureCountRef.current = 0;
+                console.log('Session started - ID:', session.id);
+            } catch (error) {
+                console.error('Failed to create session:', error);
+                cleanupStreams();
+            }
         } else {
             console.error('Failed to start session - could not initialize camera streams');
         }
@@ -242,18 +285,40 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
         console.log('Session resumed');
     };
 
-    const handlePauseSession = () => {
+    const handlePauseSession = async () => {
         setSessionState('paused');
+        
+        if (currentSessionId) {
+            try {
+                await api.updateSession(currentSessionId, { status: 'paused' });
+            } catch (error) {
+                console.error('Failed to update session status:', error);
+            }
+        }
+        
         console.log('Session paused');
     };
 
-    const handleStopSession = () => {
+    const handleStopSession = async () => {
+        if (currentSessionId) {
+            try {
+                await api.updateSession(currentSessionId, {
+                    status: 'completed',
+                    end_time: new Date().toISOString(),
+                    duration: sessionTime
+                });
+            } catch (error) {
+                console.error('Failed to update session:', error);
+            }
+        }
+        
         cleanupStreams();
         setSessionState('idle');
         setSessionTime(0);
         setCaptureCount(0);
         captureCountRef.current = 0;
-        console.log('Session stopped - streams cleaned up');
+        setCurrentSessionId(null);
+        console.log('Session stopped');
     };
 
     return (
