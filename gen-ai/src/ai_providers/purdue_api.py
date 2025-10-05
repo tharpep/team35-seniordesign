@@ -7,12 +7,13 @@ import json
 import os
 import urllib.request
 import urllib.error
-from typing import Optional
+from typing import Optional, List, Any
+from .base_client import BaseLLMClient
 
 # Load environment variables from .env file
 def load_env_file():
     """Load environment variables from .env file"""
-    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+    env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env')
     if os.path.exists(env_path):
         with open(env_path, 'r') as f:
             for line in f:
@@ -24,7 +25,7 @@ def load_env_file():
 load_env_file()
 
 
-class PurdueGenAI:
+class PurdueGenAI(BaseLLMClient):
     """Simple client for Purdue GenAI Studio"""
     
     def __init__(self, api_key: Optional[str] = None):
@@ -39,22 +40,30 @@ class PurdueGenAI:
             raise ValueError("API key is required. Provide it directly or set PURDUE_API_KEY environment variable.")
         self.base_url = "https://genai.rcac.purdue.edu/api/chat/completions"
     
-    def chat(self, message: str, model: str = "llama3.1:latest") -> str:
+    def chat(self, messages: Any, model: Optional[str] = None, **kwargs) -> str:
         """
         Send a message and get a response
         
         Args:
-            message: Your message to the AI
+            messages: Your message (str) or messages list
             model: Model to use (default: llama3.1:latest)
             
         Returns:
             str: AI response
-            
-        Raises:
-            Exception: If API call fails
         """
+        # Use default model if none specified
+        if model is None:
+            model = "llama3.1:latest"
+            
+        # Handle both string and message list formats
+        if isinstance(messages, list):
+            messages = messages
+        elif isinstance(messages, str):
+            messages = [{"role": "user", "content": messages}]
+        else:
+            messages = [{"role": "user", "content": str(messages)}]
+        
         try:
-            # Prepare request
             headers = {
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json"
@@ -62,7 +71,7 @@ class PurdueGenAI:
             
             body = {
                 "model": model,
-                "messages": [{"role": "user", "content": message}],
+                "messages": messages,
                 "stream": False
             }
             
@@ -83,6 +92,15 @@ class PurdueGenAI:
             raise Exception(f"HTTP Error {e.code}: {error_text}")
         except Exception as e:
             raise Exception(f"Error calling Purdue GenAI: {str(e)}")
+    
+    def get_available_models(self) -> List[str]:
+        """Get list of available models (hardcoded for Purdue)"""
+        return [
+            "llama3.1:latest",
+            "llama3.1:70b",
+            "mistral:latest",
+            "mixtral:latest"
+        ]
 
 
 # Example usage
@@ -90,9 +108,9 @@ if __name__ == "__main__":
     # Debug: Check if environment variable is loaded
     api_key = os.getenv('PURDUE_API_KEY')
     if api_key:
-        print(f"✅ Found API key: {api_key[:10]}...")
+        print(f" Found API key")
     else:
-        print("❌ No API key found in environment variables")
+        print(" No API key found in environment variables")
         print("Make sure your .env file contains: PURDUE_API_KEY=your-key-here")
         exit(1)
     

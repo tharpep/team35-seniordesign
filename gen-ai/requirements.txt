@@ -1,1 +1,12 @@
-# No external dependencies required - uses Python standard library
+# Core dependencies for RAG system
+sentence-transformers>=2.2.2
+qdrant-client>=1.7.0
+httpx>=0.25.0
+
+# Optional dependencies for enhanced functionality
+torch>=2.0.0
+transformers>=4.30.0
+
+# Development and testing
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
