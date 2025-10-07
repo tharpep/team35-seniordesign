@@ -10,8 +10,6 @@ interface CurrentSessionProps {
 export default function CurrentSession({ onConfigureClick }: CurrentSessionProps) {
     const [sessionState, setSessionState] = useState<SessionState>('idle');
     const [sessionTime, setSessionTime] = useState(0); // in seconds
-    const [captureCount, setCaptureCount] = useState(0);
-    
     const timerIntervalRef = useRef<number | null>(null);
     const captureIntervalRef = useRef<number | null>(null);
     const screenStreamRef = useRef<MediaStream | null>(null);
@@ -70,9 +68,6 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
                 } catch (error) {
                     console.error('Error during photo capture:', error);
                 }
-                
-                // Update the state for UI
-                setCaptureCount(newCount);
             }, 5000);
         } else {
             if (captureIntervalRef.current) {
@@ -229,7 +224,6 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
         if (streamsInitialized) {
             setSessionState('active');
             setSessionTime(0);
-            setCaptureCount(0);
             captureCountRef.current = 0;
             console.log('Session started - streams initialized');
         } else {
@@ -251,7 +245,6 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
         cleanupStreams();
         setSessionState('idle');
         setSessionTime(0);
-        setCaptureCount(0);
         captureCountRef.current = 0;
         console.log('Session stopped - streams cleaned up');
     };

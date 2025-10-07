@@ -38,9 +38,9 @@ export default function CreateAccount() {
     };
 
     return (
-        <div className="create-account-page">
-            <div className="create-account-container">
-                <div className="create-account-form">
+        <div className="auth-page create-account-page">
+            <div className="auth-container create-account-container">
+                <div className="auth-form create-account-form">
                     <div className="brand">
                         <div className="brand-logo">
                             <div className="brand-icon">

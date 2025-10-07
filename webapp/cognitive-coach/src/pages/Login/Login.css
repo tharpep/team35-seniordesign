@@ -1,109 +1,7 @@
-/* Login specific styles */
-.login-page {
-    background: #fafbff;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-}
-
+/* Login specific styles - using common auth patterns */
 .login-container {
-    background: #ffffff;
-    border-radius: 24px;
-    box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.08), 0 4px 8px 3px rgba(60, 64, 67, 0.04);
-    border: 1px solid #e8eaed;
-    overflow: hidden;
+    /* Uses .auth-container from App.css */
     max-width: 480px;
-    width: 100%;
-}
-
-.login-form {
-    padding: 48px 40px;
-    display: flex;
-    flex-direction: column;
-}
-
-.brand {
-    text-align: center;
-    margin-bottom: 32px;
-}
-
-.brand-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.brand-icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 20px;
-}
-
-.brand h1 {
-    color: #202124;
-    font-size: 28px;
-    font-weight: 400;
-    margin-bottom: 4px;
-}
-
-.brand p {
-    color: #5f6368;
-    font-size: 14px;
-}
-
-.form-section {
-    margin-bottom: 32px;
-}
-
-/* Login specific form field adjustments */
-.form-field input {
-    padding: 16px 16px 8px 16px;
-}
-
-.form-field label {
-    top: 12px;
-}
-
-.form-field input:focus + label,
-.form-field input:not(:placeholder-shown) + label {
-    top: -8px;
-    font-size: 12px;
-    color: #1a73e8;
-}
-
-.privacy-notice {
-    background: #e8f5e8;
-    border: 1px solid #c8e6c9;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 24px;
-}
-
-.privacy-notice h4 {
-    color: #2e7d32;
-    margin-bottom: 4px;
-    font-size: 14px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.privacy-notice p {
-    font-size: 12px;
-    color: #2e7d32;
-    line-height: 1.4;
-    opacity: 0.8;
 }
 
 .login-options {
@@ -116,17 +14,17 @@
 .remember-me {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacing-sm);
     font-size: 14px;
-    color: #5f6368;
+    color: var(--md-on-surface-variant);
 }
 
 .remember-me input {
-    accent-color: #1a73e8;
+    accent-color: var(--md-primary);
 }
 
 .forgot-password {
-    color: #1a73e8;
+    color: var(--md-primary);
     text-decoration: none;
     font-size: 14px;
 }
@@ -142,23 +40,23 @@
 /* Login specific button adjustments */
 .login-actions .primary-button {
     width: 100%;
-    border-radius: 8px;
-    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md) var(--spacing-xl);
 }
 
 .login-actions .primary-button:focus {
-    outline: 2px solid #1a73e8;
+    outline: 2px solid var(--md-primary);
     outline-offset: 2px;
 }
 
 .signup-link {
     text-align: center;
-    color: #5f6368;
+    color: var(--md-on-surface-variant);
     font-size: 14px;
 }
 
 .signup-link a {
-    color: #1a73e8;
+    color: var(--md-primary);
     text-decoration: none;
     font-weight: 500;
 }

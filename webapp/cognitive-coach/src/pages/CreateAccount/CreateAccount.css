@@ -1,75 +1,14 @@
 /* Create Account specific styles */
-.create-account-page {
-    background: #fafbff;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-}
-
 .create-account-container {
-    background: #ffffff;
-    border-radius: 24px;
-    box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.08), 0 4px 8px 3px rgba(60, 64, 67, 0.04);
-    border: 1px solid #e8eaed;
-    overflow: hidden;
+    /* Uses .auth-container from App.css */
     max-width: 520px;
-    width: 100%;
 }
 
-.create-account-form {
-    padding: 48px 40px;
-    display: flex;
-    flex-direction: column;
-}
-
-.brand {
-    text-align: center;
-    margin-bottom: 32px;
-}
-
-.brand-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.brand-icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 20px;
-}
-
-.brand h1 {
-    color: #202124;
-    font-size: 28px;
-    font-weight: 400;
-    margin-bottom: 4px;
-}
-
-.brand p {
-    color: #5f6368;
-    font-size: 14px;
-}
-
-.form-section {
-    margin-bottom: 32px;
-}
-
-/* Name fields in a row */
+/* Create Account specific layout */
 .name-fields {
     display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
 }
 
 .name-fields .form-field {
@@ -77,68 +16,27 @@
     margin-bottom: 0;
 }
 
-/* Create Account specific form field adjustments */
-.form-field input {
-    padding: 16px 16px 8px 16px;
-}
-
-.form-field label {
-    top: 12px;
-}
-
-.form-field input:focus + label,
-.form-field input:not(:placeholder-shown) + label {
-    top: -8px;
-    font-size: 12px;
-    color: #1a73e8;
-}
-
-.privacy-notice {
-    background: #e8f5e8;
-    border: 1px solid #c8e6c9;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 24px;
-}
-
-.privacy-notice h4 {
-    color: #2e7d32;
-    margin-bottom: 4px;
-    font-size: 14px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.privacy-notice p {
-    font-size: 12px;
-    color: #2e7d32;
-    line-height: 1.4;
-    opacity: 0.8;
-}
-
 .terms-agreement {
-    margin-bottom: 32px;
+    margin-bottom: var(--spacing-xxl);
 }
 
 .terms-checkbox {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
+    gap: var(--spacing-sm);
     font-size: 14px;
-    color: #5f6368;
+    color: var(--md-on-surface-variant);
     line-height: 1.4;
 }
 
 .terms-checkbox input {
-    accent-color: #1a73e8;
+    accent-color: var(--md-primary);
     margin-top: 2px;
     flex-shrink: 0;
 }
 
 .terms-link {
-    color: #1a73e8;
+    color: var(--md-primary);
     text-decoration: none;
 }
 
@@ -147,29 +45,29 @@
 }
 
 .create-account-actions {
-    margin-bottom: 24px;
+    margin-bottom: var(--spacing-xl);
 }
 
 /* Create Account specific button adjustments */
 .create-account-actions .primary-button {
     width: 100%;
-    border-radius: 8px;
-    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md) var(--spacing-xl);
 }
 
 .create-account-actions .primary-button:focus {
-    outline: 2px solid #1a73e8;
+    outline: 2px solid var(--md-primary);
     outline-offset: 2px;
 }
 
 .login-link {
     text-align: center;
-    color: #5f6368;
+    color: var(--md-on-surface-variant);
     font-size: 14px;
 }
 
 .login-link a {
-    color: #1a73e8;
+    color: var(--md-primary);
     text-decoration: none;
     font-weight: 500;
 }
@@ -180,27 +78,19 @@
 
 /* Responsive adjustments */
 @media (max-width: 576px) {
-    .create-account-form {
-        padding: 32px 24px;
-    }
-
-    .brand h1 {
-        font-size: 24px;
-    }
-
     .name-fields {
         flex-direction: column;
         gap: 0;
     }
 
     .name-fields .form-field {
-        margin-bottom: 24px;
+        margin-bottom: var(--spacing-xl);
     }
 }
 
 @media (max-width: 480px) {
     .create-account-container {
         max-width: 100%;
-        border-radius: 16px;
+        border-radius: var(--radius-md);
     }
 }
