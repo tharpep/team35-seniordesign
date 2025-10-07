@@ -17,9 +17,9 @@ export default function Login() {
     };
 
     return (
-        <div className="login-page">
-            <div className="login-container">
-                <div className="login-form">
+        <div className="auth-page login-page">
+            <div className="auth-container login-container">
+                <div className="auth-form login-form">
                     <div className="brand">
                         <div className="brand-logo">
                             <div className="brand-icon">

@@ -1,0 +1,96 @@
+/* Create Account specific styles */
+.create-account-container {
+    /* Uses .auth-container from App.css */
+    max-width: 520px;
+}
+
+/* Create Account specific layout */
+.name-fields {
+    display: flex;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.name-fields .form-field {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.terms-agreement {
+    margin-bottom: var(--spacing-xxl);
+}
+
+.terms-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    font-size: 14px;
+    color: var(--md-on-surface-variant);
+    line-height: 1.4;
+}
+
+.terms-checkbox input {
+    accent-color: var(--md-primary);
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.terms-link {
+    color: var(--md-primary);
+    text-decoration: none;
+}
+
+.terms-link:hover {
+    text-decoration: underline;
+}
+
+.create-account-actions {
+    margin-bottom: var(--spacing-xl);
+}
+
+/* Create Account specific button adjustments */
+.create-account-actions .primary-button {
+    width: 100%;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md) var(--spacing-xl);
+}
+
+.create-account-actions .primary-button:focus {
+    outline: 2px solid var(--md-primary);
+    outline-offset: 2px;
+}
+
+.login-link {
+    text-align: center;
+    color: var(--md-on-surface-variant);
+    font-size: 14px;
+}
+
+.login-link a {
+    color: var(--md-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .name-fields {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .name-fields .form-field {
+        margin-bottom: var(--spacing-xl);
+    }
+}
+
+@media (max-width: 480px) {
+    .create-account-container {
+        max-width: 100%;
+        border-radius: var(--radius-md);
+    }
+}
