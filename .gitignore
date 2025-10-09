@@ -371,6 +371,9 @@ datasets/
 docs/build/
 docs/_build/
 
+
+webapp/uploads/
+
 # Project-specific exceptions
 # Allow important project files
 !gen-ai/src/
@@ -386,3 +389,4 @@ docs/_build/
 !**/*.json
 !**/*.ini
 !**/*.txt
+
