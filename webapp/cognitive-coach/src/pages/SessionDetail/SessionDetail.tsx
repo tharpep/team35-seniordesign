@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './SessionDetail.css';
+import mockFlashcards from '../../assets/data/mockFlashcards.json';
+import mockMCQ from '../../assets/data/mockMCQ.json';
+import mockInsights from '../../assets/data/mockInsights.json';
+import ArtifactPopupController from '../../components/ArtifactPopup/ArtifactPopupController';
+import type { PopupState } from '../../components/ArtifactPopup/types';
 
 interface TimelineEvent {
     time: string;
@@ -10,7 +15,7 @@ interface TimelineEvent {
 
 interface Artifact {
     id: string;
-    type: 'flashcard' | 'summary' | 'quiz';
+    type: 'flashcard' | 'MCQ' | 'equation';
     title: string;
     preview: string;
 }
@@ -25,8 +30,17 @@ export default function SessionDetail() {
     const navigate = useNavigate();
     const { sessionId } = useParams();
     const [activeTab, setActiveTab] = useState('focus');
-    const [activeArtifactTab, setActiveArtifactTab] = useState('all');
+        const [activeArtifactTab, setActiveArtifactTab] = useState<'all' | 'flashcard' | 'MCQ' | 'equation'>('all')
     const [chatMessage, setChatMessage] = useState('');
+    const [popup, setPopup] = useState<PopupState>({
+        isOpen: false,
+        type: null,
+        currentIndex: 0,
+        showHint: false,
+        showBack: false,
+        selectedAnswer: null,
+        showExplanation: false
+    });
 
     // Mock data - in real app, this would come from API based on sessionId
     console.log('Session ID:', sessionId); // TODO: Use sessionId to fetch actual data
@@ -52,50 +66,49 @@ export default function SessionDetail() {
         { time: '4:45', title: 'Session Ended', description: 'Review completed' }
     ];
 
-    const artifacts: Artifact[] = [
+    // Create artifacts from mock data - show all examples
+    const flashcardArtifacts: Artifact[] = mockFlashcards.cards.map((card, index) => ({
+        id: `fc_${index + 1}`,
+        type: 'flashcard' as const,
+        title: '', // No title needed for flashcards
+        preview: card.front
+    }));
+
+    const mcqArtifacts: Artifact[] = mockMCQ.questions.map((question, index) => ({
+        id: `mcq_${index + 1}`,
+        type: 'MCQ' as const,
+        title: '', // No title needed for MCQ
+        preview: question.stem
+    }));
+
+    const equationArtifacts: Artifact[] = [
         {
-            id: '1',
-            type: 'flashcard',
-            title: 'Alkene Reactions',
-            preview: 'Q: What is the major product of hydrobromination of 2-methylpropene?\nA: 2-bromo-2-methylpropane (Markovnikov addition)'
+            id: 'eq_1',
+            type: 'equation' as const,
+            title: 'Markovnikov Addition',
+            preview: 'R₂C=CH₂ + HX → R₂CH-CH₂X'
         },
         {
-            id: '2',
-            type: 'summary',
-            title: 'Stereochemistry Principles',
-            preview: 'Covers chirality, optical activity, and R/S nomenclature. Key concepts include...'
+            id: 'eq_2',
+            type: 'equation' as const,
+            title: 'E2 Elimination',
+            preview: 'R₃C-CHR-X + Base → R₂C=CR + HX + Base-H⁺'
         },
         {
-            id: '3',
-            type: 'flashcard',
-            title: 'Elimination vs Substitution',
-            preview: 'Q: When does E2 elimination occur preferentially over SN2?\nA: With bulky bases and secondary/tertiary substrates'
-        },
-        {
-            id: '4',
-            type: 'summary',
-            title: 'Reaction Mechanisms',
-            preview: 'Overview of SN1, SN2, E1, and E2 mechanisms with examples and conditions...'
+            id: 'eq_3',
+            type: 'equation' as const,
+            title: 'Ozonolysis',
+            preview: 'R₂C=CR₂ + O₃ → R₂C=O + O=CR₂'
         }
     ];
 
-    const insights: Insight[] = [
-        {
-            title: 'Strong Performance',
-            description: 'Your focus was consistently high during reaction mechanism practice. Consider similar deep-focus sessions for complex topics.',
-            icon: 'trending_up'
-        },
-        {
-            title: 'Attention Pattern',
-            description: 'Attention decreased after 90 minutes. Consider taking shorter, more frequent breaks.',
-            icon: 'psychology'
-        },
-        {
-            title: 'Material Coverage',
-            description: 'You spent 60% of time on new material and 40% reviewing. Good balance for retention.',
-            icon: 'balance'
-        }
-    ];
+    const artifacts: Artifact[] = [...flashcardArtifacts, ...mcqArtifacts, ...equationArtifacts];
+
+    const insights: Insight[] = mockInsights.insights.slice(0, 3).map((insight, index) => ({
+        title: insight.title,
+        description: insight.takeaway,
+        icon: index === 0 ? 'trending_up' : index === 1 ? 'psychology' : 'balance'
+    }));
 
     const handleSendMessage = () => {
         if (chatMessage.trim()) {
@@ -109,6 +122,52 @@ export default function SessionDetail() {
         if (e.key === 'Enter') {
             handleSendMessage();
         }
+    };
+
+    const handleArtifactClick = (artifactType: 'flashcard' | 'MCQ' | 'equation') => {
+        setPopup({
+            isOpen: true,
+            type: artifactType,
+            currentIndex: 0,
+            showHint: false,
+            showBack: false,
+            selectedAnswer: null,
+            showExplanation: false
+        });
+    };
+
+    const closePopup = () => {
+        setPopup({
+            isOpen: false,
+            type: null,
+            currentIndex: 0,
+            showHint: false,
+            showBack: false,
+            selectedAnswer: null,
+            showExplanation: false
+        });
+    };
+
+    const navigatePopup = (direction: 'next' | 'prev') => {
+        if (!popup.type) return;
+        
+        let maxIndex = 0;
+        if (popup.type === 'flashcard') maxIndex = flashcardArtifacts.length - 1;
+        else if (popup.type === 'MCQ') maxIndex = mcqArtifacts.length - 1;
+        else if (popup.type === 'equation') maxIndex = equationArtifacts.length - 1;
+
+        const newIndex = direction === 'next' 
+            ? Math.min(popup.currentIndex + 1, maxIndex)
+            : Math.max(popup.currentIndex - 1, 0);
+
+        setPopup(prev => ({
+            ...prev,
+            currentIndex: newIndex,
+            showHint: false,
+            showBack: false,
+            selectedAnswer: null,
+            showExplanation: false
+        }));
     };
 
     const filteredArtifacts = activeArtifactTab === 'all' 
@@ -240,25 +299,31 @@ export default function SessionDetail() {
                                     Flashcards ({artifacts.filter(a => a.type === 'flashcard').length})
                                 </button>
                                 <button 
-                                    className={`tab ${activeArtifactTab === 'summary' ? 'active' : ''}`}
-                                    onClick={() => setActiveArtifactTab('summary')}
+                                    className={`tab ${activeArtifactTab === 'MCQ' ? 'active' : ''}`}
+                                    onClick={() => setActiveArtifactTab('MCQ')}
                                 >
-                                    Summaries ({artifacts.filter(a => a.type === 'summary').length})
+                                    MCQ ({artifacts.filter(a => a.type === 'MCQ').length})
                                 </button>
                                 <button 
-                                    className={`tab ${activeArtifactTab === 'quiz' ? 'active' : ''}`}
-                                    onClick={() => setActiveArtifactTab('quiz')}
+                                    className={`tab ${activeArtifactTab === 'equation' ? 'active' : ''}`}
+                                    onClick={() => setActiveArtifactTab('equation')}
                                 >
-                                    Quizzes (0)
+                                    Equations ({artifacts.filter(a => a.type === 'equation').length})
                                 </button>
                             </div>
                             <div className="artifact-grid">
                                 {filteredArtifacts.map((artifact) => (
-                                    <div key={artifact.id} className="artifact-card">
+                                    <div 
+                                        key={artifact.id} 
+                                        className="artifact-card"
+                                        onClick={() => handleArtifactClick(artifact.type)}
+                                    >
                                         <div className={`artifact-type ${artifact.type}`}>
                                             {artifact.type.charAt(0).toUpperCase() + artifact.type.slice(1)}
                                         </div>
-                                        <div className="artifact-title">{artifact.title}</div>
+                                        {artifact.type === 'equation' && (
+                                            <div className="artifact-title">{artifact.title}</div>
+                                        )}
                                         <div className="artifact-preview">{artifact.preview}</div>
                                     </div>
                                 ))}
@@ -353,6 +418,22 @@ export default function SessionDetail() {
                     </div>
                 </div>
             </main>
+
+            {/* Artifact Popup */}
+            {popup.isOpen && (
+                <ArtifactPopupController
+                    popup={popup}
+                    closePopup={closePopup}
+                    navigatePopup={navigatePopup}
+                    setPopup={setPopup}
+                    totalCount={
+                        popup.type === 'flashcard' ? flashcardArtifacts.length :
+                        popup.type === 'MCQ' ? mcqArtifacts.length :
+                        popup.type === 'equation' ? equationArtifacts.length :
+                        0
+                    }
+                />
+            )}
         </>
     );
 }
