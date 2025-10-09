@@ -365,3 +365,5 @@ datasets/
 # Generated documentation
 docs/build/
 docs/_build/
+
+webapp/uploads/

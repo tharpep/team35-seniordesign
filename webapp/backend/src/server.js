@@ -1,0 +1,164 @@
+const express = require('express');
+const session = require('express-session');
+const cors = require('cors');
+const http = require('http');
+const { Server } = require('socket.io');
+const path = require('path');
+require('dotenv').config();
+
+// Import routes
+const authRoutes = require('./routes/auth');
+const sessionRoutes = require('./routes/sessions');
+const materialRoutes = require('./routes/materials');
+
+// Import database to ensure connection
+const { db } = require('./config/database');
+
+// Initialize Express app
+const app = express();
+const server = http.createServer(app);
+
+// Initialize Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true
+  }
+});
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
+}));
+
+// Session configuration
+const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key-change-this',
+  name: process.env.SESSION_NAME || 'cognitive_coach_session',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: parseInt(process.env.SESSION_MAX_AGE) || 86400000 // 24 hours
+  }
+});
+
+app.use(sessionMiddleware);
+
+// Share session with Socket.IO
+io.use((socket, next) => {
+  sessionMiddleware(socket.request, {}, next);
+});
+
+// Make io accessible in routes
+app.set('io', io);
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/sessions', sessionRoutes);
+app.use('/api/materials', materialRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    message: 'Cognitive Coach backend is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log(`[Socket.IO] Client connected: ${socket.id}`);
+
+  // Join session room
+  socket.on('join-session', (data) => {
+    const { sessionId } = data;
+    socket.join(`session-${sessionId}`);
+    console.log(`[Socket.IO] Client ${socket.id} joined session-${sessionId}`);
+  });
+
+  // Leave session room
+  socket.on('leave-session', (data) => {
+    const { sessionId } = data;
+    socket.leave(`session-${sessionId}`);
+    console.log(`[Socket.IO] Client ${socket.id} left session-${sessionId}`);
+  });
+
+  // Disconnect
+  socket.on('disconnect', () => {
+    console.log(`[Socket.IO] Client disconnected: ${socket.id}`);
+  });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ 
+        error: 'File too large',
+        message: 'Uploaded file exceeds maximum size limit'
+      });
+    }
+  }
+  
+  res.status(500).json({ 
+    error: 'Server error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'An error occurred'
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ 
+    error: 'Not found',
+    message: 'The requested resource was not found'
+  });
+});
+
+// Start server
+const PORT = process.env.PORT || 3001;
+
+server.listen(PORT, () => {
+  console.log('\n=================================');
+  console.log('🚀 Cognitive Coach Backend Server');
+  console.log('=================================');
+  console.log(`✓ Server running on port ${PORT}`);
+  console.log(`✓ API: http://localhost:${PORT}/api`);
+  console.log(`✓ WebSocket: ws://localhost:${PORT}`);
+  console.log(`✓ Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log('=================================\n');
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, closing server...');
+  server.close(() => {
+    console.log('Server closed');
+    db.close(() => {
+      console.log('Database connection closed');
+      process.exit(0);
+    });
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('\nSIGINT received, closing server...');
+  server.close(() => {
+    console.log('Server closed');
+    db.close(() => {
+      console.log('Database connection closed');
+      process.exit(0);
+    });
+  });
+});
+
+module.exports = { app, server, io };
