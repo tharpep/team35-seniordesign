@@ -1,0 +1,140 @@
+{
+  "artifact_type": "insights",
+  "version": "1.0.0",
+  "insights": [
+    {
+      "id": "insight_001",
+      "title": "Alkene Reaction Mechanism Mastery",
+      "takeaway": "Your understanding of alkene addition reactions is strong, particularly with Markovnikov's rule and carbocation stability patterns.",
+      "bullets": [
+        "Consistently applied Markovnikov's rule correctly in hydrobromination reactions",
+        "Demonstrated good understanding of carbocation stability (3° > 2° > 1°)",
+        "Successfully distinguished between syn and anti addition mechanisms",
+        "Showed strong grasp of regioselectivity in addition reactions"
+      ],
+      "action_items": [
+        "Practice more anti-Markovnikov reactions with radical conditions",
+        "Work on stereochemical outcomes of different addition reactions",
+        "Review ozonolysis and other oxidative cleavage reactions",
+        "Practice predicting products with multiple functional groups"
+      ],
+      "misconceptions": [
+        "Occasionally confused syn/anti addition with E/Z isomerism",
+        "Need to review why peroxides cause anti-Markovnikov addition",
+        "Sometimes forgot to consider stereochemistry in addition reactions"
+      ],
+      "confidence": 0.88,
+      "source_refs": ["alkene_reactions_session", "markovnikov_practice_problems"]
+    },
+    {
+      "id": "insight_002",
+      "title": "Stereochemistry and Chirality Concepts",
+      "takeaway": "Strong performance on R/S nomenclature and chiral center identification, but need more practice with complex molecules containing multiple stereocenters.",
+      "bullets": [
+        "Correctly identified chiral centers in simple molecules",
+        "Applied Cahn-Ingold-Prelog priority rules accurately",
+        "Good understanding of enantiomers vs diastereomers",
+        "Recognized the relationship between optical activity and chirality"
+      ],
+      "action_items": [
+        "Practice R/S assignment with molecules having multiple chiral centers",
+        "Work on meso compounds and internal planes of symmetry",
+        "Study Fischer projections and their conversions",
+        "Practice relating 3D structures to 2D representations"
+      ],
+      "misconceptions": [
+        "Sometimes confused priority assignments with complex substituents",
+        "Need to review how to handle double bonds in priority rules",
+        "Occasional errors when visualizing 3D orientation from 2D drawings"
+      ],
+      "confidence": 0.82,
+      "source_refs": ["stereochemistry_principles", "r_s_nomenclature_practice"]
+    },
+    {
+      "id": "insight_003",
+      "title": "SN1 vs SN2 Mechanism Selection",
+      "takeaway": "Good foundational understanding of substitution mechanisms, but need more practice predicting which mechanism will predominate under given conditions.",
+      "bullets": [
+        "Understood the two-step nature of SN1 vs one-step SN2",
+        "Correctly identified substrate preferences (SN1: 3°, SN2: 1°)",
+        "Recognized stereochemical outcomes (SN1: racemization, SN2: inversion)",
+        "Applied leaving group and nucleophile strength concepts appropriately"
+      ],
+      "action_items": [
+        "Practice mechanism selection with borderline cases (2° substrates)",
+        "Study solvent effects on mechanism preference (polar protic vs aprotic)",
+        "Work on competition problems with multiple pathways",
+        "Review temperature effects on substitution vs elimination"
+      ],
+      "misconceptions": [
+        "Sometimes overlooked solvent effects in mechanism prediction",
+        "Need to better understand when both mechanisms can compete",
+        "Occasionally confused nucleophile strength with basicity"
+      ],
+      "confidence": 0.75,
+      "source_refs": ["substitution_mechanisms", "sn1_sn2_competition"]
+    },
+    {
+      "id": "insight_004",
+      "title": "Elimination Reaction Patterns",
+      "takeaway": "Developing good intuition for E1 vs E2 mechanisms, but need more practice with regiochemistry and stereochemistry of elimination products.",
+      "bullets": [
+        "Understood the role of base strength in mechanism selection",
+        "Correctly identified β-hydrogen requirements for elimination",
+        "Applied Zaitsev's rule for major product prediction",
+        "Recognized when elimination competes with substitution"
+      ],
+      "action_items": [
+        "Practice Hofmann elimination with bulky bases",
+        "Study E2 stereochemistry requirements (anti-coplanar)",
+        "Work on predicting elimination products from cyclohexane derivatives",
+        "Review elimination reactions of alcohols (dehydration)"
+      ],
+      "misconceptions": [
+        "Sometimes applied Zaitsev's rule without considering base size",
+        "Need to review anti-coplanar requirement for E2 elimination",
+        "Occasionally confused elimination regiochemistry with substitution"
+      ],
+      "confidence": 0.79,
+      "source_refs": ["elimination_reactions", "zaitsev_hofmann_selectivity"]
+    },
+    {
+      "id": "insight_005",
+      "title": "Focus and Attention Patterns",
+      "takeaway": "Your focus was consistently high during mechanism practice sessions, particularly when working through step-by-step arrow-pushing exercises.",
+      "bullets": [
+        "Maintained 88% average focus score throughout the 2h 15m session",
+        "Peak performance occurred during alkene reaction mechanism practice",
+        "Attention dipped slightly during stereochemistry nomenclature",
+        "Strong concentration during practice problem solving phases"
+      ],
+      "action_items": [
+        "Continue using step-by-step mechanism practice for optimal focus",
+        "Take brief breaks during nomenclature-heavy sections",
+        "Use visual aids and 3D models for stereochemistry concepts",
+        "Schedule similar 2+ hour blocks for complex organic chemistry topics"
+      ],
+      "misconceptions": [
+        "Don't assume longer study sessions always lead to better retention",
+        "Quality of focus matters more than total study time",
+        "Brief breaks can actually improve overall comprehension"
+      ],
+      "confidence": 0.92,
+      "source_refs": ["session_analytics_2847", "focus_pattern_analysis"]
+    }
+  ],
+  "provenance": {
+    "generated_by": "study_coach_ai",
+    "session_id": "session_2024_10_09_2847",
+    "session_title": "Organic Chemistry Review",
+    "timestamp": "2024-10-09T16:45:00Z",
+    "source_materials": ["mechanism_practice_problems", "stereochemistry_textbook", "alkene_reaction_notes", "focus_analytics"]
+  },
+  "metrics": {
+    "total_insights": 5,
+    "avg_confidence": 0.83,
+    "topics_covered": ["alkenes", "stereochemistry", "substitution", "elimination", "study-patterns"],
+    "avg_action_items": 4.0,
+    "generation_time_ms": 3875
+  }
+}
