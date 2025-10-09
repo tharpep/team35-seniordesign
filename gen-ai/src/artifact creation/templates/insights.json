@@ -1,0 +1,33 @@
+{
+    "artifact_type": "insights",
+    "version": "1.0",
+    "insights": [
+      {
+        "id": "ins_0001",
+        "title": "Core conditions for uniform convergence",
+        "takeaway": "Uniform convergence typically requires controlling model capacity (e.g., via VC-dimension or Rademacher complexity) and sample size; this underpins generalization guarantees.",
+        "bullets": [
+          "Capacity control prevents overfitting to noise.",
+          "Sample complexity bounds suggest data thresholds."
+        ],
+        "action_items": [
+          "Review VC-dim examples for your model class.",
+          "Compute/estimate Rademacher bounds for a toy setup."
+        ],
+        "misconceptions": [
+          "More parameters always hurt generalization."
+        ],
+        "confidence": 0.78,
+        "source_refs": ["N3"]
+      }
+    ],
+    "provenance": {
+      "N3": { "note_id": "note_xyz789", "similarity": 0.75 }
+    },
+    "metrics": {
+      "tokens_in": 880,
+      "tokens_out": 260,
+      "latency_ms": 690
+    }
+  }
+  

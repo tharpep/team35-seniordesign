@@ -33,7 +33,7 @@ class RAGConfig:
     @property
     def model_name(self) -> str:
         """Get model name based on hardware configuration"""
-        return "llama3.2:1b" if self.use_laptop else "qwen3:8b"
+        return "deepseek-r1:8b" if self.use_laptop else "qwen3:8b"
 
 
 # Default configurations
