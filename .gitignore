@@ -224,9 +224,11 @@ local.properties
 .Trash-*
 .nfs*
 
-# Logs
+# Logs - but allow log configuration and README
 logs/
 *.log
+!logs/README.md
+!**/logging_config.py
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -326,10 +328,11 @@ secrets.json
 config.json
 credentials.json
 
-# Database files
+# Database files - but allow metadata
 *.db
 *.sqlite
 *.sqlite3
+!**/meta.json
 
 # Backup files
 *.backup
@@ -356,14 +359,34 @@ wandb/
 
 # Large data files
 *.csv
-*.json
+# Allow JSON schema and config files
+!*.json
 *.xml
-data/
+# Allow sample data and documentation
+!data/documents/
+!data/sample_data/
 datasets/
-!sample_data/
 
 # Generated documentation
 docs/build/
 docs/_build/
 
+
 webapp/uploads/
+
+# Project-specific exceptions
+# Allow important project files
+!gen-ai/src/
+!gen-ai/requirements.txt
+!gen-ai/setup.py
+!gen-ai/pytest.ini
+!gen-ai/design_doc.md
+!gen-ai/logging_config.py
+!gen-ai/run
+!**/README.md
+!**/*.md
+!**/*.py
+!**/*.json
+!**/*.ini
+!**/*.txt
+
