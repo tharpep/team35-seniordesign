@@ -42,7 +42,8 @@ const login = async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        initials: user.initials,
+        first_name: user.first_name,
+        last_name: user.last_name,
         created_at: user.created_at
       },
       message: 'Login successful'
@@ -81,7 +82,7 @@ const getCurrentUser = async (req, res) => {
       });
     }
 
-    const user = await getOne('SELECT id, email, initials, created_at FROM users WHERE id = ?', [req.session.userId]);
+    const user = await getOne('SELECT id, email, first_name, last_name, created_at FROM users WHERE id = ?', [req.session.userId]);
 
     if (!user) {
       return res.status(404).json({ 
@@ -104,7 +105,7 @@ const getCurrentUser = async (req, res) => {
 // Register new user
 const register = async (req, res) => {
   try {
-    const { email, password, initials } = req.body;
+    const { email, password, first_name, last_name } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ 
@@ -127,13 +128,10 @@ const register = async (req, res) => {
     const saltRounds = 10;
     const password_hash = await bcrypt.hash(password, saltRounds);
 
-    // Create user initials from email if not provided
-    const userInitials = initials || email.substring(0, 2).toUpperCase();
-
     // Insert user
     const result = await runQuery(
-      'INSERT INTO users (email, password_hash, initials) VALUES (?, ?, ?)',
-      [email, password_hash, userInitials]
+      'INSERT INTO users (email, password_hash, first_name, last_name) VALUES (?, ?, ?, ?)',
+      [email, password_hash, first_name || null, last_name || null]
     );
 
     // Create session
@@ -144,7 +142,8 @@ const register = async (req, res) => {
       user: {
         id: result.id,
         email: email,
-        initials: userInitials
+        first_name: first_name || null,
+        last_name: last_name || null
       },
       message: 'Registration successful'
     });

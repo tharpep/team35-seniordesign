@@ -33,6 +33,30 @@ export default function SessionDetail() {
     // New state for fetched materials
     const [materials, setMaterials] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [userInitials, setUserInitials] = useState('');
+
+    // Fetch current user and generate initials
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const user = await api.getCurrentUser();
+                if (user) {
+                    // Generate initials from first_name and last_name
+                    const initials = (
+                        (user.first_name?.charAt(0) || '') + 
+                        (user.last_name?.charAt(0) || '')
+                    ).toUpperCase() || user.email.substring(0, 2).toUpperCase();
+                    
+                    setUserInitials(initials);
+                }
+            } catch (error) {
+                console.error('Error fetching user:', error);
+                setUserInitials('U');
+            }
+        };
+
+        fetchUser();
+    }, []);
 
     // Fetch materials on mount and subscribe to real-time updates
     useEffect(() => {
@@ -167,7 +191,9 @@ export default function SessionDetail() {
                         <button className="icon-button" title="Settings">
                             <span className="material-icons-round">settings</span>
                         </button>
-                        <div className="user-avatar" title="Profile">JD</div>
+                        <div className="user-avatar" title="Profile">
+                            {userInitials || '...'}
+                        </div>
                     </div>
                 </div>
             </header>

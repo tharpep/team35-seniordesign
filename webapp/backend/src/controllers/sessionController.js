@@ -108,7 +108,7 @@ const updateSession = async (req, res) => {
     }
 
     // Build update query
-    const allowedFields = ['status', 'title', 'end_time', 'duration', 'focus_score', 'attention_score', 'materials_count'];
+    const allowedFields = ['status', 'title', 'end_time', 'duration', 'focus_score'];
     const setStatements = [];
     const values = [];
 

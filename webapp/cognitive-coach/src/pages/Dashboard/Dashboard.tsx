@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 import ConfigurePopup from '../../components/ConfigurePopup/ConfigurePopup';
 import CurrentSession from '../../components/CurrentSession/CurrentSession';
+import { api } from '../../services/api';
 
 interface Session {
     id: string;
@@ -22,6 +23,31 @@ interface Session {
 export default function Dashboard() {
     const navigate = useNavigate();
     const [isConfigurePopupOpen, setIsConfigurePopupOpen] = useState(false);
+    const [userInitials, setUserInitials] = useState('');
+
+    // Fetch current user and generate initials
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const user = await api.getCurrentUser();
+                if (user) {
+                    // Generate initials from first_name and last_name
+                    const initials = (
+                        (user.first_name?.charAt(0) || '') + 
+                        (user.last_name?.charAt(0) || '')
+                    ).toUpperCase() || user.email.substring(0, 2).toUpperCase();
+                    
+                    setUserInitials(initials);
+                }
+            } catch (error) {
+                console.error('Error fetching user:', error);
+                // Fallback to default if user fetch fails
+                setUserInitials('U');
+            }
+        };
+
+        fetchUser();
+    }, []);
 
     const sessions: Session[] = [
         {
@@ -66,7 +92,6 @@ export default function Dashboard() {
         }
     ];
 
-    // Updated to navigate with sessionId
     const handleSessionClick = (sessionId: string) => {
         navigate(`/session/${sessionId}`);
     };
@@ -125,16 +150,16 @@ export default function Dashboard() {
                         <button className="icon-button" title="Settings">
                             <span className="material-icons-round">settings</span>
                         </button>
-                        <div className="user-avatar" title="Profile">JD</div>
+                        <div className="user-avatar" title="Profile">
+                            {userInitials || '...'}
+                        </div>
                     </div>
                 </div>
             </header>
 
             <main className="dashboard-container">
-                {/* Current Session Section */}
                 <CurrentSession onConfigureClick={handleConfigureClick} />
 
-                {/* Previous Sessions Section */}
                 <div className="sessions-header">
                     <h2>Previous sessions</h2>
                 </div>

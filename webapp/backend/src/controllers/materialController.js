@@ -20,7 +20,7 @@ const getMaterialsBySession = async (req, res) => {
     }
 
     const materials = await getAll(
-      `SELECT * FROM study_materials 
+      `SELECT * FROM study_artifacts 
        WHERE session_id = ? 
        ORDER BY created_at DESC`,
       [sessionId]
@@ -44,7 +44,7 @@ const getMaterialById = async (req, res) => {
     const userId = req.session.userId;
 
     const material = await getOne(
-      `SELECT sm.* FROM study_materials sm
+      `SELECT sm.* FROM study_artifacts sm
        JOIN sessions s ON sm.session_id = s.id
        WHERE sm.id = ? AND s.user_id = ?`,
       [id, userId]
@@ -96,20 +96,12 @@ const createMaterial = async (req, res) => {
 
     // Insert material
     const result = await runQuery(
-      `INSERT INTO study_materials (session_id, type, title, content) 
+      `INSERT INTO study_artifacts (session_id, type, title, content) 
        VALUES (?, ?, ?, ?)`,
       [session_id, type, title, content]
     );
 
-    const newMaterial = await getOne('SELECT * FROM study_materials WHERE id = ?', [result.id]);
-
-    // Update session materials count
-    await runQuery(
-      `UPDATE sessions 
-       SET materials_count = (SELECT COUNT(*) FROM study_materials WHERE session_id = ?) 
-       WHERE id = ?`,
-      [session_id, session_id]
-    );
+    const newMaterial = await getOne('SELECT * FROM study_artifacts WHERE id = ?', [result.id]);
 
     // Emit socket event for new material
     if (req.app.get('io')) {
@@ -140,7 +132,7 @@ const updateMaterial = async (req, res) => {
 
     // Verify material belongs to user's session
     const material = await getOne(
-      `SELECT sm.* FROM study_materials sm
+      `SELECT sm.* FROM study_artifacts sm
        JOIN sessions s ON sm.session_id = s.id
        WHERE sm.id = ? AND s.user_id = ?`,
       [id, userId]
@@ -175,11 +167,11 @@ const updateMaterial = async (req, res) => {
     values.push(id);
 
     await runQuery(
-      `UPDATE study_materials SET ${setStatements.join(', ')} WHERE id = ?`,
+      `UPDATE study_artifacts SET ${setStatements.join(', ')} WHERE id = ?`,
       values
     );
 
-    const updatedMaterial = await getOne('SELECT * FROM study_materials WHERE id = ?', [id]);
+    const updatedMaterial = await getOne('SELECT * FROM study_artifacts WHERE id = ?', [id]);
 
     res.json({ 
       material: updatedMaterial,
@@ -203,7 +195,7 @@ const deleteMaterial = async (req, res) => {
 
     // Verify material belongs to user's session
     const material = await getOne(
-      `SELECT sm.*, s.id as session_id FROM study_materials sm
+      `SELECT sm.* FROM study_artifacts sm
        JOIN sessions s ON sm.session_id = s.id
        WHERE sm.id = ? AND s.user_id = ?`,
       [id, userId]
@@ -216,15 +208,7 @@ const deleteMaterial = async (req, res) => {
       });
     }
 
-    await runQuery('DELETE FROM study_materials WHERE id = ?', [id]);
-
-    // Update session materials count
-    await runQuery(
-      `UPDATE sessions 
-       SET materials_count = (SELECT COUNT(*) FROM study_materials WHERE session_id = ?) 
-       WHERE id = ?`,
-      [material.session_id, material.session_id]
-    );
+    await runQuery('DELETE FROM study_artifacts WHERE id = ?', [id]);
 
     res.json({ message: 'Material deleted successfully' });
 

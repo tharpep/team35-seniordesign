@@ -14,22 +14,25 @@ bcrypt.hash('password', 10, (err, hash) => {
   }
 
   db.run(
-    `INSERT INTO users (email, password_hash, initials) VALUES (?, ?, ?)`,
-    ['test@example.com', hash, 'JD'],
+    `INSERT INTO users (email, password_hash, first_name, last_name) VALUES (?, ?, ?, ?)`,
+    ['test@example.com', hash, 'Test', 'User'],
     function(err) {
       if (err) {
         console.error('Error inserting user:', err);
-        console.log('User might already exist. Trying to update instead...');
+        console.log('User might already exist. Trying to update instead...\n');
         
         // Try updating instead
         db.run(
-          'UPDATE users SET password_hash = ?, initials = ? WHERE email = ?',
-          [hash, 'JD', 'test@example.com'],
+          'UPDATE users SET password_hash = ?, first_name = ?, last_name = ? WHERE email = ?',
+          [hash, 'Test', 'User', 'test@example.com'],
           (err) => {
             if (err) {
               console.error('Error updating user:', err);
             } else {
               console.log('✓ Test user updated successfully');
+              console.log('  Email: test@example.com');
+              console.log('  Password: password');
+              console.log('  Name: Test User\n');
             }
             db.close();
           }
@@ -38,7 +41,7 @@ bcrypt.hash('password', 10, (err, hash) => {
         console.log('✓ Test user created successfully');
         console.log('  Email: test@example.com');
         console.log('  Password: password');
-        console.log('  Initials: JD\n');
+        console.log('  Name: Test User\n');
         db.close();
       }
     }

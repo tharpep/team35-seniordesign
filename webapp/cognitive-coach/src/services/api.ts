@@ -105,12 +105,13 @@ export const api = {
   },
 
   // Register new user
-  register: async (email: string, password: string, initials?: string): Promise<any> => {
+  register: async (email: string, password: string, firstName: string, lastName: string): Promise<any> => {
     try {
       const response = await axios.post(`${API_BASE}/auth/register`, { 
         email, 
         password,
-        initials 
+        first_name: firstName,
+        last_name: lastName
       });
       return response.data;
     } catch (error: any) {
