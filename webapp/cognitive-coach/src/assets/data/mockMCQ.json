@@ -1,0 +1,196 @@
+{
+  "artifact_type": "mcq",
+  "version": "1.0.0",
+  "questions": [
+    {
+      "id": "mcq_001",
+      "stem": "What is the major product when 2-methylpropene reacts with HBr in the presence of peroxides?",
+      "options": [
+        "1-bromo-2-methylpropane",
+        "2-bromo-2-methylpropane",
+        "1-bromo-1-methylpropane",
+        "2-bromo-1-methylpropane"
+      ],
+      "answer_index": 0,
+      "rationale": "In the presence of peroxides, HBr addition follows anti-Markovnikov selectivity due to radical mechanism. The bromine adds to the less substituted carbon, giving 1-bromo-2-methylpropane.",
+      "bloom_level": "apply",
+      "source_refs": ["radical_addition_reactions", "anti_markovnikov_addition"]
+    },
+    {
+      "id": "mcq_002",
+      "stem": "Which of the following best describes the hybridization and geometry around the carbon atoms in ethene (C₂H₄)?",
+      "options": [
+        "sp³ hybridization, tetrahedral geometry",
+        "sp² hybridization, trigonal planar geometry",
+        "sp hybridization, linear geometry",
+        "sp³d hybridization, trigonal bipyramidal geometry"
+      ],
+      "answer_index": 1,
+      "rationale": "Each carbon in ethene forms three sigma bonds (two C-H and one C-C), requiring sp² hybridization and resulting in trigonal planar geometry with 120° bond angles.",
+      "bloom_level": "understand",
+      "source_refs": ["alkene_structure", "molecular_geometry"]
+    },
+    {
+      "id": "mcq_003",
+      "stem": "Which statement about SN2 reactions is correct?",
+      "options": [
+        "They proceed through a carbocation intermediate",
+        "They show inversion of configuration at the reaction center",
+        "They are favored by tertiary substrates",
+        "They show racemization of the product",
+        "They proceed in two distinct steps"
+      ],
+      "answer_index": 1,
+      "rationale": "SN2 reactions occur in one step with backside attack by the nucleophile, resulting in inversion of configuration (Walden inversion) at the stereocenter.",
+      "bloom_level": "understand",
+      "source_refs": ["sn2_mechanism", "stereochemical_outcomes"]
+    },
+    {
+      "id": "mcq_004",
+      "stem": "How many chiral centers are present in the molecule CHBrClF?",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "answer_index": 1,
+      "rationale": "The carbon atom is bonded to four different groups (H, Br, Cl, F), making it a chiral center. Therefore, there is 1 chiral center in this molecule.",
+      "bloom_level": "apply",
+      "source_refs": ["chirality_definition", "chiral_center_identification"]
+    },
+    {
+      "id": "mcq_005",
+      "stem": "What is the major elimination product when 2-bromobutane is treated with sodium ethoxide (NaOEt) in ethanol?",
+      "options": [
+        "1-butene",
+        "2-butene",
+        "Both 1-butene and 2-butene in equal amounts",
+        "No elimination occurs"
+      ],
+      "answer_index": 1,
+      "rationale": "According to Zaitsev's rule, the major elimination product is the more substituted alkene. 2-butene (more substituted) is favored over 1-butene (less substituted).",
+      "bloom_level": "apply",
+      "source_refs": ["e2_elimination", "zaitsev_rule"]
+    },
+    {
+      "id": "mcq_006",
+      "stem": "Which of the following conditions would favor an E2 elimination over an SN2 substitution?",
+      "options": [
+        "Strong nucleophile, primary substrate",
+        "Weak base, secondary substrate",
+        "Strong, bulky base, secondary substrate",
+        "Polar protic solvent, tertiary substrate"
+      ],
+      "answer_index": 2,
+      "rationale": "Strong, bulky bases favor elimination over substitution because they are basic enough to remove protons but too sterically hindered to attack the carbon center effectively.",
+      "bloom_level": "analyze",
+      "source_refs": ["elimination_vs_substitution", "base_effects"]
+    },
+    {
+      "id": "mcq_007",
+      "stem": "What is the relationship between the following two compounds: (R)-2-butanol and (S)-2-butanol?",
+      "options": [
+        "Constitutional isomers",
+        "Enantiomers",
+        "Diastereomers",
+        "Conformational isomers"
+      ],
+      "answer_index": 1,
+      "rationale": "These compounds are non-superimposable mirror images with opposite R/S configurations at the same chiral center, making them enantiomers.",
+      "bloom_level": "understand",
+      "source_refs": ["stereoisomer_relationships", "enantiomers_definition"]
+    },
+    {
+      "id": "mcq_008",
+      "stem": "Which reagent would you use to convert an alkene to a vicinal diol with syn stereochemistry?",
+      "options": [
+        "Br₂/H₂O",
+        "OsO₄, then NaHSO₃",
+        "HBr/ROOR",
+        "H₂SO₄/H₂O"
+      ],
+      "answer_index": 1,
+      "rationale": "OsO₄ (osmium tetroxide) followed by reducing agent like NaHSO₃ gives syn dihydroxylation, adding both OH groups to the same face of the double bond.",
+      "bloom_level": "apply",
+      "source_refs": ["alkene_oxidation", "dihydroxylation_reactions"]
+    },
+    {
+      "id": "mcq_009",
+      "stem": "In the chair conformation of cyclohexane, what is the relationship between axial and equatorial positions?",
+      "options": [
+        "Axial positions are always more stable",
+        "Equatorial positions are generally preferred for substituents",
+        "There is no energy difference between axial and equatorial",
+        "Only small substituents can occupy axial positions"
+      ],
+      "answer_index": 1,
+      "rationale": "Equatorial positions are generally preferred because they minimize 1,3-diaxial interactions (steric strain) that occur when bulky substituents occupy axial positions.",
+      "bloom_level": "understand",
+      "source_refs": ["cyclohexane_conformations", "axial_equatorial_stability"]
+    },
+    {
+      "id": "mcq_010",
+      "stem": "What is the correct priority order for the following groups according to Cahn-Ingold-Prelog rules: -CH₃, -CH₂OH, -H, -CHO?",
+      "options": [
+        "-H > -CH₃ > -CH₂OH > -CHO",
+        "-CHO > -CH₂OH > -CH₃ > -H",
+        "-CH₂OH > -CHO > -CH₃ > -H",
+        "-CHO > -CH₃ > -CH₂OH > -H"
+      ],
+      "answer_index": 1,
+      "rationale": "Priority is based on atomic number of directly attached atoms: -CHO (C with double-bonded O) > -CH₂OH (C with O) > -CH₃ (C with only H) > -H (hydrogen).",
+      "bloom_level": "apply",
+      "source_refs": ["cip_priority_rules", "r_s_nomenclature"]
+    },
+    {
+      "id": "mcq_011",
+      "stem": "Which mechanism best explains the reaction of tert-butyl bromide with methanol?",
+      "options": [
+        "SN2 - one step, inversion of configuration",
+        "SN1 - two steps, racemization",
+        "E2 - one step, anti elimination",
+        "E1 - two steps, carbocation intermediate"
+      ],
+      "answer_index": 1,
+      "rationale": "Tertiary substrates strongly favor SN1 mechanism due to stable carbocation formation. The reaction proceeds through a planar carbocation intermediate, leading to racemization.",
+      "bloom_level": "analyze",
+      "source_refs": ["sn1_mechanism", "tertiary_substrate_reactions"]
+    },
+    {
+      "id": "mcq_012",
+      "stem": "What is the expected product when 1-methylcyclohexene undergoes ozonolysis followed by reductive workup?",
+      "options": [
+        "1-methylcyclohexanol",
+        "Cyclohexanone and formaldehyde",
+        "6-oxoheptanal",
+        "Methylcyclohexane"
+      ],
+      "answer_index": 2,
+      "rationale": "Ozonolysis cleaves the C=C bond. The six-membered ring opens to form a dialdehyde, but one end has a methyl group, giving 6-oxoheptanal (aldehyde and ketone).",
+      "bloom_level": "apply",
+      "source_refs": ["ozonolysis_mechanism", "alkene_cleavage_reactions"]
+    }
+  ],
+  "provenance": {
+    "generated_by": "study_coach_ai",
+    "session_id": "session_2024_10_09_2847",
+    "session_title": "Organic Chemistry Review",
+    "timestamp": "2024-10-09T16:45:00Z",
+    "source_materials": ["organic_chemistry_textbook", "mechanism_practice_problems", "stereochemistry_workbook"]
+  },
+  "metrics": {
+    "total_questions": 12,
+    "bloom_levels_distribution": {
+      "remember": 0,
+      "understand": 4,
+      "apply": 6,
+      "analyze": 2,
+      "evaluate": 0,
+      "create": 0
+    },
+    "topics_covered": ["alkenes", "stereochemistry", "substitution", "elimination", "addition-reactions", "mechanisms", "conformations"],
+    "avg_options_per_question": 4.3,
+    "generation_time_ms": 4200
+  }
+}
