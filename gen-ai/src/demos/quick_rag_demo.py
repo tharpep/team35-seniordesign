@@ -95,6 +95,7 @@ def run_quick_rag_demo(mode="automated"):
                             context_scores = []
                         
                         print(f"📖 Study Assistant: {answer}")
+                        print(f"[TIME] Response time: {response_time:.2f}s")
                         
                         # Log the result
                         log_rag_result(
@@ -143,6 +144,7 @@ def run_quick_rag_demo(mode="automated"):
                         context_scores = []
                     
                     print(f"📖 Answer: {answer[:150]}...")  # Truncate long answers
+                    print(f"[TIME] Response time: {response_time:.2f}s")
                     
                     # Log the result
                     log_rag_result(

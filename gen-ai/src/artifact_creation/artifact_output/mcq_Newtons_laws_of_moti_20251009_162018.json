@@ -1,0 +1,49 @@
+{
+  "artifact_type": "mcq",
+  "version": "1.0",
+  "questions": [
+    {
+      "id": "mcq_001",
+      "stem": "What is the primary concept described by Newton's First Law of Motion?",
+      "options": [
+        "The force applied to an object is equal to its mass times its acceleration",
+        "An object at rest will remain at rest, and an object in motion will continue to move with a constant velocity, unless acted upon by an external force",
+        "The acceleration of an object is directly proportional to the force applied and inversely proportional to its mass",
+        "The momentum of an object remains constant over time"
+      ],
+      "answer_index": 1,
+      "rationale": "Newton's First Law, also known as the Law of Inertia, states that an object will remain at rest or in uniform motion in a straight line unless acted upon by an external force.",
+      "bloom_level": "understand",
+      "source_refs": [
+        "N1"
+      ]
+    }
+  ],
+  "provenance": {
+    "N1": {
+      "note_id": "note_001",
+      "similarity": 0.325,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N2": {
+      "note_id": "note_002",
+      "similarity": 0.325,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N3": {
+      "note_id": "note_003",
+      "similarity": 0.298,
+      "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+    }
+  },
+  "metrics": {
+    "tokens_in": 108,
+    "tokens_out": 265,
+    "latency_ms": 9409.77,
+    "retrieval_scores": [
+      0.32485831588703384,
+      0.32485831588703384,
+      0.2976019901709757
+    ]
+  }
+}

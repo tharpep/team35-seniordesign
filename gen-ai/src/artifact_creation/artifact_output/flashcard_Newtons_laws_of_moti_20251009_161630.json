@@ -1,0 +1,61 @@
+{
+  "artifact_type": "flashcards",
+  "version": "1.0",
+  "cards": [
+    {
+      "id": "fc_001",
+      "front": "What is Newton's second law of motion?",
+      "back": "F = ma, where F is the net force applied to an object, m is its mass, and a is its acceleration.",
+      "tags": [
+        "Physics",
+        "Newton's laws"
+      ],
+      "difficulty": 2,
+      "source_refs": [
+        "N1"
+      ],
+      "hints": [
+        "Force equals mass times acceleration"
+      ]
+    }
+  ],
+  "provenance": {
+    "N1": {
+      "note_id": "note_001",
+      "similarity": 0.31,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N2": {
+      "note_id": "note_002",
+      "similarity": 0.31,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N3": {
+      "note_id": "note_003",
+      "similarity": 0.253,
+      "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+    },
+    "N4": {
+      "note_id": "note_004",
+      "similarity": 0.253,
+      "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+    },
+    "N5": {
+      "note_id": "note_005",
+      "similarity": 0.232,
+      "preview": "ems - Work on eigenvalue calculations - Complete Python class implementation - Review physics formul..."
+    }
+  },
+  "metrics": {
+    "tokens_in": 87,
+    "tokens_out": 110,
+    "latency_ms": 5070.76,
+    "retrieval_scores": [
+      0.3100051922665924,
+      0.3100051922665924,
+      0.2529165236007659,
+      0.2529165236007659,
+      0.2320510495925268
+    ]
+  }
+}

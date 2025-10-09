@@ -15,7 +15,7 @@ class RAGConfig:
     use_laptop: bool = True  # True for laptop (llama3.2:1b), False for PC (qwen3:8b)
     
     # AI Provider settings
-    use_ollama: bool = True  # True for Ollama (local), False for Purdue API
+    use_ollama: bool = False  # True for Ollama (local), False for Purdue API
     
     # Vector store settings
     use_persistent: bool = True  # True for persistent storage, False for in-memory only
@@ -23,17 +23,20 @@ class RAGConfig:
     clear_on_ingest: bool = True  # Clear collection before ingesting new documents
     
     # Retrieval settings
-    top_k: int = 5  # Number of documents to retrieve (1-20 recommended)
+    top_k: int = 3  # Number of documents to retrieve (reduced for faster retrieval)
     similarity_threshold: float = 0.7  # Minimum similarity score (0.0-1.0)
     
     # Generation settings
-    max_tokens: int = 100  # Maximum tokens in response (50-500 recommended)
-    temperature: float = 0.7  # Creativity level (0.0-1.0, lower = more focused)
+    max_tokens: int = 100  # Maximum tokens in response (optimal for artifact generation)
+    temperature: float = 0.4  # Creativity level (lower for more focused JSON generation)
     
     @property
     def model_name(self) -> str:
-        """Get model name based on hardware configuration"""
-        return "deepseek-r1:8b" if self.use_laptop else "qwen3:8b"
+        """Get model name based on hardware and provider configuration"""
+        if self.use_ollama:
+            return "llama3.2:1b" if self.use_laptop else "qwen3:8b"
+        else:
+            return "llama4:latest"  # Purdue API always uses llama4:latest
 
 
 # Default configurations

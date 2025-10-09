@@ -1,0 +1,65 @@
+{
+  "artifact_type": "insights",
+  "version": "1.0",
+  "insights": [
+    {
+      "id": "ins_001",
+      "title": "Understanding Newton's Second Law of Motion",
+      "takeaway": "Newton's second law of motion relates the force applied to an object, its mass, and its acceleration.",
+      "bullets": [
+        "The law is often expressed as F = ma, where F is the net force applied to the object, m is the mass of the object, and a is the acceleration produced.",
+        "This law implies that the acceleration of an object is directly proportional to the net force acting upon it and inversely proportional to its mass."
+      ],
+      "action_items": [
+        "When solving physics problems, always identify the forces acting on an object and its mass to calculate acceleration.",
+        "Use Newton's second law to predict the motion of objects under various forces."
+      ],
+      "misconceptions": [
+        "A common mistake is to confuse mass and weight. Mass is a measure of the amount of matter in an object and is constant regardless of location, while weight is the force exerted on that mass by gravity."
+      ],
+      "confidence": 0.9,
+      "source_refs": [
+        "N1"
+      ]
+    }
+  ],
+  "provenance": {
+    "N1": {
+      "note_id": "note_001",
+      "similarity": 0.331,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N2": {
+      "note_id": "note_002",
+      "similarity": 0.331,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N3": {
+      "note_id": "note_003",
+      "similarity": 0.292,
+      "preview": "ems - Work on eigenvalue calculations - Complete Python class implementation - Review physics formul..."
+    },
+    "N4": {
+      "note_id": "note_004",
+      "similarity": 0.292,
+      "preview": "ems - Work on eigenvalue calculations - Complete Python class implementation - Review physics formul..."
+    },
+    "N5": {
+      "note_id": "note_005",
+      "similarity": 0.283,
+      "preview": "eference Lists - **Alphabetical Order**: Arranging sources by author's last name - **Hanging Indents..."
+    }
+  },
+  "metrics": {
+    "tokens_in": 114,
+    "tokens_out": 301,
+    "latency_ms": 10789.52,
+    "retrieval_scores": [
+      0.33060769821725866,
+      0.33060769821725866,
+      0.291860843778733,
+      0.2918608437787329,
+      0.2832103678092076
+    ]
+  }
+}
