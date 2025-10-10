@@ -27,6 +27,9 @@ export default function ArtifactPopupController({
             navigatePopup('prev');
         } else if (e.key === 'ArrowRight') {
             navigatePopup('next');
+        } else if (e.key === ' ' && popup.type === 'flashcard') {
+            e.preventDefault()
+            setPopup(prev => ({ ...prev, showBack: !prev.showBack }));
         }
     };
 

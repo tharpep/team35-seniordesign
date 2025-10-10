@@ -329,7 +329,7 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
                     </div>
                     <div className="metric-chip stress">
                         <div className="metric-icon stress"></div>
-                        Stress: Low
+                        Artifacts: 12
                     </div>
                 </div>
             </div>

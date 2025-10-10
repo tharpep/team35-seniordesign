@@ -91,10 +91,9 @@
     line-height: 1;
 }
 
-.overview-metric.focus .value { color: #34a853; }
-.overview-metric.attention .value { color: #fbbc04; }
-.overview-metric.materials .value { color: #1a73e8; }
-.overview-metric.artifacts .value { color: #9c27b0; }
+.overview-metric.focus .value { color: var(--md-success); }
+.overview-metric.emotion .value { color: var(--md-primary); }
+.overview-metric.artifacts .value { color: var(--md-warning); }
 
 .overview-metric .label {
     font-size: 14px;

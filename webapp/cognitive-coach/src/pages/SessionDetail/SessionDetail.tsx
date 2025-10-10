@@ -52,7 +52,7 @@ export default function SessionDetail() {
         status: 'Completed',
         metrics: {
             focusScore: 88,
-            attention: 78,
+            emotion: "focused",
             materials: 34,
             artifacts: 15
         }
@@ -135,6 +135,12 @@ export default function SessionDetail() {
             showExplanation: false
         });
     };
+
+    const flipFlashCard = () => {
+        setPopup({
+
+        })
+    }
 
     const closePopup = () => {
         setPopup({
@@ -232,16 +238,12 @@ export default function SessionDetail() {
                             <div className="value">{sessionData.metrics.focusScore}%</div>
                             <div className="label">Focus Score</div>
                         </div>
-                        <div className="overview-metric attention">
-                            <div className="value">{sessionData.metrics.attention}%</div>
-                            <div className="label">Attention</div>
-                        </div>
-                        <div className="overview-metric materials">
-                            <div className="value">{sessionData.metrics.materials}</div>
-                            <div className="label">Materials Captured</div>
+                        <div className="overview-metric emotion">
+                            <div className="value">{sessionData.metrics.emotion.charAt(0).toUpperCase() + sessionData.metrics.emotion.slice(1)}</div>
+                            <div className="label">Emotion</div>
                         </div>
                         <div className="overview-metric artifacts">
-                            <div className="value">{sessionData.metrics.artifacts}</div>
+                            <div className="value">{artifacts.length}</div>
                             <div className="label">Study Artifacts</div>
                         </div>
                     </div>
@@ -260,12 +262,6 @@ export default function SessionDetail() {
                                     onClick={() => setActiveTab('focus')}
                                 >
                                     Focus Over Time
-                                </button>
-                                <button 
-                                    className={`tab ${activeTab === 'attention' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('attention')}
-                                >
-                                    Attention Heatmap
                                 </button>
                                 <button 
                                     className={`tab ${activeTab === 'distractions' ? 'active' : ''}`}
