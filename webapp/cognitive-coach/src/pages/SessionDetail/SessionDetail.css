@@ -164,18 +164,11 @@
 }
 
 .focus-chart {
-    height: 300px;
-    background: #f8f9fa;
+    height: 450px;
     border-radius: 12px;
-    border: 1px solid #e8eaed;
+    padding: 16px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #5f6368;
-    font-style: italic;
-    font-size: 14px;
-    text-align: center;
-    line-height: 1.5;
+    flex-direction: column;
 }
 
 .timeline {

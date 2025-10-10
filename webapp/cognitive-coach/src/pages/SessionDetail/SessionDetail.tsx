@@ -5,6 +5,7 @@ import mockFlashcards from '../../assets/data/mockFlashcards.json';
 import mockMCQ from '../../assets/data/mockMCQ.json';
 import mockInsights from '../../assets/data/mockInsights.json';
 import ArtifactPopupController from '../../components/ArtifactPopup/ArtifactPopupController';
+import FocusChart from '../../components/FocusChart/FocusChart';
 import type { PopupState } from '../../components/ArtifactPopup/types';
 
 interface TimelineEvent {
@@ -136,11 +137,7 @@ export default function SessionDetail() {
         });
     };
 
-    const flipFlashCard = () => {
-        setPopup({
 
-        })
-    }
 
     const closePopup = () => {
         setPopup({
@@ -271,8 +268,11 @@ export default function SessionDetail() {
                                 </button>
                             </div>
                             <div className="focus-chart">
-                                Interactive focus chart would be rendered here<br/>
-                                Focus score ranged from 65% to 95% throughout the session
+                                <FocusChart 
+                                    startTime="2:30 PM"
+                                    endTime="4:45 PM"
+                                    averageFocus={sessionData.metrics.focusScore}
+                                />
                             </div>
                         </div>
 
