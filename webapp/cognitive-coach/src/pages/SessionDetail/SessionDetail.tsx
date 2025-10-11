@@ -1,25 +1,17 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './SessionDetail.css';
-import mockFlashcards from '../../assets/data/mockFlashcards.json';
-import mockMCQ from '../../assets/data/mockMCQ.json';
 import mockInsights from '../../assets/data/mockInsights.json';
 import ArtifactPopupController from '../../components/ArtifactPopup/ArtifactPopupController';
 import FocusChart from '../../components/FocusChart/FocusChart';
 import DistractionTimeline from '../../components/DistractionTimeline/DistractionTimeline';
+import StudyArtifacts, { getArtifactCounts } from '../../components/StudyArtifacts/StudyArtifacts';
 import type { PopupState } from '../../components/ArtifactPopup/types';
 
 interface TimelineEvent {
     time: string;
     title: string;
     description: string;
-}
-
-interface Artifact {
-    id: string;
-    type: 'flashcard' | 'MCQ' | 'equation';
-    title: string;
-    preview: string;
 }
 
 interface Insight {
@@ -32,7 +24,6 @@ export default function SessionDetail() {
     const navigate = useNavigate();
     const { sessionId } = useParams();
     const [activeTab, setActiveTab] = useState('focus');
-        const [activeArtifactTab, setActiveArtifactTab] = useState<'all' | 'flashcard' | 'MCQ' | 'equation'>('all')
     const [chatMessage, setChatMessage] = useState('');
     const [popup, setPopup] = useState<PopupState>({
         isOpen: false,
@@ -68,43 +59,7 @@ export default function SessionDetail() {
         { time: '4:45', title: 'Session Ended', description: 'Review completed' }
     ];
 
-    // Create artifacts from mock data - show all examples
-    const flashcardArtifacts: Artifact[] = mockFlashcards.cards.map((card, index) => ({
-        id: `fc_${index + 1}`,
-        type: 'flashcard' as const,
-        title: '', // No title needed for flashcards
-        preview: card.front
-    }));
 
-    const mcqArtifacts: Artifact[] = mockMCQ.questions.map((question, index) => ({
-        id: `mcq_${index + 1}`,
-        type: 'MCQ' as const,
-        title: '', // No title needed for MCQ
-        preview: question.stem
-    }));
-
-    const equationArtifacts: Artifact[] = [
-        {
-            id: 'eq_1',
-            type: 'equation' as const,
-            title: 'Markovnikov Addition',
-            preview: 'R₂C=CH₂ + HX → R₂CH-CH₂X'
-        },
-        {
-            id: 'eq_2',
-            type: 'equation' as const,
-            title: 'E2 Elimination',
-            preview: 'R₃C-CHR-X + Base → R₂C=CR + HX + Base-H⁺'
-        },
-        {
-            id: 'eq_3',
-            type: 'equation' as const,
-            title: 'Ozonolysis',
-            preview: 'R₂C=CR₂ + O₃ → R₂C=O + O=CR₂'
-        }
-    ];
-
-    const artifacts: Artifact[] = [...flashcardArtifacts, ...mcqArtifacts, ...equationArtifacts];
 
     const insights: Insight[] = mockInsights.insights.slice(0, 3).map((insight, index) => ({
         title: insight.title,
@@ -155,10 +110,11 @@ export default function SessionDetail() {
     const navigatePopup = (direction: 'next' | 'prev') => {
         if (!popup.type) return;
         
+        const artifactCounts = getArtifactCounts();
         let maxIndex = 0;
-        if (popup.type === 'flashcard') maxIndex = flashcardArtifacts.length - 1;
-        else if (popup.type === 'MCQ') maxIndex = mcqArtifacts.length - 1;
-        else if (popup.type === 'equation') maxIndex = equationArtifacts.length - 1;
+        if (popup.type === 'flashcard') maxIndex = artifactCounts.flashcard - 1;
+        else if (popup.type === 'MCQ') maxIndex = artifactCounts.MCQ - 1;
+        else if (popup.type === 'equation') maxIndex = artifactCounts.equation - 1;
 
         const newIndex = direction === 'next' 
             ? Math.min(popup.currentIndex + 1, maxIndex)
@@ -174,9 +130,7 @@ export default function SessionDetail() {
         }));
     };
 
-    const filteredArtifacts = activeArtifactTab === 'all' 
-        ? artifacts 
-        : artifacts.filter(artifact => artifact.type === activeArtifactTab);
+
 
     return (
         <>
@@ -241,7 +195,7 @@ export default function SessionDetail() {
                             <div className="label">Emotion</div>
                         </div>
                         <div className="overview-metric artifacts">
-                            <div className="value">{artifacts.length}</div>
+                            <div className="value">{getArtifactCounts().total}</div>
                             <div className="label">Study Artifacts</div>
                         </div>
                     </div>
@@ -271,8 +225,6 @@ export default function SessionDetail() {
                             <div className="focus-chart">
                                 {activeTab === 'focus' ? (
                                     <FocusChart 
-                                        startTime="2:30 PM"
-                                        endTime="4:45 PM"
                                         averageFocus={sessionData.metrics.focusScore}
                                     />
                                 ) : (
@@ -284,55 +236,7 @@ export default function SessionDetail() {
                             </div>
                         </div>
 
-                        <div className="section card">
-                            <h2>
-                                <span className="material-icons-round section-icon">auto_awesome</span>
-                                Study Artifacts
-                            </h2>
-                            <div className="tabs">
-                                <button 
-                                    className={`tab ${activeArtifactTab === 'all' ? 'active' : ''}`}
-                                    onClick={() => setActiveArtifactTab('all')}
-                                >
-                                    All Artifacts
-                                </button>
-                                <button 
-                                    className={`tab ${activeArtifactTab === 'flashcard' ? 'active' : ''}`}
-                                    onClick={() => setActiveArtifactTab('flashcard')}
-                                >
-                                    Flashcards ({artifacts.filter(a => a.type === 'flashcard').length})
-                                </button>
-                                <button 
-                                    className={`tab ${activeArtifactTab === 'MCQ' ? 'active' : ''}`}
-                                    onClick={() => setActiveArtifactTab('MCQ')}
-                                >
-                                    MCQ ({artifacts.filter(a => a.type === 'MCQ').length})
-                                </button>
-                                <button 
-                                    className={`tab ${activeArtifactTab === 'equation' ? 'active' : ''}`}
-                                    onClick={() => setActiveArtifactTab('equation')}
-                                >
-                                    Equations ({artifacts.filter(a => a.type === 'equation').length})
-                                </button>
-                            </div>
-                            <div className="artifact-grid">
-                                {filteredArtifacts.map((artifact) => (
-                                    <div 
-                                        key={artifact.id} 
-                                        className="artifact-card"
-                                        onClick={() => handleArtifactClick(artifact.type)}
-                                    >
-                                        <div className={`artifact-type ${artifact.type}`}>
-                                            {artifact.type.charAt(0).toUpperCase() + artifact.type.slice(1)}
-                                        </div>
-                                        {artifact.type === 'equation' && (
-                                            <div className="artifact-title">{artifact.title}</div>
-                                        )}
-                                        <div className="artifact-preview">{artifact.preview}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <StudyArtifacts onArtifactClick={handleArtifactClick} />
 
                         <div className="section card">
                             <h2>
@@ -431,9 +335,9 @@ export default function SessionDetail() {
                     navigatePopup={navigatePopup}
                     setPopup={setPopup}
                     totalCount={
-                        popup.type === 'flashcard' ? flashcardArtifacts.length :
-                        popup.type === 'MCQ' ? mcqArtifacts.length :
-                        popup.type === 'equation' ? equationArtifacts.length :
+                        popup.type === 'flashcard' ? getArtifactCounts().flashcard :
+                        popup.type === 'MCQ' ? getArtifactCounts().MCQ :
+                        popup.type === 'equation' ? getArtifactCounts().equation :
                         0
                     }
                 />

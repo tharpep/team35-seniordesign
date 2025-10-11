@@ -24,75 +24,22 @@ ChartJS.register(
 );
 
 interface FocusChartProps {
-    startTime: string; // "2:30 PM"
-    endTime: string;   // "4:45 PM"
     averageFocus: number; // 88
 }
 
-export default function FocusChart({ startTime, endTime, averageFocus }: FocusChartProps) {
-    // Generate fake focus score data based on the session timeline
-    const generateFocusData = () => {
-        // Convert time to minutes for easier calculation
-        const parseTime = (timeStr: string) => {
-            const [time, period] = timeStr.split(' ');
-            const [hours, minutes] = time.split(':').map(Number);
-            const hour24 = period === 'PM' && hours !== 12 ? hours + 12 : hours;
-            return hour24 * 60 + minutes;
-        };
-
-        const startMinutes = parseTime(startTime);
-        const endMinutes = parseTime(endTime);
-        const sessionDuration = endMinutes - startMinutes;
-        
-        // Generate data points every 5 minutes
-        const dataPoints = [];
-        const labels = [];
-        
-        for (let i = 0; i <= sessionDuration; i += 5) {
-            const currentMinutes = startMinutes + i;
-            const currentHour = Math.floor(currentMinutes / 60);
-            const currentMin = currentMinutes % 60;
-            const displayHour = currentHour > 12 ? currentHour - 12 : currentHour;
-            const timeLabel = `${displayHour}:${currentMin.toString().padStart(2, '0')}`;
-            
-            labels.push(timeLabel);
-            
-            // Generate realistic focus score variations with larger range and clear trends
-            let focusScore;
-            const progress = i / sessionDuration;
-            
-            if (progress < 0.05) {
-                // Session startup - low focus as student settles in
-                focusScore = 20 + Math.random() * 15;
-            } else if (progress < 0.15) {
-                // Ramping up - focus increases as student gets into flow
-                focusScore = 35 + (progress - 0.05) * 400 + Math.random() * 10;
-            } else if (progress < 0.35) {
-                // High focus period - peak performance
-                focusScore = 85 + Math.random() * 12 - 6;
-            } else if (progress < 0.45) {
-                // Break period - significant focus drop
-                focusScore = 25 + Math.random() * 20;
-            } else if (progress < 0.65) {
-                // Recovery period - gradual improvement
-                focusScore = 50 + (progress - 0.45) * 150 + Math.random() * 15 - 7;
-            } else if (progress < 0.85) {
-                // Focus fatigue - declining attention
-                focusScore = 80 - (progress - 0.65) * 100 + Math.random() * 20 - 10;
-            } else {
-                // End of session - final push but lower overall
-                focusScore = 40 + Math.random() * 25;
-            }
-            
-            // Ensure score stays within bounds but allow full range
-            focusScore = Math.max(5, Math.min(100, focusScore));
-            dataPoints.push(Math.round(focusScore));
-        }
-        
-        return { labels, dataPoints };
-    };
-
-    const { labels, dataPoints } = generateFocusData();
+export default function FocusChart({ averageFocus }: FocusChartProps) {
+    // Static mock focus score data - realistic pattern for 2h 15m session (2:30 PM - 4:45 PM)
+    const labels = [
+        '2:30', '2:35', '2:40', '2:45', '2:50', '2:55', '3:00', '3:05', '3:10', '3:15', 
+        '3:20', '3:25', '3:30', '3:35', '3:40', '3:45', '3:50', '3:55', '4:00', '4:05',
+        '4:10', '4:15', '4:20', '4:25', '4:30', '4:35', '4:40', '4:45'
+    ];
+    
+    const dataPoints = [
+        25, 32, 45, 58, 72, 85, 92, 89, 95, 88,  // Session start to high focus
+        35, 28, 42, 55, 68, 75, 82, 78, 85, 72,  // Break period to recovery
+        68, 62, 55, 48, 52, 58, 45, 38           // Focus fatigue to end
+    ];
 
     const data = {
         labels,
