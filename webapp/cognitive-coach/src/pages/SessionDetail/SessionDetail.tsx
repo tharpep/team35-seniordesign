@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './SessionDetail.css';
 import mockInsights from '../../assets/data/mockInsights.json';
@@ -19,10 +19,27 @@ interface Insight {
     icon: string;
 }
 
+interface ChatMessage {
+    id: string;
+    type: 'user' | 'ai';
+    text: string;
+    timestamp: string;
+}
+
 export default function SessionDetail() {
     const navigate = useNavigate();
     const { sessionId } = useParams();
     const [chatMessage, setChatMessage] = useState('');
+    const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
+        {
+            id: '1',
+            type: 'ai',
+            text: "Hi! I can help answer questions about your Organic Chemistry session. Ask me anything about the topics you covered, clarify concepts, or get additional practice problems!",
+            timestamp: 'Just now'
+        }
+    ]);
+    const [isTyping, setIsTyping] = useState(false);
+    const chatMessagesRef = useRef<HTMLDivElement>(null);
     const [popup, setPopup] = useState<PopupState>({
         isOpen: false,
         type: null,
@@ -57,7 +74,12 @@ export default function SessionDetail() {
         { time: '4:45', title: 'Session Ended', description: 'Review completed' }
     ];
 
-
+    // Auto-scroll to bottom when new messages are added
+    useEffect(() => {
+        if (chatMessagesRef.current) {
+            chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
+        }
+    }, [chatHistory, isTyping]);
 
     const insights: Insight[] = mockInsights.insights.slice(0, 3).map((insight, index) => ({
         title: insight.title,
@@ -65,12 +87,56 @@ export default function SessionDetail() {
         icon: index === 0 ? 'trending_up' : index === 1 ? 'psychology' : 'balance'
     }));
 
-    const handleSendMessage = () => {
-        if (chatMessage.trim()) {
-            // TODO: Implement AI chat functionality
-            console.log('Sending message:', chatMessage);
-            setChatMessage('');
+    // Mock AI responses based on keywords
+    const getMockAIResponse = (userMessage: string): string => {
+        const message = userMessage.toLowerCase();
+        
+        if (message.includes("markovnikov")) {
+            return "Markovnikov's rule states that in the addition of HX to an alkene, the hydrogen atom attaches to the carbon with the greater number of hydrogen atoms, while the halogen attaches to the carbon with fewer hydrogen atoms. This occurs because the reaction proceeds through the more stable carbocation intermediate.";
+        } else if (message.includes("practice problem")) {
+            return "Here's a practice problem: Draw the major product when 2-methyl-2-butene reacts with HBr. Remember to apply Markovnikov's rule! The answer would be 2-bromo-2-methylbutane, as the Br⁻ adds to the more substituted carbon.";
+        } else if (message.includes("common mistakes") || message.includes("mistakes")) {
+            return "Common mistakes in alkene reactions include: 1) Forgetting to consider carbocation stability, 2) Not applying Markovnikov's rule correctly, 3) Ignoring stereochemistry in addition reactions, and 4) Confusing syn vs anti addition mechanisms.";
+        } else if (message.includes("alkene") || message.includes("alkenes")) {
+            return "Alkenes are hydrocarbons with C=C double bonds. Key reactions include: addition reactions (hydrohalogenation, hydration, halogenation), oxidation (ozonolysis, epoxidation), and polymerization. The double bond makes them reactive nucleophiles.";
+        } else if (message.includes("stereochemistry")) {
+            return "Stereochemistry in alkene reactions is crucial! Syn addition (both groups add to the same face) occurs in catalytic hydrogenation and osmium tetroxide reactions. Anti addition (groups add to opposite faces) occurs in bromine addition and acid-catalyzed hydration.";
+        } else if (message.includes("carbocation")) {
+            return "Carbocation stability follows the order: tertiary > secondary > primary > methyl. This is due to hyperconjugation and inductive effects from alkyl groups. More stable carbocations form preferentially, explaining Markovnikov's rule.";
+        } else if (message.includes("focus") || message.includes("attention")) {
+            return "I noticed your focus was highest during the alkene reactions section (around 3:00-3:20). This suggests you learn best when working with specific mechanisms. Try breaking down complex topics into step-by-step mechanisms like you did with those reactions!";
+        } else {
+            return "That's a great question! Based on your session, you showed strong understanding of reaction mechanisms. Could you be more specific about which aspect of organic chemistry you'd like me to explain? I can help with alkenes, stereochemistry, or any other topics you covered.";
         }
+    };
+
+    const handleSendMessage = async () => {
+        if (!chatMessage.trim()) return;
+
+        const userMessage: ChatMessage = {
+            id: Date.now().toString(),
+            type: 'user',
+            text: chatMessage,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        // Add user message
+        setChatHistory(prev => [...prev, userMessage]);
+        setChatMessage('');
+        setIsTyping(true);
+
+        // Simulate AI thinking time
+        setTimeout(() => {
+            const aiResponse: ChatMessage = {
+                id: (Date.now() + 1).toString(),
+                type: 'ai',
+                text: getMockAIResponse(chatMessage),
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            setChatHistory(prev => [...prev, aiResponse]);
+            setIsTyping(false);
+        }, 1500); // 1.5 second delay to simulate AI processing
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -211,16 +277,32 @@ export default function SessionDetail() {
                                 Ask AI About This Session
                             </h2>
                             <div className="ai-chat-container">
-                                <div className="chat-messages">
-                                    <div className="ai-message">
-                                        <div className="message-avatar ai-avatar">AI</div>
-                                        <div className="message-content">
-                                            <div className="message-text">
-                                                Hi! I can help answer questions about your Organic Chemistry session. Ask me anything about the topics you covered, clarify concepts, or get additional practice problems!
+                                <div className="chat-messages" ref={chatMessagesRef}>
+                                    {chatHistory.map((message) => (
+                                        <div key={message.id} className={`${message.type}-message`}>
+                                            <div className={`message-avatar ${message.type}-avatar`}>
+                                                {message.type === 'ai' ? 'AI' : 'You'}
                                             </div>
-                                            <div className="message-time">Just now</div>
+                                            <div className="message-content">
+                                                <div className="message-text">
+                                                    {message.text}
+                                                </div>
+                                                <div className="message-time">{message.timestamp}</div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    ))}
+                                    {isTyping && (
+                                        <div className="ai-message">
+                                            <div className="message-avatar ai-avatar">AI</div>
+                                            <div className="message-content">
+                                                <div className="message-text typing-indicator">
+                                                    <span></span>
+                                                    <span></span>
+                                                    <span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="chat-input-container">
                                     <div className="suggested-questions">
