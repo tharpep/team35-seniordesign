@@ -6,6 +6,7 @@ import mockMCQ from '../../assets/data/mockMCQ.json';
 import mockInsights from '../../assets/data/mockInsights.json';
 import ArtifactPopupController from '../../components/ArtifactPopup/ArtifactPopupController';
 import FocusChart from '../../components/FocusChart/FocusChart';
+import DistractionTimeline from '../../components/DistractionTimeline/DistractionTimeline';
 import type { PopupState } from '../../components/ArtifactPopup/types';
 
 interface TimelineEvent {
@@ -268,11 +269,18 @@ export default function SessionDetail() {
                                 </button>
                             </div>
                             <div className="focus-chart">
-                                <FocusChart 
-                                    startTime="2:30 PM"
-                                    endTime="4:45 PM"
-                                    averageFocus={sessionData.metrics.focusScore}
-                                />
+                                {activeTab === 'focus' ? (
+                                    <FocusChart 
+                                        startTime="2:30 PM"
+                                        endTime="4:45 PM"
+                                        averageFocus={sessionData.metrics.focusScore}
+                                    />
+                                ) : (
+                                    <DistractionTimeline 
+                                        startTime="2:30 PM"
+                                        sessionDuration={135} // 2h 15m = 135 minutes
+                                    />
+                                )}
                             </div>
                         </div>
 
