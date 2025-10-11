@@ -3,9 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import './SessionDetail.css';
 import mockInsights from '../../assets/data/mockInsights.json';
 import ArtifactPopupController from '../../components/ArtifactPopup/ArtifactPopupController';
-import FocusChart from '../../components/FocusChart/FocusChart';
-import DistractionTimeline from '../../components/DistractionTimeline/DistractionTimeline';
 import StudyArtifacts, { getArtifactCounts } from '../../components/StudyArtifacts/StudyArtifacts';
+import FocusAnalytics from '../../components/FocusAnalytics/FocusAnalytics';
 import type { PopupState } from '../../components/ArtifactPopup/types';
 
 interface TimelineEvent {
@@ -23,7 +22,6 @@ interface Insight {
 export default function SessionDetail() {
     const navigate = useNavigate();
     const { sessionId } = useParams();
-    const [activeTab, setActiveTab] = useState('focus');
     const [chatMessage, setChatMessage] = useState('');
     const [popup, setPopup] = useState<PopupState>({
         isOpen: false,
@@ -203,38 +201,7 @@ export default function SessionDetail() {
 
                 <div className="content-grid">
                     <div className="main-content">
-                        <div className="section card">
-                            <h2>
-                                <span className="material-icons-round section-icon">analytics</span>
-                                Focus & Attention Analytics
-                            </h2>
-                            <div className="tabs">
-                                <button 
-                                    className={`tab ${activeTab === 'focus' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('focus')}
-                                >
-                                    Focus Over Time
-                                </button>
-                                <button 
-                                    className={`tab ${activeTab === 'distractions' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('distractions')}
-                                >
-                                    Distraction Events
-                                </button>
-                            </div>
-                            <div className="focus-chart">
-                                {activeTab === 'focus' ? (
-                                    <FocusChart 
-                                        averageFocus={sessionData.metrics.focusScore}
-                                    />
-                                ) : (
-                                    <DistractionTimeline 
-                                        startTime="2:30 PM"
-                                        sessionDuration={135} // 2h 15m = 135 minutes
-                                    />
-                                )}
-                            </div>
-                        </div>
+                        <FocusAnalytics focusScore={sessionData.metrics.focusScore} />
 
                         <StudyArtifacts onArtifactClick={handleArtifactClick} />
 
