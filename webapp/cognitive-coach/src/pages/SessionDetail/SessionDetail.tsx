@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './SessionDetail.css';
-import mockFlashcards from '../../assets/data/mockFlashcards.json';
-import mockMCQ from '../../assets/data/mockMCQ.json';
 import mockInsights from '../../assets/data/mockInsights.json';
 import ArtifactPopupController from '../../components/ArtifactPopup/ArtifactPopupController';
+import StudyArtifacts, { getArtifactCounts } from '../../components/StudyArtifacts/StudyArtifacts';
+import FocusAnalytics from '../../components/FocusAnalytics/FocusAnalytics';
 import type { PopupState } from '../../components/ArtifactPopup/types';
 
 interface TimelineEvent {
@@ -13,25 +13,33 @@ interface TimelineEvent {
     description: string;
 }
 
-interface Artifact {
-    id: string;
-    type: 'flashcard' | 'MCQ' | 'equation';
-    title: string;
-    preview: string;
-}
-
 interface Insight {
     title: string;
     description: string;
     icon: string;
 }
 
+interface ChatMessage {
+    id: string;
+    type: 'user' | 'ai';
+    text: string;
+    timestamp: string;
+}
+
 export default function SessionDetail() {
     const navigate = useNavigate();
     const { sessionId } = useParams();
-    const [activeTab, setActiveTab] = useState('focus');
-        const [activeArtifactTab, setActiveArtifactTab] = useState<'all' | 'flashcard' | 'MCQ' | 'equation'>('all')
     const [chatMessage, setChatMessage] = useState('');
+    const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
+        {
+            id: '1',
+            type: 'ai',
+            text: "Hi! I can help answer questions about your Organic Chemistry session. Ask me anything about the topics you covered, clarify concepts, or get additional practice problems!",
+            timestamp: 'Just now'
+        }
+    ]);
+    const [isTyping, setIsTyping] = useState(false);
+    const chatMessagesRef = useRef<HTMLDivElement>(null);
     const [popup, setPopup] = useState<PopupState>({
         isOpen: false,
         type: null,
@@ -52,7 +60,7 @@ export default function SessionDetail() {
         status: 'Completed',
         metrics: {
             focusScore: 88,
-            attention: 78,
+            emotion: "focused",
             materials: 34,
             artifacts: 15
         }
@@ -66,43 +74,12 @@ export default function SessionDetail() {
         { time: '4:45', title: 'Session Ended', description: 'Review completed' }
     ];
 
-    // Create artifacts from mock data - show all examples
-    const flashcardArtifacts: Artifact[] = mockFlashcards.cards.map((card, index) => ({
-        id: `fc_${index + 1}`,
-        type: 'flashcard' as const,
-        title: '', // No title needed for flashcards
-        preview: card.front
-    }));
-
-    const mcqArtifacts: Artifact[] = mockMCQ.questions.map((question, index) => ({
-        id: `mcq_${index + 1}`,
-        type: 'MCQ' as const,
-        title: '', // No title needed for MCQ
-        preview: question.stem
-    }));
-
-    const equationArtifacts: Artifact[] = [
-        {
-            id: 'eq_1',
-            type: 'equation' as const,
-            title: 'Markovnikov Addition',
-            preview: 'R₂C=CH₂ + HX → R₂CH-CH₂X'
-        },
-        {
-            id: 'eq_2',
-            type: 'equation' as const,
-            title: 'E2 Elimination',
-            preview: 'R₃C-CHR-X + Base → R₂C=CR + HX + Base-H⁺'
-        },
-        {
-            id: 'eq_3',
-            type: 'equation' as const,
-            title: 'Ozonolysis',
-            preview: 'R₂C=CR₂ + O₃ → R₂C=O + O=CR₂'
+    // Auto-scroll to bottom when new messages are added
+    useEffect(() => {
+        if (chatMessagesRef.current) {
+            chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
         }
-    ];
-
-    const artifacts: Artifact[] = [...flashcardArtifacts, ...mcqArtifacts, ...equationArtifacts];
+    }, [chatHistory, isTyping]);
 
     const insights: Insight[] = mockInsights.insights.slice(0, 3).map((insight, index) => ({
         title: insight.title,
@@ -110,12 +87,56 @@ export default function SessionDetail() {
         icon: index === 0 ? 'trending_up' : index === 1 ? 'psychology' : 'balance'
     }));
 
-    const handleSendMessage = () => {
-        if (chatMessage.trim()) {
-            // TODO: Implement AI chat functionality
-            console.log('Sending message:', chatMessage);
-            setChatMessage('');
+    // Mock AI responses based on keywords
+    const getMockAIResponse = (userMessage: string): string => {
+        const message = userMessage.toLowerCase();
+        
+        if (message.includes("markovnikov")) {
+            return "Markovnikov's rule states that in the addition of HX to an alkene, the hydrogen atom attaches to the carbon with the greater number of hydrogen atoms, while the halogen attaches to the carbon with fewer hydrogen atoms. This occurs because the reaction proceeds through the more stable carbocation intermediate.";
+        } else if (message.includes("practice problem")) {
+            return "Here's a practice problem: Draw the major product when 2-methyl-2-butene reacts with HBr. Remember to apply Markovnikov's rule! The answer would be 2-bromo-2-methylbutane, as the Br⁻ adds to the more substituted carbon.";
+        } else if (message.includes("common mistakes") || message.includes("mistakes")) {
+            return "Common mistakes in alkene reactions include: 1) Forgetting to consider carbocation stability, 2) Not applying Markovnikov's rule correctly, 3) Ignoring stereochemistry in addition reactions, and 4) Confusing syn vs anti addition mechanisms.";
+        } else if (message.includes("alkene") || message.includes("alkenes")) {
+            return "Alkenes are hydrocarbons with C=C double bonds. Key reactions include: addition reactions (hydrohalogenation, hydration, halogenation), oxidation (ozonolysis, epoxidation), and polymerization. The double bond makes them reactive nucleophiles.";
+        } else if (message.includes("stereochemistry")) {
+            return "Stereochemistry in alkene reactions is crucial! Syn addition (both groups add to the same face) occurs in catalytic hydrogenation and osmium tetroxide reactions. Anti addition (groups add to opposite faces) occurs in bromine addition and acid-catalyzed hydration.";
+        } else if (message.includes("carbocation")) {
+            return "Carbocation stability follows the order: tertiary > secondary > primary > methyl. This is due to hyperconjugation and inductive effects from alkyl groups. More stable carbocations form preferentially, explaining Markovnikov's rule.";
+        } else if (message.includes("focus") || message.includes("attention")) {
+            return "I noticed your focus was highest during the alkene reactions section (around 3:00-3:20). This suggests you learn best when working with specific mechanisms. Try breaking down complex topics into step-by-step mechanisms like you did with those reactions!";
+        } else {
+            return "That's a great question! Based on your session, you showed strong understanding of reaction mechanisms. Could you be more specific about which aspect of organic chemistry you'd like me to explain? I can help with alkenes, stereochemistry, or any other topics you covered.";
         }
+    };
+
+    const handleSendMessage = async () => {
+        if (!chatMessage.trim()) return;
+
+        const userMessage: ChatMessage = {
+            id: Date.now().toString(),
+            type: 'user',
+            text: chatMessage,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        // Add user message
+        setChatHistory(prev => [...prev, userMessage]);
+        setChatMessage('');
+        setIsTyping(true);
+
+        // Simulate AI thinking time
+        setTimeout(() => {
+            const aiResponse: ChatMessage = {
+                id: (Date.now() + 1).toString(),
+                type: 'ai',
+                text: getMockAIResponse(chatMessage),
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            setChatHistory(prev => [...prev, aiResponse]);
+            setIsTyping(false);
+        }, 1500); // 1.5 second delay to simulate AI processing
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -136,6 +157,8 @@ export default function SessionDetail() {
         });
     };
 
+
+
     const closePopup = () => {
         setPopup({
             isOpen: false,
@@ -151,10 +174,11 @@ export default function SessionDetail() {
     const navigatePopup = (direction: 'next' | 'prev') => {
         if (!popup.type) return;
         
+        const artifactCounts = getArtifactCounts();
         let maxIndex = 0;
-        if (popup.type === 'flashcard') maxIndex = flashcardArtifacts.length - 1;
-        else if (popup.type === 'MCQ') maxIndex = mcqArtifacts.length - 1;
-        else if (popup.type === 'equation') maxIndex = equationArtifacts.length - 1;
+        if (popup.type === 'flashcard') maxIndex = artifactCounts.flashcard - 1;
+        else if (popup.type === 'MCQ') maxIndex = artifactCounts.MCQ - 1;
+        else if (popup.type === 'equation') maxIndex = artifactCounts.equation - 1;
 
         const newIndex = direction === 'next' 
             ? Math.min(popup.currentIndex + 1, maxIndex)
@@ -170,9 +194,7 @@ export default function SessionDetail() {
         }));
     };
 
-    const filteredArtifacts = activeArtifactTab === 'all' 
-        ? artifacts 
-        : artifacts.filter(artifact => artifact.type === activeArtifactTab);
+
 
     return (
         <>
@@ -232,16 +254,12 @@ export default function SessionDetail() {
                             <div className="value">{sessionData.metrics.focusScore}%</div>
                             <div className="label">Focus Score</div>
                         </div>
-                        <div className="overview-metric attention">
-                            <div className="value">{sessionData.metrics.attention}%</div>
-                            <div className="label">Attention</div>
-                        </div>
-                        <div className="overview-metric materials">
-                            <div className="value">{sessionData.metrics.materials}</div>
-                            <div className="label">Materials Captured</div>
+                        <div className="overview-metric emotion">
+                            <div className="value">{sessionData.metrics.emotion.charAt(0).toUpperCase() + sessionData.metrics.emotion.slice(1)}</div>
+                            <div className="label">Emotion</div>
                         </div>
                         <div className="overview-metric artifacts">
-                            <div className="value">{sessionData.metrics.artifacts}</div>
+                            <div className="value">{getArtifactCounts().total}</div>
                             <div className="label">Study Artifacts</div>
                         </div>
                     </div>
@@ -249,86 +267,9 @@ export default function SessionDetail() {
 
                 <div className="content-grid">
                     <div className="main-content">
-                        <div className="section card">
-                            <h2>
-                                <span className="material-icons-round section-icon">analytics</span>
-                                Focus & Attention Analytics
-                            </h2>
-                            <div className="tabs">
-                                <button 
-                                    className={`tab ${activeTab === 'focus' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('focus')}
-                                >
-                                    Focus Over Time
-                                </button>
-                                <button 
-                                    className={`tab ${activeTab === 'attention' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('attention')}
-                                >
-                                    Attention Heatmap
-                                </button>
-                                <button 
-                                    className={`tab ${activeTab === 'distractions' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('distractions')}
-                                >
-                                    Distraction Events
-                                </button>
-                            </div>
-                            <div className="focus-chart">
-                                Interactive focus chart would be rendered here<br/>
-                                Focus score ranged from 65% to 95% throughout the session
-                            </div>
-                        </div>
+                        <FocusAnalytics focusScore={sessionData.metrics.focusScore} />
 
-                        <div className="section card">
-                            <h2>
-                                <span className="material-icons-round section-icon">auto_awesome</span>
-                                Study Artifacts
-                            </h2>
-                            <div className="tabs">
-                                <button 
-                                    className={`tab ${activeArtifactTab === 'all' ? 'active' : ''}`}
-                                    onClick={() => setActiveArtifactTab('all')}
-                                >
-                                    All Artifacts
-                                </button>
-                                <button 
-                                    className={`tab ${activeArtifactTab === 'flashcard' ? 'active' : ''}`}
-                                    onClick={() => setActiveArtifactTab('flashcard')}
-                                >
-                                    Flashcards ({artifacts.filter(a => a.type === 'flashcard').length})
-                                </button>
-                                <button 
-                                    className={`tab ${activeArtifactTab === 'MCQ' ? 'active' : ''}`}
-                                    onClick={() => setActiveArtifactTab('MCQ')}
-                                >
-                                    MCQ ({artifacts.filter(a => a.type === 'MCQ').length})
-                                </button>
-                                <button 
-                                    className={`tab ${activeArtifactTab === 'equation' ? 'active' : ''}`}
-                                    onClick={() => setActiveArtifactTab('equation')}
-                                >
-                                    Equations ({artifacts.filter(a => a.type === 'equation').length})
-                                </button>
-                            </div>
-                            <div className="artifact-grid">
-                                {filteredArtifacts.map((artifact) => (
-                                    <div 
-                                        key={artifact.id} 
-                                        className="artifact-card"
-                                        onClick={() => handleArtifactClick(artifact.type)}
-                                    >
-                                        <div className={`artifact-type ${artifact.type}`}>
-                                            {artifact.type.charAt(0).toUpperCase() + artifact.type.slice(1)}
-                                        </div>
-                                        {artifact.type === 'equation' && (
-                                            <div className="artifact-title">{artifact.title}</div>
-                                        )}
-                                        <div className="artifact-preview">{artifact.preview}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <StudyArtifacts onArtifactClick={handleArtifactClick} />
 
                         <div className="section card">
                             <h2>
@@ -336,16 +277,32 @@ export default function SessionDetail() {
                                 Ask AI About This Session
                             </h2>
                             <div className="ai-chat-container">
-                                <div className="chat-messages">
-                                    <div className="ai-message">
-                                        <div className="message-avatar ai-avatar">AI</div>
-                                        <div className="message-content">
-                                            <div className="message-text">
-                                                Hi! I can help answer questions about your Organic Chemistry session. Ask me anything about the topics you covered, clarify concepts, or get additional practice problems!
+                                <div className="chat-messages" ref={chatMessagesRef}>
+                                    {chatHistory.map((message) => (
+                                        <div key={message.id} className={`${message.type}-message`}>
+                                            <div className={`message-avatar ${message.type}-avatar`}>
+                                                {message.type === 'ai' ? 'AI' : 'You'}
                                             </div>
-                                            <div className="message-time">Just now</div>
+                                            <div className="message-content">
+                                                <div className="message-text">
+                                                    {message.text}
+                                                </div>
+                                                <div className="message-time">{message.timestamp}</div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    ))}
+                                    {isTyping && (
+                                        <div className="ai-message">
+                                            <div className="message-avatar ai-avatar">AI</div>
+                                            <div className="message-content">
+                                                <div className="message-text typing-indicator">
+                                                    <span></span>
+                                                    <span></span>
+                                                    <span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="chat-input-container">
                                     <div className="suggested-questions">
@@ -427,9 +384,9 @@ export default function SessionDetail() {
                     navigatePopup={navigatePopup}
                     setPopup={setPopup}
                     totalCount={
-                        popup.type === 'flashcard' ? flashcardArtifacts.length :
-                        popup.type === 'MCQ' ? mcqArtifacts.length :
-                        popup.type === 'equation' ? equationArtifacts.length :
+                        popup.type === 'flashcard' ? getArtifactCounts().flashcard :
+                        popup.type === 'MCQ' ? getArtifactCounts().MCQ :
+                        popup.type === 'equation' ? getArtifactCounts().equation :
                         0
                     }
                 />

@@ -12,6 +12,7 @@ interface Session {
     focusScore: number;
     materials: number;
     attention: number;
+    emotion: string;
     artifacts: {
         equations?: number;
         flashcards?: number;
@@ -32,6 +33,7 @@ export default function Dashboard() {
             focusScore: 88,
             materials: 34,
             attention: 78,
+            emotion: 'Focused',
             artifacts: { equations: 12, flashcards: 15, questions: 3 }
         },
         {
@@ -42,6 +44,7 @@ export default function Dashboard() {
             focusScore: 92,
             materials: 28,
             attention: 89,
+            emotion: 'Confident',
             artifacts: { equations: 18, flashcards: 15, questions: 2 }
         },
         {
@@ -52,6 +55,7 @@ export default function Dashboard() {
             focusScore: 76,
             materials: 45,
             attention: 72,
+            emotion: 'Calm',
             artifacts: { flashcards: 18, questions: 5 }
         },
         {
@@ -62,6 +66,7 @@ export default function Dashboard() {
             focusScore: 94,
             materials: 31,
             attention: 91,
+            emotion: 'Engaged',
             artifacts: { equations: 8, flashcards: 9, questions: 4 }
         }
     ];
@@ -154,21 +159,8 @@ export default function Dashboard() {
 
                             <div className="session-metrics">
                                 <div className="session-focus-score">
-                                    <span className="focus-score">{session.focusScore}%</span>
-                                    <div className="focus-bar">
-                                        <div 
-                                            className="focus-fill" 
-                                            style={{width: `${session.focusScore}%`}}
-                                        ></div>
-                                    </div>
-                                </div>
-                                <div className="session-metrics-chips">
-                                    <div className="session-metric-chip">
-                                        {session.materials} materials
-                                    </div>
-                                    <div className="session-metric-chip">
-                                        {session.attention}% attention
-                                    </div>
+                                    <span className="focus-score">Focus: {session.focusScore}%</span>
+                                    <span className="emotion-label" style={{fontSize: '18px', fontWeight: '500', color: '#3b82f6', marginLeft: '16px'}}>Emotion: {session.emotion}</span>
                                 </div>
                             </div>
 

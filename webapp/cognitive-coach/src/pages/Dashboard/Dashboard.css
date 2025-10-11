@@ -112,21 +112,6 @@
     color: var(--md-success);
 }
 
-.focus-bar {
-    width: 120px;
-    height: 6px;
-    background: var(--md-outline);
-    border-radius: 3px;
-    overflow: hidden;
-}
-
-.focus-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--md-error) 0%, var(--md-warning) 50%, var(--md-success) 100%);
-    border-radius: 3px;
-    transition: width 0.3s ease;
-}
-
 .session-metrics-chips {
     display: flex;
     gap: var(--spacing-sm);

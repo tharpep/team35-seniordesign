@@ -91,10 +91,9 @@
     line-height: 1;
 }
 
-.overview-metric.focus .value { color: #34a853; }
-.overview-metric.attention .value { color: #fbbc04; }
-.overview-metric.materials .value { color: #1a73e8; }
-.overview-metric.artifacts .value { color: #9c27b0; }
+.overview-metric.focus .value { color: var(--md-success); }
+.overview-metric.emotion .value { color: var(--md-primary); }
+.overview-metric.artifacts .value { color: var(--md-warning); }
 
 .overview-metric .label {
     font-size: 14px;
@@ -165,18 +164,11 @@
 }
 
 .focus-chart {
-    height: 300px;
-    background: #f8f9fa;
+    height: 450px;
     border-radius: 12px;
-    border: 1px solid #e8eaed;
+    padding: 16px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #5f6368;
-    font-style: italic;
-    font-size: 14px;
-    text-align: center;
-    line-height: 1.5;
+    flex-direction: column;
 }
 
 .timeline {
@@ -382,6 +374,28 @@
     background: #1a73e8;
 }
 
+.user-message {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-direction: row-reverse;
+}
+
+.user-avatar {
+    background: #34a853;
+}
+
+.user-message .message-text {
+    background: #e8f0fe;
+    border-color: #1a73e8;
+}
+
+.user-message .message-time {
+    text-align: right;
+    padding-right: 16px;
+    padding-left: 0;
+}
+
 .message-content {
     flex: 1;
 }
@@ -401,6 +415,40 @@
     font-size: 11px;
     color: #5f6368;
     padding-left: 16px;
+}
+
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 16px !important;
+}
+
+.typing-indicator span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #9aa0a6;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes typing {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .chat-input-container {

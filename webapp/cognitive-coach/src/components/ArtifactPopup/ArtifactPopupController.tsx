@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import FlashcardContent from './FlashcardContent';
 import MCQContent from './MCQContent';
 import EquationContent from './EquationContent';
@@ -19,6 +19,14 @@ export default function ArtifactPopupController({
     setPopup,
     totalCount
 }: ArtifactPopupControllerProps) {
+    const popupRef = useRef<HTMLDivElement>(null);
+
+    // Auto-focus the popup when it opens to enable keyboard navigation
+    useEffect(() => {
+        if (popup.isOpen && popupRef.current) {
+            popupRef.current.focus();
+        }
+    }, [popup.isOpen]);
     
     const handlePopupKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Escape') {
@@ -27,6 +35,9 @@ export default function ArtifactPopupController({
             navigatePopup('prev');
         } else if (e.key === 'ArrowRight') {
             navigatePopup('next');
+        } else if (e.key === ' ' && popup.type === 'flashcard') {
+            e.preventDefault()
+            setPopup(prev => ({ ...prev, showBack: !prev.showBack }));
         }
     };
 
@@ -46,6 +57,7 @@ export default function ArtifactPopupController({
     return (
         <div className="artifact-popup-overlay" onClick={closePopup}>
             <div 
+                ref={popupRef}
                 className="artifact-popup-content" 
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={handlePopupKeyPress}
