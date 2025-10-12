@@ -1,0 +1,109 @@
+{
+  "artifact_type": "flashcards",
+  "version": "1.0.0",
+  "cards": [
+    {
+      "id": "fc_001",
+      "front": "What is the major product of hydrobromination of 2-methylpropene?",
+      "back": "2-bromo-2-methylpropane (Markovnikov addition) - The hydrogen adds to the carbon with more hydrogens, and bromine adds to the more substituted carbon.",
+      "tags": ["alkenes", "addition-reactions", "markovnikov"],
+      "difficulty": 3,
+      "source_refs": ["organic_chemistry_ch8", "alkene_reactions_notes"],
+      "hints": ["Remember Markovnikov's rule", "Consider carbocation stability"]
+    },
+    {
+      "id": "fc_002",
+      "front": "When does E2 elimination occur preferentially over SN2?",
+      "back": "E2 elimination occurs preferentially with bulky bases (like tert-butoxide) and secondary/tertiary substrates. High temperature also favors elimination over substitution.",
+      "tags": ["elimination", "substitution", "e2", "sn2"],
+      "difficulty": 4,
+      "source_refs": ["elimination_vs_substitution", "reaction_mechanisms_ch12"],
+      "hints": ["Think about sterics", "Consider base size and substrate substitution"]
+    },
+    {
+      "id": "fc_003",
+      "front": "What is a chiral center?",
+      "back": "A chiral center is a carbon atom bonded to four different groups. It has no plane of symmetry and can exist as non-superimposable mirror images (enantiomers).",
+      "tags": ["stereochemistry", "chirality", "optical-activity"],
+      "difficulty": 2,
+      "source_refs": ["stereochemistry_ch5", "chirality_examples"],
+      "hints": ["Think about four different substituents", "Consider mirror images"]
+    },
+    {
+      "id": "fc_004",
+      "front": "What is the difference between SN1 and SN2 mechanisms?",
+      "back": "SN1: Two-step mechanism with carbocation intermediate, favors tertiary substrates, racemization occurs. SN2: One-step mechanism, backside attack, favors primary substrates, inversion of configuration.",
+      "tags": ["substitution", "sn1", "sn2", "mechanisms"],
+      "difficulty": 4,
+      "source_refs": ["nucleophilic_substitution", "reaction_mechanisms"],
+      "hints": ["Consider number of steps", "Think about stereochemistry outcomes"]
+    },
+    {
+      "id": "fc_005",
+      "front": "How do you determine R/S configuration?",
+      "back": "1) Assign priorities using Cahn-Ingold-Prelog rules (atomic number). 2) Orient molecule with lowest priority away. 3) Trace 1→2→3: clockwise = R, counterclockwise = S.",
+      "tags": ["stereochemistry", "r-s-nomenclature", "cip-rules"],
+      "difficulty": 3,
+      "source_refs": ["stereochemistry_nomenclature", "cip_system"],
+      "hints": ["Remember priority rules", "Think about steering wheel direction"]
+    },
+    {
+      "id": "fc_006",
+      "front": "What is anti-Markovnikov addition? Give an example.",
+      "back": "Anti-Markovnikov addition is when hydrogen adds to the more substituted carbon. Example: HBr with peroxides (ROOR) - creates radicals that follow different regioselectivity.",
+      "tags": ["alkenes", "anti-markovnikov", "radical-reactions"],
+      "difficulty": 3,
+      "source_refs": ["radical_addition_reactions", "peroxide_effects"],
+      "hints": ["Think about radical intermediates", "Consider peroxide conditions"]
+    },
+    {
+      "id": "fc_007",
+      "front": "What is the hybridization of carbon in alkenes?",
+      "back": "sp² hybridization - Carbon forms three sigma bonds (120° bond angles) and one pi bond. The double bond consists of one sigma and one pi bond.",
+      "tags": ["hybridization", "alkenes", "bonding"],
+      "difficulty": 2,
+      "source_refs": ["molecular_orbital_theory", "alkene_structure"],
+      "hints": ["Count the electron domains", "Consider double bond composition"]
+    },
+    {
+      "id": "fc_008",
+      "front": "What are the conditions for ozonolysis of alkenes?",
+      "back": "1) O₃ (ozone) followed by 2) reducing agent like Zn/AcOH or Me₂S. This cleaves C=C bonds to form aldehydes and/or ketones depending on substitution pattern.",
+      "tags": ["alkenes", "ozonolysis", "oxidative-cleavage"],
+      "difficulty": 3,
+      "source_refs": ["alkene_oxidation_reactions", "ozonolysis_mechanisms"],
+      "hints": ["Think about bond cleavage", "Consider what replaces the double bond"]
+    },
+    {
+      "id": "fc_009",
+      "front": "What is syn vs anti addition?",
+      "back": "Syn addition: both groups add to the same face of the double bond (e.g., OsO₄, BH₃). Anti addition: groups add to opposite faces (e.g., Br₂, halohydrin formation).",
+      "tags": ["stereochemistry", "addition-reactions", "syn-anti"],
+      "difficulty": 4,
+      "source_refs": ["stereochemical_outcomes", "addition_stereochemistry"],
+      "hints": ["Think about facial selectivity", "Consider cyclic intermediates"]
+    },
+    {
+      "id": "fc_010",
+      "front": "What is the mechanism of acid-catalyzed hydration of alkenes?",
+      "back": "1) Protonation of alkene (Markovnikov), 2) Water attacks carbocation, 3) Deprotonation gives alcohol. Overall: alkene + H₂O/H⁺ → alcohol.",
+      "tags": ["alkenes", "hydration", "acid-catalyzed", "mechanisms"],
+      "difficulty": 3,
+      "source_refs": ["alkene_hydration", "carbocation_chemistry"],
+      "hints": ["Follow electron flow", "Consider carbocation intermediate"]
+    }
+  ],
+  "provenance": {
+    "generated_by": "study_coach_ai",
+    "session_id": "session_2024_10_09_2847",
+    "session_title": "Organic Chemistry Review",
+    "timestamp": "2024-10-09T16:45:00Z",
+    "source_materials": ["alkene_reactions_notes", "stereochemistry_textbook", "mechanism_practice_problems"]
+  },
+  "metrics": {
+    "total_cards": 10,
+    "avg_difficulty": 3.0,
+    "topics_covered": ["alkenes", "stereochemistry", "substitution", "elimination", "addition-reactions", "mechanisms"],
+    "generation_time_ms": 2850
+  }
+}

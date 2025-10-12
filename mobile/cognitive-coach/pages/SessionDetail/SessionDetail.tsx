@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingVi
 import { router } from 'expo-router';
 import { Typography, Card, Button } from '../../components/ui';
 import { commonStyles, tokens } from '../../styles/theme';
+import StudyArtifacts from '../../components/StudyArtifacts/StudyArtifacts';
 
 interface TimelineEvent {
   time: string;
@@ -209,6 +210,9 @@ export default function SessionDetail() {
             </View>
           </View>
         </Card>
+
+        {/* Study Artifacts Section */}
+        <StudyArtifacts />
 
         {/* AI Chat Section */}
         <Card style={styles.chatSection}>
