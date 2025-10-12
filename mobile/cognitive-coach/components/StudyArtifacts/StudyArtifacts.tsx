@@ -125,6 +125,8 @@ export default function StudyArtifacts({ onArtifactClick }: StudyArtifactsProps)
       // Navigate to appropriate study page
       if (artifact.type === 'flashcard') {
         router.push('/flashcard-study');
+      } else if (artifact.type === 'MCQ') {
+        router.push('/mcq-study');
       } else {
         // For other types, show console log for now
         console.log('Navigate to artifact:', artifact.type, artifact.id);
