@@ -21,7 +21,7 @@ interface StudyArtifactsProps {
 export const getArtifactCounts = () => {
   const flashcardCount = mockFlashcards.cards.length;
   const mcqCount = mockMCQ.questions.length;
-  const equationCount = 3; // Static count for equations
+  const equationCount = 6; // Static count for equations
   
   return {
     flashcard: flashcardCount,
@@ -88,17 +88,35 @@ export default function StudyArtifacts({ onArtifactClick }: StudyArtifactsProps)
     {
       id: 'eq_1',
       type: 'equation' as const,
+      title: 'Henderson-Hasselbalch Equation',
+      preview: 'pH = pKa + log([A⁻]/[HA])'
+    },
+    {
+      id: 'eq_2',
+      type: 'equation' as const,
+      title: 'Arrhenius Equation',
+      preview: 'k = Ae^(-Ea/RT)'
+    },
+    {
+      id: 'eq_3',
+      type: 'equation' as const,
+      title: 'Beer-Lambert Law',
+      preview: 'A = εbc'
+    },
+    {
+      id: 'eq_4',
+      type: 'equation' as const,
       title: 'Markovnikov Addition',
       preview: 'R₂C=CH₂ + HX → R₂CH-CH₂X'
     },
     {
-      id: 'eq_2',
+      id: 'eq_5',
       type: 'equation' as const,
       title: 'E2 Elimination',
       preview: 'R₃C-CHR-X + Base → R₂C=CR + HX + Base-H⁺'
     },
     {
-      id: 'eq_3',
+      id: 'eq_6',
       type: 'equation' as const,
       title: 'Ozonolysis',
       preview: 'R₂C=CR₂ + O₃ → R₂C=O + O=CR₂'
@@ -127,6 +145,8 @@ export default function StudyArtifacts({ onArtifactClick }: StudyArtifactsProps)
         router.push('/flashcard-study');
       } else if (artifact.type === 'MCQ') {
         router.push('/mcq-study');
+      } else if (artifact.type === 'equation') {
+        router.push('/equation-study');
       } else {
         // For other types, show console log for now
         console.log('Navigate to artifact:', artifact.type, artifact.id);
