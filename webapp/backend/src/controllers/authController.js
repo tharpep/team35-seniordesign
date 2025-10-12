@@ -1,8 +1,11 @@
 const bcrypt = require('bcrypt');
 const { getOne, runQuery } = require('../config/database');
+const logger = require('../utils/logger');
 
 // Login
 const login = async (req, res) => {
+  const startTime = Date.now();
+  
   try {
     const { email, password } = req.body;
 
@@ -37,6 +40,18 @@ const login = async (req, res) => {
     req.session.userId = user.id;
     req.session.email = user.email;
 
+    // Calculate duration and log SPEC-8
+    const duration = Date.now() - startTime;
+    const passed = duration <= 400;
+    
+    logger.logSpec('SPEC-8', {
+      action: 'LOGIN',
+      details: {
+        User: email,
+        Status: 'SUCCESS'
+      }
+    }, passed, duration);
+
     // Return user info (without password hash)
     res.json({
       user: {
@@ -51,6 +66,18 @@ const login = async (req, res) => {
 
   } catch (error) {
     console.error('Login error:', error);
+    
+    // Log failed login
+    const duration = Date.now() - startTime;
+    logger.logSpec('SPEC-8', {
+      action: 'LOGIN',
+      details: {
+        User: req.body.email || 'unknown',
+        Status: 'ERROR',
+        Error: error.message
+      }
+    }, false, duration);
+    
     res.status(500).json({ 
       error: 'Server error',
       message: 'An error occurred during login'

@@ -6,6 +6,9 @@ const { Server } = require('socket.io');
 const path = require('path');
 require('dotenv').config();
 
+// Import logger
+const logger = require('./utils/logger');
+
 // Import routes
 const authRoutes = require('./routes/auth');
 const sessionRoutes = require('./routes/sessions');
@@ -95,6 +98,16 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log(`[Socket.IO] Client disconnected: ${socket.id}`);
   });
+
+  // Handle test material insertions from script
+  socket.on('test-material-created', (data) => {
+    const { sessionId, material } = data;
+    console.log(`[Socket.IO] Test material created for session-${sessionId}, broadcasting...`);
+    
+    // Broadcast to all clients in the session room
+    // Emit just the material to match materialController format
+    io.to(`session-${sessionId}`).emit('material-created', material);
+  });
 });
 
 // Error handling middleware
@@ -136,11 +149,15 @@ server.listen(PORT, () => {
   console.log(`✓ WebSocket: ws://localhost:${PORT}`);
   console.log(`✓ Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log('=================================\n');
+  
+  // Start demo logging
+  logger.startSession();
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('SIGTERM received, closing server...');
+  logger.endSession();
   server.close(() => {
     console.log('Server closed');
     db.close(() => {
@@ -152,6 +169,7 @@ process.on('SIGTERM', () => {
 
 process.on('SIGINT', () => {
   console.log('\nSIGINT received, closing server...');
+  logger.endSession();
   server.close(() => {
     console.log('Server closed');
     db.close(() => {

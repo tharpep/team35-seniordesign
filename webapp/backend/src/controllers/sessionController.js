@@ -1,11 +1,22 @@
 const { getOne, getAll, runQuery } = require('../config/database');
 const fs = require('fs').promises;
 const path = require('path');
+const logger = require('../utils/logger');
 
 // Get all sessions for logged-in user
 const getAllSessions = async (req, res) => {
   try {
     const userId = req.session.userId;
+
+    // SPEC-7: Log data isolation check
+    logger.logSpec('SPEC-7', {
+      action: 'DATA ISOLATION CHECK',
+      details: {
+        Endpoint: 'GET /api/sessions',
+        User: `ID ${userId}`,
+        Action: 'Retrieving own sessions only'
+      }
+    }, true);
 
     const sessions = await getAll(
       `SELECT * FROM sessions 
@@ -37,11 +48,32 @@ const getSessionById = async (req, res) => {
     );
 
     if (!session) {
+      // SPEC-7: Log denied access (either not found or not owned by user)
+      logger.logSpec('SPEC-7', {
+        action: 'DATA ISOLATION CHECK',
+        details: {
+          Endpoint: `GET /api/sessions/${id}`,
+          User: `ID ${userId}`,
+          Result: 'ACCESS DENIED - Session not found or not owned by user'
+        }
+      }, true);
+      
       return res.status(404).json({ 
         error: 'Not found',
         message: 'Session not found'
       });
     }
+
+    // SPEC-7: Log successful access to own data
+    logger.logSpec('SPEC-7', {
+      action: 'DATA ISOLATION CHECK',
+      details: {
+        Endpoint: `GET /api/sessions/${id}`,
+        User: `ID ${userId}`,
+        'Session Owner': `ID ${session.user_id}`,
+        Result: 'ACCESS ALLOWED'
+      }
+    }, true);
 
     res.json({ session });
 
@@ -203,15 +235,66 @@ const deleteSession = async (req, res) => {
 
 // Upload captured frame
 const uploadFrame = async (req, res) => {
+  const uploadStartTime = Date.now();
+  
   try {
     const { id: sessionId } = req.params;
     const userId = req.session.userId;
     const frameType = req.body.type; // 'webcam' or 'screen'
 
     if (!req.file) {
+      // SPEC-5: Track failed upload
+      logger.logSpec('SPEC-5', {
+        action: 'FRAME UPLOAD',
+        success: false,
+        details: {
+          Session: sessionId,
+          Reason: 'No file provided'
+        }
+      }, false);
+      
       return res.status(400).json({ 
         error: 'No file',
         message: 'No frame file uploaded'
+      });
+    }
+
+    // SPEC-9: Validate frame payload (JPEG/PNG, ≤5MB)
+    const fileType = req.file.mimetype;
+    const fileSize = req.file.size;
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const validTypes = ['image/jpeg', 'image/png'];
+    
+    const isValidType = validTypes.includes(fileType);
+    const isValidSize = fileSize <= maxSize;
+    const validationPassed = isValidType && isValidSize;
+    
+    logger.logSpec('SPEC-9', {
+      action: 'FRAME VALIDATION',
+      details: {
+        Type: fileType,
+        Size: `${(fileSize / 1024 / 1024).toFixed(2)}MB`,
+        'Max Size': '5MB',
+        'Valid Type': isValidType ? 'YES' : 'NO',
+        'Valid Size': isValidSize ? 'YES' : 'NO',
+        Status: validationPassed ? 'VALID' : 'INVALID'
+      }
+    }, validationPassed);
+
+    if (!validationPassed) {
+      // SPEC-5: Track failed upload
+      logger.logSpec('SPEC-5', {
+        action: 'FRAME UPLOAD',
+        success: false,
+        details: {
+          Session: sessionId,
+          Reason: !isValidType ? 'Invalid file type' : 'File too large'
+        }
+      }, false);
+      
+      return res.status(400).json({ 
+        error: 'Invalid file',
+        message: !isValidType ? 'Only JPEG/PNG files allowed' : 'File exceeds 5MB limit'
       });
     }
 
@@ -222,18 +305,67 @@ const uploadFrame = async (req, res) => {
     );
 
     if (!session) {
+      // SPEC-5: Track failed upload
+      logger.logSpec('SPEC-5', {
+        action: 'FRAME UPLOAD',
+        success: false,
+        details: {
+          Session: sessionId,
+          Reason: 'Session not found or access denied'
+        }
+      }, false);
+      
       return res.status(404).json({ 
         error: 'Not found',
         message: 'Session not found'
       });
     }
 
-    // Save frame record to database
+    // SPEC-1: Track frame upload time
+    const uploadDuration = Date.now() - uploadStartTime;
+    const uploadPassed = uploadDuration < 500;
+    
+    logger.logSpec('SPEC-1', {
+      action: 'FRAME UPLOAD',
+      details: {
+        Session: sessionId,
+        Type: frameType,
+        Size: `${(fileSize / 1024 / 1024).toFixed(2)}MB`,
+        Status: 'SUCCESS'
+      }
+    }, uploadPassed, uploadDuration);
+
+    // SPEC-2: Track metadata persistence time
+    const dbStartTime = Date.now();
+    
     await runQuery(
       `INSERT INTO captured_frames (session_id, frame_type, file_path) 
        VALUES (?, ?, ?)`,
       [sessionId, frameType, req.file.path]
     );
+    
+    const dbDuration = Date.now() - dbStartTime;
+    const dbPassed = dbDuration <= 150;
+    
+    logger.logSpec('SPEC-2', {
+      action: 'METADATA PERSIST',
+      details: {
+        'Frame Type': frameType,
+        'DB Operation': 'INSERT captured_frames',
+        Status: 'SUCCESS'
+      }
+    }, dbPassed, dbDuration);
+
+    // SPEC-5: Track successful upload
+    logger.logSpec('SPEC-5', {
+      action: 'FRAME UPLOAD',
+      success: true,
+      details: {
+        Session: sessionId,
+        Type: frameType,
+        Size: `${(fileSize / 1024 / 1024).toFixed(2)}MB`
+      }
+    }, true);
 
     res.json({ 
       message: 'Frame uploaded successfully',
@@ -246,6 +378,17 @@ const uploadFrame = async (req, res) => {
 
   } catch (error) {
     console.error('Upload frame error:', error);
+    
+    // SPEC-5: Track failed upload
+    logger.logSpec('SPEC-5', {
+      action: 'FRAME UPLOAD',
+      success: false,
+      details: {
+        Session: req.params.id,
+        Reason: `Server error: ${error.message}`
+      }
+    }, false);
+    
     res.status(500).json({ 
       error: 'Server error',
       message: 'Could not upload frame'

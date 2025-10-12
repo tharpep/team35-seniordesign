@@ -67,7 +67,7 @@ export default function SessionDetail() {
                 setIsLoading(true);
                 const data = await api.getMaterials(sessionId);
                 setMaterials(data);
-                console.log(`Fetched ${data.length} materials for session ${sessionId}`);
+                console.log(`✓ Fetched ${data.length} materials for session ${sessionId}`);
             } catch (error) {
                 console.error('Error fetching materials:', error);
             } finally {
@@ -79,8 +79,18 @@ export default function SessionDetail() {
 
         // Subscribe to real-time material updates
         subscribeToMaterials(sessionId, (newMaterial: any) => {
-            console.log('Received new material via WebSocket:', newMaterial);
-            setMaterials(prev => [...prev, newMaterial]);
+            console.log('✓ Received new material via WebSocket:', newMaterial);
+            
+            setMaterials(prev => {
+                // Check if material already exists to avoid duplicates
+                const exists = prev.some(m => m.id === newMaterial.id);
+                if (exists) {
+                    console.log('⚠️  Material already exists, skipping duplicate');
+                    return prev;
+                }
+                console.log(`✓ Added material ID ${newMaterial.id} to display`);
+                return [...prev, newMaterial];
+            });
         });
 
         // Cleanup on unmount

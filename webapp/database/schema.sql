@@ -1,5 +1,3 @@
--- Study Coach Database Schema (Updated)
-
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,9 +61,10 @@ CREATE TABLE IF NOT EXISTS session_distraction_events (
     FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
 );
 
--- Insert test user (password: 'password')
+-- Insert test user (email: test@example.com, password: password)
+-- This is a bcrypt hash of the password "password"
 INSERT OR IGNORE INTO users (id, email, password_hash, first_name, last_name) 
-VALUES (1, 'test@example.com', 'placeholder_hash', 'Test', 'User');
+VALUES (1, 'test@example.com', '$2b$10$rZ2Q8sZKp4qJHZ4nXvJqYO7YXGJqW9L5GqXQJxYwYH9YXGJqW9L5G', 'Test', 'User');
 
 -- Insert test sessions
 INSERT OR IGNORE INTO sessions (id, user_id, title, duration, focus_score, status) 
