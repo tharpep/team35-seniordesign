@@ -1,23 +1,43 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { router } from 'expo-router';
+import { Button, InputField, Typography, Card } from '../../components/ui';
+import { commonStyles, tokens } from '../../styles/theme';
 
 export default function CreateAccount() {
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
 
-  const handleSignUp = () => {
-    if (!name || !email || !password || !confirmPassword) {
+  const handleSubmit = () => {
+    // Basic validation
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
+    
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match');
       return;
     }
-    // Mock signup - navigate back to login
+    
+    if (!agreeToTerms) {
+      Alert.alert('Error', 'Please agree to the terms and conditions');
+      return;
+    }
+
+    // Mock account creation
+    console.log('Account creation attempt:', { 
+      firstName, 
+      lastName, 
+      email, 
+      password 
+    });
+    
+    // Navigate back to login after creating account
     Alert.alert('Success', 'Account created successfully! Please sign in.', [
       { text: 'OK', onPress: () => router.push('./login') }
     ]);
@@ -27,140 +47,177 @@ export default function CreateAccount() {
     router.push('./login');
   };
 
+  const handleTermsPress = () => {
+    Alert.alert('Terms of Service', 'Terms of Service would open here.');
+  };
+
+  const handlePrivacyPress = () => {
+    Alert.alert('Privacy Policy', 'Privacy Policy would open here.');
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Join us to start your learning journey</Text>
-      </View>
-
-      <View style={styles.form}>
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Full Name</Text>
-          <TextInput
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-            placeholder="Enter your full name"
-          />
+    <View style={commonStyles.authPage}>
+      <ScrollView 
+        style={{ flex: 1, width: '100%' }}
+        contentContainerStyle={{ 
+          flexGrow: 1, 
+          justifyContent: 'center',
+          paddingVertical: tokens.spacing.xl 
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Brand Section */}
+        <View style={commonStyles.brand}>
+          <View style={commonStyles.brandLogo}>
+            <View style={commonStyles.brandIcon}>
+              <Text style={commonStyles.brandIconText}>🧠</Text>
+            </View>
+          </View>
+          <Typography variant="displaySmall" style={commonStyles.brandTitle}>
+            Study Coach
+          </Typography>
+          <Typography variant="bodyLarge" color="secondary" style={commonStyles.brandSubtitle}>
+            Create your account
+          </Typography>
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Enter your email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
+        {/* Create Account Form Card */}
+        <Card variant="large" style={{ 
+          marginHorizontal: tokens.spacing.xl,
+          marginBottom: tokens.spacing.xl 
+        }}>
+          <View style={commonStyles.formSection}>
+            {/* Name Fields */}
+            <View style={{ 
+              flexDirection: 'row', 
+              gap: tokens.spacing.md,
+              marginBottom: tokens.spacing.xl 
+            }}>
+              <View style={{ flex: 1 }}>
+                <InputField
+                  label="First Name"
+                  value={firstName}
+                  onChangeText={setFirstName}
+                  placeholder=" "
+                  autoComplete="given-name"
+                  containerStyle={{ marginBottom: 0 }}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <InputField
+                  label="Last Name"
+                  value={lastName}
+                  onChangeText={setLastName}
+                  placeholder=" "
+                  autoComplete="family-name"
+                  containerStyle={{ marginBottom: 0 }}
+                />
+              </View>
+            </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Enter your password"
-            secureTextEntry
-          />
-        </View>
+            <InputField
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              placeholder=" "
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
+            />
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Confirm Password</Text>
-          <TextInput
-            style={styles.input}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            placeholder="Confirm your password"
-            secureTextEntry
-          />
-        </View>
+            <InputField
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              placeholder=" "
+              secureTextEntry
+              autoComplete="new-password"
+            />
 
-        <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
-          <Text style={styles.signupButtonText}>Create Account</Text>
-        </TouchableOpacity>
+            <InputField
+              label="Confirm Password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              placeholder=" "
+              secureTextEntry
+              autoComplete="new-password"
+            />
 
-        <View style={styles.signinContainer}>
-          <Text style={styles.signinText}>Already have an account? </Text>
-          <TouchableOpacity onPress={handleSignIn}>
-            <Text style={styles.signinLink}>Sign In</Text>
-          </TouchableOpacity>
+            {/* Terms Agreement */}
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              marginBottom: tokens.spacing.xxl,
+              gap: tokens.spacing.md,
+            }}>
+              <TouchableOpacity 
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderWidth: 2,
+                  borderColor: agreeToTerms ? tokens.colors.primary : tokens.colors.outlineVariant,
+                  backgroundColor: agreeToTerms ? tokens.colors.primary : 'transparent',
+                  borderRadius: 4,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 2,
+                }}
+                onPress={() => setAgreeToTerms(!agreeToTerms)}
+              >
+                {agreeToTerms && (
+                  <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>✓</Text>
+                )}
+              </TouchableOpacity>
+              
+              <View style={{ flex: 1 }}>
+                <Text style={[commonStyles.bodySmall, { color: tokens.colors.onSurfaceVariant }]}>
+                  I agree to the{' '}
+                  <Text 
+                    style={{ color: tokens.colors.primary, fontWeight: '500' }}
+                    onPress={handleTermsPress}
+                  >
+                    Terms of Service
+                  </Text>
+                  {' '}and{' '}
+                  <Text 
+                    style={{ color: tokens.colors.primary, fontWeight: '500' }}
+                    onPress={handlePrivacyPress}
+                  >
+                    Privacy Policy
+                  </Text>
+                </Text>
+              </View>
+            </View>
+
+            {/* Create Account Button */}
+            <Button
+              title="Create Account"
+              onPress={handleSubmit}
+              variant="primary"
+              icon="👤"
+              iconPosition="left"
+            />
+          </View>
+        </Card>
+
+        {/* Sign In Link */}
+        <View style={{
+          alignItems: 'center',
+          paddingHorizontal: tokens.spacing.xl,
+        }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Typography variant="bodyMedium" color="secondary">
+              Already have an account?{' '}
+            </Typography>
+            <TouchableOpacity onPress={handleSignIn}>
+              <Typography variant="bodyMedium" color="link" style={{ fontWeight: '500' }}>
+                Sign in
+              </Typography>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    padding: 40,
-    paddingTop: 80,
-    backgroundColor: '#4A90E2',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
-  },
-  form: {
-    padding: 20,
-    paddingTop: 40,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: 'white',
-  },
-  signupButton: {
-    backgroundColor: '#4A90E2',
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  signupButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  signinContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 30,
-  },
-  signinText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  signinLink: {
-    fontSize: 14,
-    color: '#4A90E2',
-    fontWeight: 'bold',
-  },
-});

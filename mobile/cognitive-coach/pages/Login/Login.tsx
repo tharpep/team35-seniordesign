@@ -122,7 +122,7 @@ export default function Login() {
               variant="primary"
               icon="→"
               iconPosition="left"
-              style={{ marginBottom: tokens.spacing.xl }}
+              
             />
           </View>
         </Card>

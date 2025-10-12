@@ -14,11 +14,7 @@ export const tokens = {
     outline: '#e8eaed',
     outlineVariant: '#dadce0',
     
-    // Success/Warning/Error States
-    success: '#34a853',
-    successBg: '#e8f5e8',
-    successBorder: '#c8e6c9',
-    successText: '#2e7d32',
+    // Warning/Error States
     warning: '#fbbc04',
     warningHover: '#e8900d',
     error: '#ea4335',
@@ -345,10 +341,6 @@ export const commonStyles = StyleSheet.create({
   
   textLink: {
     color: tokens.colors.primary,
-  },
-  
-  textSuccess: {
-    color: tokens.colors.success,
   },
   
   textWarning: {

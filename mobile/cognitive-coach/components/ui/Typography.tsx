@@ -8,7 +8,7 @@ type TypographyVariant =
   | 'titleLarge' | 'titleMedium' | 'titleSmall'
   | 'bodyLarge' | 'bodyMedium' | 'bodySmall';
 
-type TextColor = 'primary' | 'secondary' | 'link' | 'success' | 'warning' | 'error';
+type TextColor = 'primary' | 'secondary' | 'link' | 'warning' | 'error';
 
 interface TypographyProps {
   variant?: TypographyVariant;
@@ -29,7 +29,6 @@ export const Typography: React.FC<TypographyProps> = ({
     switch (color) {
       case 'secondary': return commonStyles.textSecondary;
       case 'link': return commonStyles.textLink;
-      case 'success': return commonStyles.textSuccess;
       case 'warning': return commonStyles.textWarning;
       case 'error': return commonStyles.textError;
       default: return commonStyles.textPrimary;
