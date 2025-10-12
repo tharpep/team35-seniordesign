@@ -253,10 +253,13 @@ const styles = {
   },
   sectionTitle: {
     marginBottom: tokens.spacing.lg,
-    fontWeight: '500' as const,
+    fontWeight: '400' as const,
+    fontSize: 24,
+    color: tokens.colors.onSurface,
   },
   sessionCard: {
     marginBottom: tokens.spacing.lg,
+    ...tokens.shadows.sm,
   },
   sessionHeader: {
     flexDirection: 'row' as const,
@@ -269,12 +272,15 @@ const styles = {
   },
   sessionTitle: {
     marginBottom: tokens.spacing.xs,
+    fontSize: 18,
+    fontWeight: '500' as const,
+    color: tokens.colors.onSurface,
   },
   sessionDate: {
     // No additional styles needed, handled by Typography
   },
   sessionDuration: {
-    backgroundColor: '#e8f0fe',
+    backgroundColor: tokens.colors.durationBg,
     color: tokens.colors.primary,
     fontWeight: '500' as const,
     paddingVertical: 6,
@@ -292,10 +298,14 @@ const styles = {
   },
   focusScore: {
     fontWeight: '500' as const,
-    color: '#34a853',
+    color: tokens.colors.success,
+    fontSize: 18,
   },
   emotion: {
     fontWeight: '500' as const,
+    fontSize: 18,
+    color: tokens.colors.emotionBlue,
+    marginLeft: 16,
   },
   sessionArtifacts: {
     flexDirection: 'row' as const,
@@ -310,20 +320,20 @@ const styles = {
     borderRadius: tokens.radius.lg,
     gap: tokens.spacing.xs,
     borderWidth: 1,
-    backgroundColor: '#f1f3f4',
-    borderColor: tokens.colors.outlineVariant,
+    backgroundColor: tokens.colors.artifactDefault,
+    borderColor: tokens.colors.artifactDefaultBorder,
   },
   artifactChipEquation: {
-    backgroundColor: '#e8f5e8',
-    borderColor: '#c8e6c9',
+    backgroundColor: tokens.colors.successBg,
+    borderColor: tokens.colors.successBorder,
   },
   artifactChipFlashcard: {
-    backgroundColor: '#fff3e0',
-    borderColor: '#ffcc02',
+    backgroundColor: tokens.colors.flashcardBg,
+    borderColor: tokens.colors.flashcardBorder,
   },
   artifactChipQuestion: {
-    backgroundColor: '#e3f2fd',
-    borderColor: '#bbdefb',
+    backgroundColor: tokens.colors.questionBg,
+    borderColor: tokens.colors.questionBorder,
   },
   artifactIcon: {
     fontSize: 12,
@@ -331,15 +341,15 @@ const styles = {
   artifactText: {
     fontSize: 12,
     fontWeight: '500' as const,
-    color: '#3c4043',
+    color: tokens.colors.artifactDefaultText,
   },
   artifactTextEquation: {
-    color: '#2e7d32',
+    color: tokens.colors.successText,
   },
   artifactTextFlashcard: {
-    color: '#e65100',
+    color: tokens.colors.flashcardText,
   },
   artifactTextQuestion: {
-    color: '#1565c0',
+    color: tokens.colors.questionText,
   },
 };

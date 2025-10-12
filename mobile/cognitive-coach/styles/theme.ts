@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 // Material 3 Design System - Design Tokens
 export const tokens = {
-  // Material 3 Colors
+  // Material 3 Colors - Exact match with web CSS variables
   colors: {
     primary: '#1a73e8',
     primaryHover: '#1557b0',
@@ -14,7 +14,7 @@ export const tokens = {
     outline: '#e8eaed',
     outlineVariant: '#dadce0',
     
-    // Success/Warning/Error States  
+    // Success/Warning/Error States - Exact match with web
     success: '#34a853',
     successBg: '#e8f5e8',
     successBorder: '#c8e6c9',
@@ -24,6 +24,23 @@ export const tokens = {
     error: '#ea4335',
     errorBg: '#d93025',
     errorHover: '#b52d20',
+    
+    // Additional colors from web CSS for artifact chips and UI elements
+    artifactDefault: '#f1f3f4',
+    artifactDefaultBorder: '#dadce0',
+    artifactDefaultText: '#3c4043',
+    flashcardBg: '#fff3e0',
+    flashcardBorder: '#ffcc02',
+    flashcardText: '#e65100',
+    questionBg: '#e3f2fd',
+    questionBorder: '#bbdefb',
+    questionText: '#1565c0',
+    durationBg: '#e8f0fe',
+    
+    // Common web colors for secondary backgrounds and borders
+    lightGray: '#f8f9fa',
+    mediumGray: '#c4c7c5',
+    emotionBlue: '#3b82f6',
   },
   
   // Spacing Scale
