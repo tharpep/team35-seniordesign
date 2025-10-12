@@ -14,7 +14,11 @@ export const tokens = {
     outline: '#e8eaed',
     outlineVariant: '#dadce0',
     
-    // Warning/Error States
+    // Success/Warning/Error States  
+    success: '#34a853',
+    successBg: '#e8f5e8',
+    successBorder: '#c8e6c9',
+    successText: '#2e7d32',
     warning: '#fbbc04',
     warningHover: '#e8900d',
     error: '#ea4335',

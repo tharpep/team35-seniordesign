@@ -1,143 +1,345 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { router } from 'expo-router';
+import { Typography, Card } from '../../components/ui';
+import { commonStyles, tokens } from '../../styles/theme';
+
+interface Session {
+  id: string;
+  title: string;
+  date: string;
+  duration: string;
+  focusScore: number;
+  emotion: string;
+  artifacts: {
+    equations?: number;
+    flashcards?: number;
+    questions?: number;
+  };
+}
 
 export default function Dashboard() {
-  const handleSessionPress = () => {
+  const sessions: Session[] = [
+    {
+      id: '1',
+      title: 'Organic Chemistry Review',
+      date: 'Today, 2:30 PM',
+      duration: '2h 15m',
+      focusScore: 88,
+      emotion: 'Focused',
+      artifacts: { equations: 12, flashcards: 15, questions: 3 }
+    },
+    {
+      id: '2',
+      title: 'Calculus Problem Solving',
+      date: 'Yesterday, 7:45 PM',
+      duration: '1h 45m',
+      focusScore: 92,
+      emotion: 'Confident',
+      artifacts: { equations: 18, flashcards: 15, questions: 2 }
+    },
+    {
+      id: '3',
+      title: 'World History Reading',
+      date: '2 days ago, 3:15 PM',
+      duration: '3h 20m',
+      focusScore: 76,
+      emotion: 'Calm',
+      artifacts: { flashcards: 18, questions: 5 }
+    },
+    {
+      id: '4',
+      title: 'Physics Lab Analysis',  
+      date: '3 days ago, 1:00 PM',
+      duration: '2h 50m',
+      focusScore: 94,
+      emotion: 'Engaged',
+      artifacts: { equations: 8, flashcards: 9, questions: 4 }
+    }
+  ];
+
+  const handleSessionClick = (sessionId: string) => {
     router.push('/session');
   };
 
+  const handleProfilePress = () => {
+    Alert.alert('Profile', 'Profile functionality would be implemented here.');
+  };
+
+  const handleNotificationsPress = () => {
+    Alert.alert('Notifications', 'No new notifications.');
+  };
+
+  const renderArtifacts = (artifacts: Session['artifacts']) => {
+    const items = [];
+    if (artifacts.equations) {
+      items.push(
+        <View key="equations" style={[styles.artifactChip, styles.artifactChipEquation]}>
+          <Text style={styles.artifactIcon}>⚡</Text>
+          <Text style={[styles.artifactText, styles.artifactTextEquation]}>
+            {artifacts.equations} equations
+          </Text>
+        </View>
+      );
+    }
+    if (artifacts.flashcards) {
+      items.push(
+        <View key="flashcards" style={[styles.artifactChip, styles.artifactChipFlashcard]}>
+          <Text style={styles.artifactIcon}>📚</Text>
+          <Text style={[styles.artifactText, styles.artifactTextFlashcard]}>
+            {artifacts.flashcards} flashcards
+          </Text>
+        </View>
+      );
+    }
+    if (artifacts.questions) {
+      items.push(
+        <View key="questions" style={[styles.artifactChip, styles.artifactChipQuestion]}>
+          <Text style={styles.artifactIcon}>❓</Text>
+          <Text style={[styles.artifactText, styles.artifactTextQuestion]}>
+            {artifacts.questions} questions
+          </Text>
+        </View>
+      );
+    }
+    return items;
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Study Dashboard</Text>
-        <Text style={styles.subtitle}>Track your learning progress</Text>
+    <View style={commonStyles.container}>
+      {/* Mobile Header */}
+      <View style={styles.mobileHeader}>
+        <View style={styles.headerTop}>
+          <View style={styles.brandSection}>
+            <View style={styles.brandIcon}>
+              <Text style={styles.brandIconText}>🧠</Text>
+            </View>
+            <Typography variant="titleLarge" style={{ fontWeight: '500' }}>
+              Study Coach
+            </Typography>
+          </View>
+          <View style={styles.headerActions}>
+            <TouchableOpacity style={styles.headerButton} onPress={handleNotificationsPress}>
+              <Text style={styles.headerButtonIcon}>🔔</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.profileButton} onPress={handleProfilePress}>
+              <Text style={styles.profileText}>JD</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <Typography variant="bodyLarge" color="secondary" style={{ marginTop: tokens.spacing.sm }}>
+          Welcome back! Here's your study progress.
+        </Typography>
       </View>
 
-      <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>42</Text>
-          <Text style={styles.statLabel}>Flashcards</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>18</Text>
-          <Text style={styles.statLabel}>MCQ</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>7</Text>
-          <Text style={styles.statLabel}>Insights</Text>
-        </View>
-      </View>
+      <ScrollView 
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: tokens.spacing.xl }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Previous Sessions Section */}
+        <View style={styles.sessionsSection}>
+          <Typography variant="titleLarge" style={styles.sectionTitle}>
+            Previous sessions
+          </Typography>
+          
+          {sessions.map((session) => (
+            <TouchableOpacity
+              key={session.id}
+              onPress={() => handleSessionClick(session.id)}
+              activeOpacity={0.7}
+            >
+              <Card style={styles.sessionCard}>
+                <View style={styles.sessionHeader}>
+                  <View style={styles.sessionInfo}>
+                    <Typography variant="titleMedium" style={styles.sessionTitle}>
+                      {session.title}
+                    </Typography>
+                    <Typography variant="bodySmall" color="secondary" style={styles.sessionDate}>
+                      {session.date}
+                    </Typography>
+                  </View>
+                  <Typography variant="bodyMedium" style={styles.sessionDuration}>
+                    {session.duration}
+                  </Typography>
+                </View>
 
-      <View style={styles.sessionContainer}>
-        <Text style={styles.sectionTitle}>Recent Sessions</Text>
-        <TouchableOpacity style={styles.sessionCard} onPress={handleSessionPress}>
-          <View style={styles.sessionInfo}>
-            <Text style={styles.sessionTitle}>Mathematics Study</Text>
-            <Text style={styles.sessionDate}>Today, 2:30 PM</Text>
-          </View>
-          <Text style={styles.sessionDuration}>45 min</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.sessionCard} onPress={handleSessionPress}>
-          <View style={styles.sessionInfo}>
-            <Text style={styles.sessionTitle}>Physics Review</Text>
-            <Text style={styles.sessionDate}>Yesterday, 4:15 PM</Text>
-          </View>
-          <Text style={styles.sessionDuration}>30 min</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+                <View style={styles.sessionMetrics}>
+                  <View style={styles.focusScoreContainer}>
+                    <Typography variant="bodyMedium" style={styles.focusScore}>
+                      Focus: {session.focusScore}%
+                    </Typography>
+                    <Typography variant="bodyMedium" color="link" style={styles.emotion}>
+                      Emotion: {session.emotion}
+                    </Typography>
+                  </View>
+                </View>
+
+                <View style={styles.sessionArtifacts}>
+                  {renderArtifacts(session.artifacts)}
+                </View>
+              </Card>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    padding: 20,
+const styles = {
+  mobileHeader: {
+    backgroundColor: tokens.colors.surface,
     paddingTop: 60,
-    backgroundColor: '#4A90E2',
+    paddingHorizontal: tokens.spacing.xl,
+    paddingBottom: tokens.spacing.xl,
+    borderBottomWidth: 1,
+    borderBottomColor: tokens.colors.outline,
+    ...tokens.shadows.sm,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+  headerTop: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+  },
+  brandSection: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: tokens.spacing.md,
+  },
+  brandIcon: {
+    width: 36,
+    height: 36,
+    backgroundColor: tokens.colors.primary,
+    borderRadius: tokens.radius.sm,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  brandIconText: {
+    fontSize: 18,
     color: 'white',
-    marginBottom: 5,
   },
-  subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+  headerActions: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: tokens.spacing.sm,
   },
-  statsContainer: {
-    flexDirection: 'row',
-    padding: 20,
-    justifyContent: 'space-between',
+  headerButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    backgroundColor: 'rgba(95, 99, 104, 0.1)',
   },
-  statCard: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    flex: 1,
-    marginHorizontal: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+  headerButtonIcon: {
+    fontSize: 18,
   },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#4A90E2',
-    marginBottom: 5,
+  profileButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: tokens.colors.primary,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
   },
-  statLabel: {
-    fontSize: 12,
-    color: '#666',
+  profileText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '500' as const,
   },
-  sessionContainer: {
-    padding: 20,
+  sessionsSection: {
+    padding: tokens.spacing.xl,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: '#333',
+    marginBottom: tokens.spacing.lg,
+    fontWeight: '500' as const,
   },
   sessionCard: {
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginBottom: tokens.spacing.lg,
+  },
+  sessionHeader: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'flex-start' as const,
+    marginBottom: tokens.spacing.md,
   },
   sessionInfo: {
     flex: 1,
   },
   sessionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 3,
+    marginBottom: tokens.spacing.xs,
   },
   sessionDate: {
-    fontSize: 12,
-    color: '#666',
+    // No additional styles needed, handled by Typography
   },
   sessionDuration: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#4A90E2',
+    backgroundColor: '#e8f0fe',
+    color: tokens.colors.primary,
+    fontWeight: '500' as const,
+    paddingVertical: 6,
+    paddingHorizontal: tokens.spacing.md,
+    borderRadius: tokens.radius.md,
+    fontSize: 12,
   },
-});
+  sessionMetrics: {
+    marginBottom: tokens.spacing.md,
+  },
+  focusScoreContainer: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: tokens.spacing.lg,
+  },
+  focusScore: {
+    fontWeight: '500' as const,
+    color: '#34a853',
+  },
+  emotion: {
+    fontWeight: '500' as const,
+  },
+  sessionArtifacts: {
+    flexDirection: 'row' as const,
+    flexWrap: 'wrap' as const,
+    gap: tokens.spacing.sm,
+  },
+  artifactChip: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    paddingVertical: tokens.spacing.xs,
+    paddingHorizontal: tokens.spacing.md,
+    borderRadius: tokens.radius.lg,
+    gap: tokens.spacing.xs,
+    borderWidth: 1,
+    backgroundColor: '#f1f3f4',
+    borderColor: tokens.colors.outlineVariant,
+  },
+  artifactChipEquation: {
+    backgroundColor: '#e8f5e8',
+    borderColor: '#c8e6c9',
+  },
+  artifactChipFlashcard: {
+    backgroundColor: '#fff3e0',
+    borderColor: '#ffcc02',
+  },
+  artifactChipQuestion: {
+    backgroundColor: '#e3f2fd',
+    borderColor: '#bbdefb',
+  },
+  artifactIcon: {
+    fontSize: 12,
+  },
+  artifactText: {
+    fontSize: 12,
+    fontWeight: '500' as const,
+    color: '#3c4043',
+  },
+  artifactTextEquation: {
+    color: '#2e7d32',
+  },
+  artifactTextFlashcard: {
+    color: '#e65100',
+  },
+  artifactTextQuestion: {
+    color: '#1565c0',
+  },
+};
