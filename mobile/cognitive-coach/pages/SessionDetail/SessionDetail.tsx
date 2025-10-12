@@ -313,8 +313,8 @@ export default function SessionDetail() {
           </View>
         </Card>
 
-        {/* Session Timeline */}
-        <Card style={styles.timelineSection}>
+        {/* Session Timeline - Commented out for now */}
+        {/* <Card style={styles.timelineSection}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionIcon}>📅</Text>
             <Typography variant="titleMedium" style={styles.sectionTitle}>
@@ -341,7 +341,7 @@ export default function SessionDetail() {
               </View>
             ))}
           </View>
-        </Card>
+        </Card> */}
 
         {/* AI Insights */}
         <Card style={styles.insightsSection}>
