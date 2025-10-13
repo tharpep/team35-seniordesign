@@ -73,9 +73,16 @@ export default function FlashcardStudy() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Text style={styles.backIcon}>‹</Text>
+        </TouchableOpacity>
         <Typography variant="titleMedium" style={styles.headerTitle}>
           Studying Flashcards • {state.currentIndex + 1} of {totalCards}
         </Typography>
+        <View style={styles.headerSpacer} />
       </View>
 
       {/* Flashcard */}
@@ -186,16 +193,36 @@ const styles = StyleSheet.create({
     backgroundColor: tokens.colors.background,
   },
   header: {
-    justifyContent: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     padding: tokens.spacing.xl,
     borderBottomWidth: 1,
     borderBottomColor: tokens.colors.outline,
     backgroundColor: tokens.colors.surface,
   },
+  backButton: {
+    padding: tokens.spacing.sm,
+    borderRadius: tokens.radius.md,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backIcon: {
+    fontSize: 28,
+    color: tokens.colors.primary,
+    fontWeight: 'bold',
+  },
   headerTitle: {
     fontWeight: '500',
     color: tokens.colors.onSurface,
+    flex: 1,
+    textAlign: 'center',
+  },
+  headerSpacer: {
+    width: 40,
+    height: 40,
   },
   cardContainer: {
     flex: 1,
