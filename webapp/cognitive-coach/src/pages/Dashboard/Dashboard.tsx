@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 import ConfigurePopup from '../../components/ConfigurePopup/ConfigurePopup';
 import CurrentSession from '../../components/CurrentSession/CurrentSession';
+import ProfilePopup from '../../components/ProfilePopup/ProfilePopup';
 
 interface Session {
     id: string;
@@ -23,6 +24,7 @@ interface Session {
 export default function Dashboard() {
     const navigate = useNavigate();
     const [isConfigurePopupOpen, setIsConfigurePopupOpen] = useState(false);
+    const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
 
     const sessions: Session[] = [
         {
@@ -83,6 +85,14 @@ export default function Dashboard() {
         setIsConfigurePopupOpen(false);
     };
 
+    const handleProfileClick = () => {
+        setIsProfilePopupOpen(true);
+    };
+
+    const handleCloseProfilePopup = () => {
+        setIsProfilePopupOpen(false);
+    };
+
     const renderArtifacts = (artifacts: Session['artifacts']) => {
         const items = [];
         if (artifacts.equations) {
@@ -129,7 +139,7 @@ export default function Dashboard() {
                         <button className="icon-button" title="Settings">
                             <span className="material-icons-round">settings</span>
                         </button>
-                        <div className="user-avatar" title="Profile">JD</div>
+                        <button className="user-avatar" title="Profile" onClick={handleProfileClick}>JD</button>
                     </div>
                 </div>
             </header>
@@ -175,6 +185,11 @@ export default function Dashboard() {
             <ConfigurePopup 
                 isOpen={isConfigurePopupOpen}
                 onClose={handleCloseConfigurePopup}
+            />
+            
+            <ProfilePopup 
+                isOpen={isProfilePopupOpen}
+                onClose={handleCloseProfilePopup}
             />
         </>
     );

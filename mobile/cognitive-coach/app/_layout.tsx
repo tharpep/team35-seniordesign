@@ -19,6 +19,7 @@ export default function RootLayout() {
         <Stack.Screen name="flashcard-study" options={{ headerShown: false }} />
         <Stack.Screen name="mcq-study" options={{ headerShown: false }} />
         <Stack.Screen name="equation-study" options={{ headerShown: false }} />
+        <Stack.Screen name="profile" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
