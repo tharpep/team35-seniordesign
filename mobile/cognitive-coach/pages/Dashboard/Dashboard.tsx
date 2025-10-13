@@ -63,7 +63,7 @@ export default function Dashboard() {
   };
 
   const handleProfilePress = () => {
-    Alert.alert('Profile', 'Profile functionality would be implemented here.');
+    router.push('/profile');
   };
 
   const handleNotificationsPress = () => {
