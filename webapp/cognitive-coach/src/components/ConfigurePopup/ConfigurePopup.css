@@ -36,7 +36,6 @@
     justify-content: space-between;
     align-items: center;
     padding: 32px 32px 24px 32px;
-    border-bottom: 1px solid #e8eaed;
     background: #fafbff;
 }
 
@@ -337,5 +336,144 @@
     .stop-recording-button {
         padding: 10px 16px;
         font-size: 14px;
+    }
+}
+
+/* Main Section Tabs */
+.main-section-tabs {
+    display: flex;
+    border-bottom: 1px solid #e8eaed;
+    background: #fafbff;
+    margin: 0;
+    padding: 0 32px;
+}
+
+.section-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 20px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 8px 8px 0 0;
+    color: #5f6368;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.section-tab:hover {
+    color: #1a73e8;
+    background: rgba(26, 115, 232, 0.04);
+}
+
+.section-tab.active {
+    color: #1a73e8;
+    border-bottom-color: #1a73e8;
+    background: rgba(26, 115, 232, 0.08);
+}
+
+.section-tab .material-icons-round {
+    font-size: 20px;
+}
+
+/* Settings Section */
+.settings-section {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.setting-group {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e8eaed;
+}
+
+.setting-group h3 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: #202124;
+}
+
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.setting-item label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #3c4043;
+}
+
+.interval-selector {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.interval-button {
+    padding: 12px 20px;
+    background: #ffffff;
+    border: 2px solid #e8eaed;
+    border-radius: 8px;
+    color: #3c4043;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 60px;
+}
+
+.interval-button:hover {
+    border-color: #1a73e8;
+    background: rgba(26, 115, 232, 0.04);
+    color: #1a73e8;
+}
+
+.interval-button.active {
+    background: #1a73e8;
+    border-color: #1a73e8;
+    color: #ffffff;
+}
+
+.setting-description {
+    margin: 8px 0 0 0;
+    font-size: 14px;
+    color: #5f6368;
+    line-height: 1.4;
+}
+
+/* Responsive adjustments for settings */
+@media (max-width: 640px) {
+    .main-section-tabs {
+        padding: 0 16px;
+    }
+    
+    .section-tab {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+    
+    .settings-section {
+        padding: 20px;
+    }
+    
+    .setting-group {
+        padding: 20px;
+    }
+    
+    .interval-button {
+        padding: 10px 16px;
+        font-size: 14px;
+        min-width: 50px;
     }
 }
