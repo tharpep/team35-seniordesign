@@ -430,8 +430,11 @@ export default function CurrentSession({ onConfigureClick, sessionSettings }: Cu
             <div className="session-title">
                 <h1>Current Session</h1>
                 <div className="session-status">
-                    <div className="status-dot"></div>
-                    All systems ready • {videoDevices.length + 1} cameras detected
+                    <div className={`status-dot ${(videoDevices.length + 1) >= 2 ? 'green' : 'red'}`}></div>
+                    {(videoDevices.length + 1) >= 2 
+                        ? `All systems ready • ${videoDevices.length + 1} cameras detected`
+                        : `Setup incomplete • ${videoDevices.length + 1} camera${(videoDevices.length + 1) === 1 ? '' : 's'} detected (need 2+)`
+                    }
                     {sessionState === 'active' && captureCount > 0 && (
                         <span> • {captureCount} captures</span>
                     )}
