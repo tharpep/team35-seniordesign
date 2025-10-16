@@ -49,7 +49,9 @@ class FlashcardGenerator(BaseArtifactGenerator):
         # Create specific prompt for flashcards
         prompt = f"""Create {num_items} flashcard about "{topic}".
 
-Output JSON format:
+IMPORTANT: Respond with ONLY valid JSON. No additional text, explanations, or markdown formatting.
+
+Required JSON format:
 {{
   "artifact_type": "flashcards",
   "version": "1.0",
@@ -66,10 +68,10 @@ Output JSON format:
   ]
 }}
 
-Generate now:"""
+Generate the JSON now:"""
         
-        # Use existing RAG system
-        result = self.rag.query(prompt)
+        # Use existing RAG system with artifact token limit
+        result = self.rag.query(prompt, max_tokens=self.rag.config.max_tokens)
         
         # Handle tuple return format
         if isinstance(result, tuple):
@@ -79,9 +81,22 @@ Generate now:"""
             context_docs = []
             context_scores = []
         
-        # Try to parse JSON
+        # Try to parse JSON with cleanup
         try:
-            artifact = json.loads(answer)
+            # Clean up common JSON issues
+            cleaned_answer = answer.strip()
+            
+            # Remove markdown code blocks if present
+            if cleaned_answer.startswith('```json'):
+                cleaned_answer = cleaned_answer[7:]  # Remove ```json
+            if cleaned_answer.startswith('```'):
+                cleaned_answer = cleaned_answer[3:]   # Remove ```
+            if cleaned_answer.endswith('```'):
+                cleaned_answer = cleaned_answer[:-3]  # Remove trailing ```
+            
+            cleaned_answer = cleaned_answer.strip()
+            
+            artifact = json.loads(cleaned_answer)
         except json.JSONDecodeError:
             artifact = self._create_fallback_artifact(answer, topic)
         

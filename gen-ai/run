@@ -237,7 +237,10 @@ def run_demo():
     demo_files = []
     for item in demos_dir.iterdir():
         if item.is_file() and item.name.endswith('_demo.py'):
-            demo_name = item.stem.replace('_demo', '').replace('_', ' ').title()
+            if item.name == 'subsystem_demo.py':
+                demo_name = "Subsystem (All Specifications)"
+            else:
+                demo_name = item.stem.replace('_demo', '').replace('_', ' ').title()
             demo_files.append((demo_name, item.stem))
     
     if not demo_files:

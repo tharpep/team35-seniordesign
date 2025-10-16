@@ -23,11 +23,12 @@ class RAGConfig:
     clear_on_ingest: bool = True  # Clear collection before ingesting new documents
     
     # Retrieval settings
-    top_k: int = 3  # Number of documents to retrieve (reduced for faster retrieval)
+    top_k: int = 5  # Number of documents to retrieve (increased for better context)
     similarity_threshold: float = 0.7  # Minimum similarity score (0.0-1.0)
     
     # Generation settings
-    max_tokens: int = 100  # Maximum tokens in response (optimal for artifact generation)
+    max_tokens: int = 500  # Maximum tokens in response (optimal for artifact generation)
+    max_chat_tokens: int = 150  # Maximum tokens for chatbot responses
     temperature: float = 0.4  # Creativity level (lower for more focused JSON generation)
     
     @property
@@ -36,7 +37,7 @@ class RAGConfig:
         if self.use_ollama:
             return "llama3.2:1b" if self.use_laptop else "qwen3:8b"
         else:
-            return "llama4:latest"  # Purdue API always uses llama4:latest
+            return "mistral:latest"  # Balanced speed and accuracy
 
 
 # Default configurations

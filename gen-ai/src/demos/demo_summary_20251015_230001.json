@@ -1,0 +1,381 @@
+{
+  "demo_timestamp": "20251015_230001",
+  "total_specifications": 6,
+  "successful_specifications": 3,
+  "success_rate": 0.5,
+  "results": {
+    "Artifact Generation": {
+      "specification": "Artifact Generation",
+      "target": "3+ artifact types",
+      "achieved": 3,
+      "success": true,
+      "artifact_types": [
+        "mcq",
+        "insights",
+        "flashcards"
+      ],
+      "generation_times": {
+        "flashcard": 4.612734079360962,
+        "mcq": 2.7252535820007324,
+        "insight": 1.9784362316131592
+      },
+      "artifacts": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "error": "JSON parsing failed",
+          "raw_response": "```json\n{\n  \"artifact_type\": \"flashcards\",\n  \"version\": \"1.0\",\n  \"cards\": [\n    {\n      \"id\": \"fc_001\",\n      \"front\": \"What are Newton's three laws of motion?\",\n      \"back\": \"1. First Law (Law of Inertia): An object at rest stays at rest, and an object in motion continues in motion with the same speed and direction unless acted upon by an unbalanced force.\\n2. Second Law: The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass...",
+          "topic": "Newton's laws of motion",
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.326,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.326,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.267,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 115,
+            "tokens_out": 147,
+            "latency_ms": 4612.73,
+            "retrieval_scores": [
+              0.3263943637517775,
+              0.3263943637517775,
+              0.26727875439091253
+            ]
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "error": "JSON parsing failed",
+          "raw_response": "```json\n{\n  \"artifact_type\": \"mcq\",\n  \"version\": \"1.0\",\n  \"questions\": [\n    {\n      \"id\": \"mcq_001\",\n      \"stem\": \"Which of Newton's laws explains why an object at rest stays at rest, and an object in motion continues in motion with the same speed and direction unless acted upon by an unbalanced force?\",\n      \"options\": [\n        \"Newton's First Law of Motion (Law of Inertia)\",\n        \"Newton's Second Law of Motion\",\n        \"Newton's Third Law of Motion\",\n        \"None of the above\"\n      ]...",
+          "topic": "Newton's laws of motion",
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.31,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.31,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.278,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 136,
+            "tokens_out": 146,
+            "latency_ms": 2725.25,
+            "retrieval_scores": [
+              0.31034498605561445,
+              0.31034498605561445,
+              0.2780847222570504
+            ]
+          }
+        },
+        "insight": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "Application of Newton's Laws in Problem Solving",
+              "takeaway": "Understanding and applying Newton's laws, especially the second law (F=ma), is crucial for solving mechanics problems effectively."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.329,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.329,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.279,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 95,
+            "tokens_out": 84,
+            "latency_ms": 1978.44,
+            "retrieval_scores": [
+              0.32896752206368574,
+              0.32896752206368574,
+              0.2785555112613333
+            ]
+          }
+        }
+      }
+    },
+    "Schema Compliance": {
+      "specification": "Schema Compliance",
+      "target": "Fixed JSON schema per artifact type",
+      "success": false,
+      "validation_results": {
+        "flashcard": true,
+        "mcq": false,
+        "insight": true
+      },
+      "artifacts": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "cards": [
+            {
+              "id": "fc_001",
+              "front": "What is supervised learning in machine learning?",
+              "back": "Supervised learning involves training a model on labeled data, where the correct output is provided for each input during the training phase. The model learns to map inputs to outputs and makes predictions on new, unseen data.",
+              "tags": [
+                "machine learning basics"
+              ],
+              "difficulty": 2,
+              "source_refs": [],
+              "hints": []
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.249,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.249,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.233,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 115,
+            "tokens_out": 134,
+            "latency_ms": 2296.99,
+            "retrieval_scores": [
+              0.24878626018948963,
+              0.24878626018948963,
+              0.23251623431246693
+            ]
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "error": "JSON parsing failed",
+          "raw_response": "```json\n{\n  \"artifact_type\": \"mcq\",\n  \"version\": \"1.0\",\n  \"questions\": [\n    {\n      \"id\": \"mcq_001\",\n      \"stem\": \"Which of the following is a primary type of machine learning?\",\n      \"options\": [\"Supervised Learning\", \"Unsupervised Learning\", \"Reinforcement Learning\", \"All of the above\"],\n      \"answer_index\": 3,\n      \"rationale\": \"The three primary types of machine learning are Supervised Learning, Unsupervised Learning, and Reinforcement Learning. Thus, 'All of the above' is correct.\",\n  ...",
+          "topic": "Machine learning basics",
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.273,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.251,
+              "preview": "y optimization, connection pooling ### Security Principles - **Input Validation**: Checking and sani..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.25,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 136,
+            "tokens_out": 141,
+            "latency_ms": 2815.25,
+            "retrieval_scores": [
+              0.27346547056935333,
+              0.25051668600085586,
+              0.24990016721100466
+            ]
+          }
+        },
+        "insight": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "Foundation of Machine Learning",
+              "takeaway": "Machine learning basics involve understanding key concepts such as supervised, unsupervised, and reinforcement learning, which form the foundation for developing algorithms that enable systems to learn from data without being explicitly programmed."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.286,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.281,
+              "preview": "essions over time rather than massing - **Forgetting Curve**: Memory retention decreases over time w..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.255,
+              "preview": "ferent operations - **Status Codes**: HTTP response codes indicating request results - **API Documen..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 95,
+            "tokens_out": 109,
+            "latency_ms": 2125.65,
+            "retrieval_scores": [
+              0.28648801813169394,
+              0.2807844499012929,
+              0.2550540302695117
+            ]
+          }
+        }
+      }
+    },
+    "Token Management": {
+      "specification": "Token Management",
+      "target": "<500 tokens per artifact, <150 per chat",
+      "success": false,
+      "artifact_tokens": {
+        "flashcard": {
+          "tokens": 116,
+          "limit": 500,
+          "within_limit": true
+        },
+        "mcq": {
+          "tokens": 160,
+          "limit": 500,
+          "within_limit": true
+        },
+        "insight": {
+          "tokens": 96,
+          "limit": 500,
+          "within_limit": true
+        }
+      },
+      "chat_tokens": [
+        {
+          "query": "What is inheritance?",
+          "tokens": 196,
+          "limit": 150,
+          "within_limit": false
+        },
+        {
+          "query": "Explain polymorphism",
+          "tokens": 187,
+          "limit": 150,
+          "within_limit": false
+        },
+        {
+          "query": "How does encapsulation work?",
+          "tokens": 205,
+          "limit": 150,
+          "within_limit": false
+        }
+      ]
+    },
+    "Processing Latency": {
+      "specification": "Processing Latency",
+      "target": "<5.0s at 95th percentile",
+      "achieved": 2.9087021350860596,
+      "success": true,
+      "avg_latency": 2.7318922996521,
+      "p95_latency": 2.9087021350860596,
+      "max_latency": 2.9087021350860596,
+      "min_latency": 2.5789661407470703,
+      "response_times": [
+        2.657034397125244,
+        2.7346317768096924,
+        2.9087021350860596,
+        2.6854207515716553,
+        2.8481597900390625,
+        2.832104206085205,
+        2.740751028060913,
+        2.5789661407470703,
+        2.6404802799224854,
+        2.6926724910736084
+      ]
+    },
+    "Factual Accuracy": {
+      "specification": "Factual Accuracy",
+      "target": "90% accuracy, <5% hallucination",
+      "achieved_accuracy": 0.4935702057091593,
+      "achieved_hallucination": 91.37338273169665,
+      "success": false,
+      "llm_accuracy": 0.5,
+      "hitl_accuracy": 0.8944444444444446,
+      "individual_scores": {
+        "llm_scores": [
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "hitl_scores": [
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.8500000000000001,
+          0.9000000000000001,
+          0.9000000000000001
+        ]
+      }
+    },
+    "System Reliability": {
+      "specification": "System Reliability",
+      "target": "98% uptime, <2% drop rate",
+      "achieved_uptime": 1.0,
+      "achieved_drop_rate": 0.0,
+      "success": true,
+      "reliability_results": {
+        "success_rate": 1.0,
+        "failure_rate": 0.0,
+        "avg_response_time": 2.2652899742126467,
+        "p95_response_time": 2.2652899742126467,
+        "total_requests": 15,
+        "successful_requests": 15,
+        "failed_requests": 0
+      },
+      "degradation_results": {
+        "graceful_handling": true,
+        "response_time": 1.9852044582366943,
+        "has_response": true,
+        "response_length": 876,
+        "context_docs_retrieved": 3,
+        "avg_context_score": 0.22788490371055584
+      }
+    }
+  }
+}

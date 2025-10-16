@@ -17,15 +17,16 @@ from config import get_rag_config
 class BasicRAG:
     """RAG system that orchestrates vector storage, retrieval, and generation"""
     
-    def __init__(self, collection_name=None, use_persistent=None):
+    def __init__(self, config=None, collection_name=None, use_persistent=None):
         """
         Initialize RAG system
         
         Args:
+            config: RAGConfig object (uses default if None)
             collection_name: Name for Qdrant collection (uses config default if None)
             use_persistent: If True, use persistent Qdrant storage (uses config default if None)
         """
-        self.config = get_rag_config()
+        self.config = config or get_rag_config()
         self.collection_name = collection_name or self.config.collection_name
         
         # Initialize components
@@ -83,13 +84,14 @@ class BasicRAG:
         # Search vector store
         return self.vector_store.search(self.collection_name, query_embedding, limit)
     
-    def query(self, question, context_limit=None):
+    def query(self, question, context_limit=None, max_tokens=None):
         """
         Answer a question using RAG
         
         Args:
             question: Question to answer
             context_limit: Number of documents to retrieve for context (uses config default if None)
+            max_tokens: Maximum tokens for response (uses chat limit if None)
             
         Returns:
             Answer string
@@ -115,8 +117,9 @@ Question: {question}
 
 Answer:"""
         
-        # Generate answer
-        answer = self.gateway.chat(prompt)
+        # Generate answer with appropriate token limit
+        token_limit = max_tokens or self.config.max_chat_tokens
+        answer = self.gateway.chat(prompt, max_tokens=token_limit)
         
         # Return answer along with context details for logging
         context_docs = [doc for doc, _ in retrieved_docs]

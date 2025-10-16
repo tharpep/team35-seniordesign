@@ -1,0 +1,367 @@
+{
+  "demo_timestamp": "20251015_214946",
+  "total_specifications": 6,
+  "successful_specifications": 1,
+  "success_rate": 0.16666666666666666,
+  "results": {
+    "Artifact Generation": {
+      "specification": "Artifact Generation",
+      "target": "3+ artifact types",
+      "achieved": 3,
+      "success": true,
+      "artifact_types": [
+        "flashcards",
+        "insights",
+        "mcq"
+      ],
+      "generation_times": {
+        "flashcard": 8.906541585922241,
+        "mcq": 9.951705694198608,
+        "insight": 4.071290016174316
+      },
+      "artifacts": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "error": "JSON parsing failed",
+          "raw_response": "```json\n{\n  \"artifact_type\": \"flashcards\",\n  \"version\": \"1.0\",\n  \"cards\": [\n    {\n      \"id\": \"fc_001\",\n      \"front\": \"What are Newton's three laws of motion?\",\n      \"back\": \"Newton's laws of motion are: \n      1. The First Law (Law of Inertia): An object at rest stays at rest, and an object in motion stays in motion with the same speed and in the same direction unless acted upon by an unbalanced force.\n      2. The Second Law (Law of Acceleration): The acceleration of an object is directly re...",
+          "topic": "Newton's laws of motion",
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.31,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.31,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.253,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 87,
+            "tokens_out": 215,
+            "latency_ms": 8906.54,
+            "retrieval_scores": [
+              0.3100051922665924,
+              0.3100051922665924,
+              0.2529165236007659
+            ]
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "questions": [
+            {
+              "id": "mcq_001",
+              "stem": "What is the primary concept described by Newton's First Law of Motion?",
+              "options": [
+                "The force applied to an object is equal to its mass times its acceleration",
+                "An object at rest will remain at rest, and an object in motion will continue to move with a constant velocity, unless acted upon by an external force",
+                "The acceleration of an object is directly proportional to the force applied and inversely proportional to its mass",
+                "The momentum of an object is conserved in a closed system"
+              ],
+              "answer_index": 1,
+              "rationale": "Newton's First Law, also known as the Law of Inertia, states that an object will remain at rest or in uniform motion in a straight line unless acted upon by an external force. This concept is fundamental to understanding how forces affect motion.",
+              "bloom_level": "understand",
+              "source_refs": [
+                "N1"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.325,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.325,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.298,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 108,
+            "tokens_out": 281,
+            "latency_ms": 9951.71,
+            "retrieval_scores": [
+              0.32485831588703384,
+              0.32485831588703384,
+              0.2976019901709757
+            ]
+          }
+        },
+        "insight": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "Newton's Second Law of Motion",
+              "takeaway": "Force (F) is equal to mass (m) times acceleration (a), or F = ma, which describes the relationship between a body's force, mass, and acceleration."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.291,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.291,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.263,
+              "preview": "ems - Work on eigenvalue calculations - Complete Python class implementation - Review physics formul..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 67,
+            "tokens_out": 84,
+            "latency_ms": 4071.29,
+            "retrieval_scores": [
+              0.2914213024044007,
+              0.2914213024044007,
+              0.26306214506402464
+            ]
+          }
+        }
+      }
+    },
+    "Schema Compliance": {
+      "specification": "Schema Compliance",
+      "target": "Fixed JSON schema per artifact type",
+      "success": false,
+      "validation_results": {
+        "flashcard": false,
+        "mcq": true,
+        "insight": false
+      },
+      "artifacts": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "cards": [
+            {
+              "id": "fc_001",
+              "front": "What is the primary goal of machine learning?",
+              "back": "The primary goal of machine learning is to enable computers to learn from data and make predictions or decisions without being explicitly programmed.",
+              "tags": [
+                "machine learning",
+                "basics"
+              ],
+              "difficulty": 2,
+              "source_refs": [
+                "N1"
+              ],
+              "hints": []
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.235,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.235,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.232,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 87,
+            "tokens_out": 116,
+            "latency_ms": 5186.61,
+            "retrieval_scores": [
+              0.2347429408547892,
+              0.2347429408547892,
+              0.23237293035316525
+            ]
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "questions": [
+            {
+              "id": "mcq_001",
+              "stem": "What is the primary goal of a machine learning model?",
+              "options": [
+                "To write complex algorithms",
+                "To store large datasets",
+                "To make predictions or decisions based on data",
+                "To design user interfaces"
+              ],
+              "answer_index": 2,
+              "rationale": "The primary goal of a machine learning model is to learn from data and make predictions or decisions without being explicitly programmed.",
+              "bloom_level": "understand",
+              "source_refs": [
+                "ML Basics"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.278,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.25,
+              "preview": "inutes) - **Lunch Break**: 12:00 PM (already taken) - **Study Partner Break**: 3:45 PM (10 minutes) ..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.25,
+              "preview": "inutes) - **Lunch Break**: 12:00 PM (already taken) - **Study Partner Break**: 3:45 PM (10 minutes) ..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 108,
+            "tokens_out": 324,
+            "latency_ms": 11008.74,
+            "retrieval_scores": [
+              0.2784083058616946,
+              0.24952417475838162,
+              0.24952417475838157
+            ]
+          }
+        },
+        "insight": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "Machine Learning Basics",
+              "takeaway": "Machine learning is a type of artificial intelligence that enables computers to learn from data without being explicitly programmed, and it involves training algorithms on data to make predictions, classify objects, or make decisions."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.24,
+              "preview": "essions over time rather than massing - **Forgetting Curve**: Memory retention decreases over time w..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.233,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.21,
+              "preview": "# Academic Writing and Research ## Writing Process and Structure ### Pre-Writing Strategies - **Brai..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 67,
+            "tokens_out": 257,
+            "latency_ms": 9374.81,
+            "retrieval_scores": [
+              0.2397298421262731,
+              0.23306835520578745,
+              0.20960203094511437
+            ]
+          }
+        }
+      }
+    },
+    "Token Management": {
+      "specification": "Token Management",
+      "target": "<500 tokens per artifact, <150 per chat",
+      "success": false,
+      "artifact_tokens": {
+        "flashcard": {
+          "tokens": 130,
+          "limit": 500,
+          "within_limit": true
+        },
+        "mcq": {
+          "tokens": 326,
+          "limit": 500,
+          "within_limit": true
+        },
+        "insight": {
+          "tokens": 132,
+          "limit": 500,
+          "within_limit": true
+        }
+      },
+      "chat_tokens": [
+        {
+          "query": "What is inheritance?",
+          "tokens": 424,
+          "limit": 150,
+          "within_limit": false
+        },
+        {
+          "query": "Explain polymorphism",
+          "tokens": 631,
+          "limit": 150,
+          "within_limit": false
+        },
+        {
+          "query": "How does encapsulation work?",
+          "tokens": 564,
+          "limit": 150,
+          "within_limit": false
+        }
+      ]
+    },
+    "Processing Latency": {
+      "specification": "Processing Latency",
+      "target": "<5.0s at 95th percentile",
+      "achieved": 22.361342191696167,
+      "success": false,
+      "avg_latency": 12.739864206314087,
+      "p95_latency": 22.361342191696167,
+      "max_latency": 22.361342191696167,
+      "min_latency": 1.004784345626831,
+      "response_times": [
+        4.2832136154174805,
+        22.03377866744995,
+        12.15155839920044,
+        1.004784345626831,
+        12.689426898956299,
+        15.272223711013794,
+        20.89338755607605,
+        22.361342191696167,
+        10.495812892913818,
+        6.213113784790039
+      ]
+    },
+    "Factual Accuracy": {
+      "specification": "Factual Accuracy",
+      "success": false,
+      "error": "'charmap' codec can't encode character '\\u2265' in position 28: character maps to <undefined>"
+    },
+    "System Reliability": {
+      "specification": "System Reliability",
+      "success": false,
+      "error": "'charmap' codec can't encode character '\\u2265' in position 27: character maps to <undefined>"
+    }
+  }
+}
