@@ -150,22 +150,80 @@ export default function CurrentSession({ onConfigureClick, sessionSettings }: Cu
         }
     };
 
+    // Check and log resolution for a video stream
+    const checkStreamResolution = (stream: MediaStream, sourceName: string): Promise<{ width: number; height: number; is1080pOrHigher: boolean }> => {
+        return new Promise((resolve) => {
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            video.muted = true;
+            video.play();
+
+            video.onloadedmetadata = () => {
+                const width = video.videoWidth;
+                const height = video.videoHeight;
+                const is1080pOrHigher = height >= 1080;
+                
+                console.log(`📹 ${sourceName} Resolution: ${width}x${height} ${is1080pOrHigher ? '✅ (1080p+)' : '⚠️ (Below 1080p)'}`);
+                
+                video.remove();
+                resolve({ width, height, is1080pOrHigher });
+            };
+        });
+    };
+
+    // Check all stream resolutions and log summary
+    const checkAllStreamResolutions = async () => {
+        const results = [];
+        
+        if (webcamStreamRef.current) {
+            const webcamResult = await checkStreamResolution(webcamStreamRef.current, 'Webcam');
+            results.push({ source: 'Webcam', ...webcamResult });
+        }
+        
+        if (screenStreamRef.current) {
+            const screenResult = await checkStreamResolution(screenStreamRef.current, 'Screen Capture');
+            results.push({ source: 'Screen Capture', ...screenResult });
+        }
+        
+        if (externalCameraStreamRef.current) {
+            const externalResult = await checkStreamResolution(externalCameraStreamRef.current, 'External Camera');
+            results.push({ source: 'External Camera', ...externalResult });
+        }
+
+        // Log summary
+        const allHighRes = results.every(r => r.is1080pOrHigher);
+        const totalSources = results.length;
+        const highResSources = results.filter(r => r.is1080pOrHigher).length;
+        
+        console.log(`📊 Resolution Summary: ${highResSources}/${totalSources} sources at 1080p+ ${allHighRes ? '✅ All streams meet requirements' : '⚠️ Some streams below 1080p'}`);
+        
+        return { allHighRes, results };
+    };
+
     // Initialize camera streams
     const initializeStreams = async () => {
         try {
-            // Initialize webcam stream
+            // Initialize webcam stream with high resolution preference
             if (!webcamStreamRef.current) {
                 const webcamStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
+                    video: {
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 },
+                        frameRate: { ideal: 30 }
+                    },
                     audio: false
                 });
                 webcamStreamRef.current = webcamStream;
             }
 
-            // Initialize screen capture stream
+            // Initialize screen capture stream with high resolution preference
             if (!screenStreamRef.current) {
                 const screenStream = await navigator.mediaDevices.getDisplayMedia({
-                    video: true,
+                    video: {
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 },
+                        frameRate: { ideal: 30 }
+                    },
                     audio: false
                 });
                 screenStreamRef.current = screenStream;
@@ -177,11 +235,16 @@ export default function CurrentSession({ onConfigureClick, sessionSettings }: Cu
                 });
             }
 
-            // Initialize external camera stream (optional)
+            // Initialize external camera stream (optional) with high resolution preference
             if (externalDeviceId && !externalCameraStreamRef.current) {
                 try {
                     const externalStream = await navigator.mediaDevices.getUserMedia({
-                        video: { deviceId: { exact: externalDeviceId } },
+                        video: { 
+                            deviceId: { exact: externalDeviceId },
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 },
+                            frameRate: { ideal: 30 }
+                        },
                         audio: false
                     });
                     externalCameraStreamRef.current = externalStream;
@@ -191,6 +254,10 @@ export default function CurrentSession({ onConfigureClick, sessionSettings }: Cu
                     // Don't fail the whole initialization if external camera fails
                 }
             }
+
+            // Check and log resolutions after initialization
+            console.log('🔍 Checking stream resolutions...');
+            await checkAllStreamResolutions();
 
             return true;
         } catch (error) {
@@ -215,6 +282,9 @@ export default function CurrentSession({ onConfigureClick, sessionSettings }: Cu
                     const canvas = document.createElement('canvas');
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
+                    
+                    // Log capture resolution
+                    console.log(`📸 Webcam capture: ${video.videoWidth}x${video.videoHeight}`);
                     
                     const ctx = canvas.getContext('2d');
                     if (ctx) {
@@ -251,6 +321,9 @@ export default function CurrentSession({ onConfigureClick, sessionSettings }: Cu
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                     
+                    // Log capture resolution
+                    console.log(`📸 Screen capture: ${video.videoWidth}x${video.videoHeight}`);
+                    
                     const ctx = canvas.getContext('2d');
                     if (ctx) {
                         ctx.drawImage(video, 0, 0);
@@ -267,9 +340,7 @@ export default function CurrentSession({ onConfigureClick, sessionSettings }: Cu
             console.error('Failed to capture screen photo:', error);
             return false;
         }
-    };
-
-    // Capture photo from external camera
+    };    // Capture photo from external camera
     const captureExternalCameraPhoto = async (): Promise<boolean> => {
         try {
             if (!externalCameraStreamRef.current) {
@@ -286,6 +357,9 @@ export default function CurrentSession({ onConfigureClick, sessionSettings }: Cu
                     const canvas = document.createElement('canvas');
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
+                    
+                    // Log capture resolution
+                    console.log(`📸 External camera capture: ${video.videoWidth}x${video.videoHeight}`);
                     
                     const ctx = canvas.getContext('2d');
                     if (ctx) {
