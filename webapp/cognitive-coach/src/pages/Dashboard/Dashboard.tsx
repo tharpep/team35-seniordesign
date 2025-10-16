@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 import ConfigurePopup from '../../components/ConfigurePopup/ConfigurePopup';
@@ -22,6 +22,7 @@ interface Session {
 export default function Dashboard() {
     const navigate = useNavigate();
     const [isConfigurePopupOpen, setIsConfigurePopupOpen] = useState(false);
+    const [sessionSettings, setSessionSettings] = useState({ photoInterval: 2 });
 
     const sessions: Session[] = [
         {
@@ -78,6 +79,10 @@ export default function Dashboard() {
         setIsConfigurePopupOpen(false);
     };
 
+    const handleSettingsChange = useCallback((settings: { photoInterval: number }) => {
+        setSessionSettings(settings);
+    }, []);
+
     const renderArtifacts = (artifacts: Session['artifacts']) => {
         const items = [];
         if (artifacts.equations) {
@@ -131,7 +136,10 @@ export default function Dashboard() {
 
             <main className="dashboard-container">
                 {/* Current Session Section */}
-                <CurrentSession onConfigureClick={handleConfigureClick} />
+                <CurrentSession 
+                    onConfigureClick={handleConfigureClick} 
+                    sessionSettings={sessionSettings}
+                />
 
                 {/* Previous Sessions Section */}
                 <div className="sessions-header">
@@ -183,6 +191,7 @@ export default function Dashboard() {
             <ConfigurePopup 
                 isOpen={isConfigurePopupOpen}
                 onClose={handleCloseConfigurePopup}
+                onSettingsChange={handleSettingsChange}
             />
         </>
     );
