@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "facial-processing"
+version = "0.1.0"
+description = "Facial processing subsystem for AI Study Glasses"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Team 35" }]
+dependencies = [
+  "opencv-python>=4.8.0",
+  "mediapipe>=0.10.0",
+  "numpy>=1.24.0",
+  "scipy>=1.13.0",
+  "torch>=2.0.0",
+  "torchvision>=0.15.0",
+  "fastapi>=0.104.0",
+  "uvicorn>=0.24.0",
+  "websockets>=12.0",
+  "pydantic>=2.5.0",
+  "python-dotenv>=1.0.0",
+  "Pillow>=10.0.0",
+  "aiofiles>=23.0.0",
+  "pytest>=7.0.0",
+  "pytest-asyncio>=0.21.0",
+  "pytest-cov>=4.1.0"
+]
