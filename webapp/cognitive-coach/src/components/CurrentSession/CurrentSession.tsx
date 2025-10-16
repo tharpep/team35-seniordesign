@@ -3,18 +3,58 @@ import './CurrentSession.css';
 
 type SessionState = 'idle' | 'active' | 'paused';
 
-interface CurrentSessionProps {
-    onConfigureClick: () => void;
+interface SessionSettings {
+    photoInterval: number;
 }
 
-export default function CurrentSession({ onConfigureClick }: CurrentSessionProps) {
+interface CurrentSessionProps {
+    onConfigureClick: () => void;
+    sessionSettings?: SessionSettings;
+}
+
+export default function CurrentSession({ onConfigureClick, sessionSettings }: CurrentSessionProps) {
     const [sessionState, setSessionState] = useState<SessionState>('idle');
     const [sessionTime, setSessionTime] = useState(0); // in seconds
+    const [captureCount, setCaptureCount] = useState(0);
+    const [videoDevices, setVideoDevices] = useState<Array<{ deviceId: string; label: string }>>([]);
+    const [externalDeviceId, setExternalDeviceId] = useState<string | null>(null);
+    
     const timerIntervalRef = useRef<number | null>(null);
     const captureIntervalRef = useRef<number | null>(null);
     const screenStreamRef = useRef<MediaStream | null>(null);
     const webcamStreamRef = useRef<MediaStream | null>(null);
+    const externalCameraStreamRef = useRef<MediaStream | null>(null);
     const captureCountRef = useRef<number>(0);
+
+    // Enumerate video devices on component mount
+    useEffect(() => {
+        const enumerateDevices = async () => {
+            try {
+                // Request permission first to get device labels
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                stream.getTracks().forEach(track => track.stop()); // Stop immediately
+                
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoInputs = devices
+                    .filter(device => device.kind === 'videoinput')
+                    .map(device => ({
+                        deviceId: device.deviceId,
+                        label: device.label || `Camera ${device.deviceId.slice(-4)}`
+                    }));
+                
+                setVideoDevices(videoInputs);
+                
+                // Set external device as the second camera if available
+                if (videoInputs.length > 1) {
+                    setExternalDeviceId(videoInputs[1].deviceId);
+                }
+            } catch (error) {
+                console.error('Error enumerating devices:', error);
+            }
+        };
+        
+        enumerateDevices();
+    }, []);
 
     // Timer effect - runs every second when session is active
     useEffect(() => {
@@ -36,9 +76,10 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
         };
     }, [sessionState]);
 
-    // Capture effect - runs every 5 seconds when session is active
+    // Capture effect - runs at configured interval when session is active
     useEffect(() => {
         if (sessionState === 'active') {
+            const intervalMs = (sessionSettings?.photoInterval || 2) * 1000; // Default to 2 seconds
             captureIntervalRef.current = window.setInterval(async () => {
                 // Update ref and state
                 captureCountRef.current += 1;
@@ -55,20 +96,26 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
                 try {
                     const webcamSuccess = await captureWebcamPhoto();
                     const screenSuccess = await captureScreenPhoto();
+                    const externalSuccess = await captureExternalCameraPhoto();
                     
-                    if (webcamSuccess && screenSuccess) {
-                        console.log(`✓ Both webcam and screen photos captured successfully`);
-                    } else if (webcamSuccess) {
-                        console.log(`✓ Webcam photo captured, ✗ Screen capture failed`);
-                    } else if (screenSuccess) {
-                        console.log(`✗ Webcam capture failed, ✓ Screen photo captured`);
+                    // Log results based on what succeeded
+                    const results = [];
+                    if (webcamSuccess) results.push('webcam');
+                    if (screenSuccess) results.push('screen');
+                    if (externalSuccess) results.push('external');
+                    
+                    if (results.length > 0) {
+                        console.log(`✓ Captured from: ${results.join(', ')}`);
                     } else {
-                        console.log(`✗ Both captures failed`);
+                        console.log(`✗ All captures failed`);
                     }
                 } catch (error) {
                     console.error('Error during photo capture:', error);
                 }
-            }, 5000);
+                
+                // Update the state for UI
+                setCaptureCount(newCount);
+            }, intervalMs);
         } else {
             if (captureIntervalRef.current) {
                 clearInterval(captureIntervalRef.current);
@@ -81,7 +128,7 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
                 clearInterval(captureIntervalRef.current);
             }
         };
-    }, [sessionState]);
+    }, [sessionState, sessionSettings]);
 
     // Cleanup on component unmount
     useEffect(() => {
@@ -103,22 +150,80 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
         }
     };
 
+    // Check and log resolution for a video stream
+    const checkStreamResolution = (stream: MediaStream, sourceName: string): Promise<{ width: number; height: number; is1080pOrHigher: boolean }> => {
+        return new Promise((resolve) => {
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            video.muted = true;
+            video.play();
+
+            video.onloadedmetadata = () => {
+                const width = video.videoWidth;
+                const height = video.videoHeight;
+                const is1080pOrHigher = height >= 1080;
+                
+                console.log(`📹 ${sourceName} Resolution: ${width}x${height} ${is1080pOrHigher ? '✅ (1080p+)' : '⚠️ (Below 1080p)'}`);
+                
+                video.remove();
+                resolve({ width, height, is1080pOrHigher });
+            };
+        });
+    };
+
+    // Check all stream resolutions and log summary
+    const checkAllStreamResolutions = async () => {
+        const results = [];
+        
+        if (webcamStreamRef.current) {
+            const webcamResult = await checkStreamResolution(webcamStreamRef.current, 'Webcam');
+            results.push({ source: 'Webcam', ...webcamResult });
+        }
+        
+        if (screenStreamRef.current) {
+            const screenResult = await checkStreamResolution(screenStreamRef.current, 'Screen Capture');
+            results.push({ source: 'Screen Capture', ...screenResult });
+        }
+        
+        if (externalCameraStreamRef.current) {
+            const externalResult = await checkStreamResolution(externalCameraStreamRef.current, 'External Camera');
+            results.push({ source: 'External Camera', ...externalResult });
+        }
+
+        // Log summary
+        const allHighRes = results.every(r => r.is1080pOrHigher);
+        const totalSources = results.length;
+        const highResSources = results.filter(r => r.is1080pOrHigher).length;
+        
+        console.log(`📊 Resolution Summary: ${highResSources}/${totalSources} sources at 1080p+ ${allHighRes ? '✅ All streams meet requirements' : '⚠️ Some streams below 1080p'}`);
+        
+        return { allHighRes, results };
+    };
+
     // Initialize camera streams
     const initializeStreams = async () => {
         try {
-            // Initialize webcam stream
+            // Initialize webcam stream with high resolution preference
             if (!webcamStreamRef.current) {
                 const webcamStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
+                    video: {
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 },
+                        frameRate: { ideal: 30 }
+                    },
                     audio: false
                 });
                 webcamStreamRef.current = webcamStream;
             }
 
-            // Initialize screen capture stream
+            // Initialize screen capture stream with high resolution preference
             if (!screenStreamRef.current) {
                 const screenStream = await navigator.mediaDevices.getDisplayMedia({
-                    video: true,
+                    video: {
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 },
+                        frameRate: { ideal: 30 }
+                    },
                     audio: false
                 });
                 screenStreamRef.current = screenStream;
@@ -129,6 +234,30 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
                     console.log('Screen sharing ended by user');
                 });
             }
+
+            // Initialize external camera stream (optional) with high resolution preference
+            if (externalDeviceId && !externalCameraStreamRef.current) {
+                try {
+                    const externalStream = await navigator.mediaDevices.getUserMedia({
+                        video: { 
+                            deviceId: { exact: externalDeviceId },
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 },
+                            frameRate: { ideal: 30 }
+                        },
+                        audio: false
+                    });
+                    externalCameraStreamRef.current = externalStream;
+                    console.log('External camera initialized successfully');
+                } catch (externalError) {
+                    console.warn('External camera not available:', externalError);
+                    // Don't fail the whole initialization if external camera fails
+                }
+            }
+
+            // Check and log resolutions after initialization
+            console.log('🔍 Checking stream resolutions...');
+            await checkAllStreamResolutions();
 
             return true;
         } catch (error) {
@@ -153,6 +282,9 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
                     const canvas = document.createElement('canvas');
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
+                    
+                    // Log capture resolution
+                    console.log(`📸 Webcam capture: ${video.videoWidth}x${video.videoHeight}`);
                     
                     const ctx = canvas.getContext('2d');
                     if (ctx) {
@@ -189,6 +321,9 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                     
+                    // Log capture resolution
+                    console.log(`📸 Screen capture: ${video.videoWidth}x${video.videoHeight}`);
+                    
                     const ctx = canvas.getContext('2d');
                     if (ctx) {
                         ctx.drawImage(video, 0, 0);
@@ -205,6 +340,43 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
             console.error('Failed to capture screen photo:', error);
             return false;
         }
+    };    // Capture photo from external camera
+    const captureExternalCameraPhoto = async (): Promise<boolean> => {
+        try {
+            if (!externalCameraStreamRef.current) {
+                // Return false but don't log error since external camera is optional
+                return false;
+            }
+
+            const video = document.createElement('video');
+            video.srcObject = externalCameraStreamRef.current;
+            video.play();
+
+            return new Promise((resolve) => {
+                video.onloadedmetadata = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    // Log capture resolution
+                    console.log(`📸 External camera capture: ${video.videoWidth}x${video.videoHeight}`);
+                    
+                    const ctx = canvas.getContext('2d');
+                    if (ctx) {
+                        ctx.drawImage(video, 0, 0);
+                        // Photo captured successfully (not storing, just discarding)
+                        video.remove();
+                        resolve(true);
+                    } else {
+                        video.remove();
+                        resolve(false);
+                    }
+                };
+            });
+        } catch (error) {
+            console.error('Failed to capture external camera photo:', error);
+            return false;
+        }
     };
 
     // Cleanup streams
@@ -216,6 +388,10 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
         if (screenStreamRef.current) {
             screenStreamRef.current.getTracks().forEach(track => track.stop());
             screenStreamRef.current = null;
+        }
+        if (externalCameraStreamRef.current) {
+            externalCameraStreamRef.current.getTracks().forEach(track => track.stop());
+            externalCameraStreamRef.current = null;
         }
     };
 
@@ -254,8 +430,14 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
             <div className="session-title">
                 <h1>Current Session</h1>
                 <div className="session-status">
-                    <div className="status-dot"></div>
-                    All systems ready • 3 cameras detected
+                    <div className={`status-dot ${(videoDevices.length + 1) >= 2 ? 'green' : 'red'}`}></div>
+                    {(videoDevices.length + 1) >= 2 
+                        ? `All systems ready • ${videoDevices.length + 1} cameras detected`
+                        : `Setup incomplete • ${videoDevices.length + 1} camera${(videoDevices.length + 1) === 1 ? '' : 's'} detected (need 2+)`
+                    }
+                    {sessionState === 'active' && captureCount > 0 && (
+                        <span> • {captureCount} captures</span>
+                    )}
                 </div>
                 {sessionState !== 'idle' && (
                     <div className="session-timer">
@@ -329,7 +511,7 @@ export default function CurrentSession({ onConfigureClick }: CurrentSessionProps
                     </div>
                     <div className="metric-chip stress">
                         <div className="metric-icon stress"></div>
-                        Stress: Low
+                        Artifacts: 12
                     </div>
                 </div>
             </div>

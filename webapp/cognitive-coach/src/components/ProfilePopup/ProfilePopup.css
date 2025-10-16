@@ -1,0 +1,180 @@
+/* Profile Popup Styles */
+.profile-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    padding: 16px;
+}
+
+.profile-popup {
+    background: var(--md-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--md-outline);
+    width: 320px;
+    margin-top: 70px; /* Position below the header */
+    margin-right: 20px; /* Align with the profile icon */
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.profile-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-xl);
+    border-bottom: 1px solid var(--md-outline);
+    background: var(--md-background);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.profile-popup-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--md-on-surface);
+    font-family: 'Google Sans', sans-serif;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    padding: 4px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--md-on-surface-variant);
+    transition: all 0.2s ease;
+}
+
+.close-button:hover {
+    background-color: var(--md-outline);
+    color: var(--md-on-surface);
+}
+
+.profile-popup-content {
+    padding: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.profile-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.profile-field label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--md-on-surface-variant);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: 'Google Sans', sans-serif;
+}
+
+.profile-value {
+    font-size: 16px;
+    color: var(--md-on-surface);
+    padding: var(--spacing-sm) 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.profile-password-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.password-toggle-button {
+    background: none;
+    border: none;
+    padding: var(--spacing-xs);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--md-on-surface-variant);
+    transition: all 0.2s ease;
+    margin-left: var(--spacing-sm);
+}
+
+.password-toggle-button:hover {
+    background-color: var(--md-outline);
+    color: var(--md-on-surface);
+}
+
+.password-toggle-button .material-icons-round {
+    font-size: 18px;
+}
+
+.profile-actions {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--md-outline);
+}
+
+.sign-out-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background-color: var(--md-error);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Google Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sign-out-button:hover {
+    background-color: var(--md-error-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.sign-out-button .material-icons-round {
+    font-size: 18px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .profile-popup-overlay {
+        align-items: center;
+        justify-content: center;
+        padding: var(--spacing-lg);
+    }
+    
+    .profile-popup {
+        width: 100%;
+        max-width: 350px;
+        margin: 0;
+    }
+}

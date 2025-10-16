@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 import ConfigurePopup from '../../components/ConfigurePopup/ConfigurePopup';
 import CurrentSession from '../../components/CurrentSession/CurrentSession';
+import ProfilePopup from '../../components/ProfilePopup/ProfilePopup';
 
 interface Session {
     id: string;
@@ -12,6 +13,7 @@ interface Session {
     focusScore: number;
     materials: number;
     attention: number;
+    emotion: string;
     artifacts: {
         equations?: number;
         flashcards?: number;
@@ -22,6 +24,8 @@ interface Session {
 export default function Dashboard() {
     const navigate = useNavigate();
     const [isConfigurePopupOpen, setIsConfigurePopupOpen] = useState(false);
+    const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
+    const [sessionSettings, setSessionSettings] = useState({ photoInterval: 2 });
 
     const sessions: Session[] = [
         {
@@ -32,6 +36,7 @@ export default function Dashboard() {
             focusScore: 88,
             materials: 34,
             attention: 78,
+            emotion: 'Focused',
             artifacts: { equations: 12, flashcards: 15, questions: 3 }
         },
         {
@@ -42,6 +47,7 @@ export default function Dashboard() {
             focusScore: 92,
             materials: 28,
             attention: 89,
+            emotion: 'Confident',
             artifacts: { equations: 18, flashcards: 15, questions: 2 }
         },
         {
@@ -52,6 +58,7 @@ export default function Dashboard() {
             focusScore: 76,
             materials: 45,
             attention: 72,
+            emotion: 'Calm',
             artifacts: { flashcards: 18, questions: 5 }
         },
         {
@@ -62,6 +69,7 @@ export default function Dashboard() {
             focusScore: 94,
             materials: 31,
             attention: 91,
+            emotion: 'Engaged',
             artifacts: { equations: 8, flashcards: 9, questions: 4 }
         }
     ];
@@ -77,6 +85,18 @@ export default function Dashboard() {
     const handleCloseConfigurePopup = () => {
         setIsConfigurePopupOpen(false);
     };
+
+    const handleProfileClick = () => {
+        setIsProfilePopupOpen(true);
+    };
+
+    const handleCloseProfilePopup = () => {
+        setIsProfilePopupOpen(false);
+    };
+
+    const handleSettingsChange = useCallback((settings: { photoInterval: number }) => {
+        setSessionSettings(settings);
+    }, []);
 
     const renderArtifacts = (artifacts: Session['artifacts']) => {
         const items = [];
@@ -124,14 +144,17 @@ export default function Dashboard() {
                         <button className="icon-button" title="Settings">
                             <span className="material-icons-round">settings</span>
                         </button>
-                        <div className="user-avatar" title="Profile">JD</div>
+                        <button className="user-avatar" title="Profile" onClick={handleProfileClick}>JD</button>
                     </div>
                 </div>
             </header>
 
             <main className="dashboard-container">
                 {/* Current Session Section */}
-                <CurrentSession onConfigureClick={handleConfigureClick} />
+                <CurrentSession 
+                    onConfigureClick={handleConfigureClick} 
+                    sessionSettings={sessionSettings}
+                />
 
                 {/* Previous Sessions Section */}
                 <div className="sessions-header">
@@ -154,21 +177,8 @@ export default function Dashboard() {
 
                             <div className="session-metrics">
                                 <div className="session-focus-score">
-                                    <span className="focus-score">{session.focusScore}%</span>
-                                    <div className="focus-bar">
-                                        <div 
-                                            className="focus-fill" 
-                                            style={{width: `${session.focusScore}%`}}
-                                        ></div>
-                                    </div>
-                                </div>
-                                <div className="session-metrics-chips">
-                                    <div className="session-metric-chip">
-                                        {session.materials} materials
-                                    </div>
-                                    <div className="session-metric-chip">
-                                        {session.attention}% attention
-                                    </div>
+                                    <span className="focus-score">Focus: {session.focusScore}%</span>
+                                    <span className="emotion-label" style={{fontSize: '18px', fontWeight: '500', color: '#3b82f6', marginLeft: '16px'}}>Emotion: {session.emotion}</span>
                                 </div>
                             </div>
 
@@ -183,6 +193,12 @@ export default function Dashboard() {
             <ConfigurePopup 
                 isOpen={isConfigurePopupOpen}
                 onClose={handleCloseConfigurePopup}
+                onSettingsChange={handleSettingsChange}
+            />
+            
+            <ProfilePopup 
+                isOpen={isProfilePopupOpen}
+                onClose={handleCloseProfilePopup}
             />
         </>
     );
