@@ -1,0 +1,32 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "InsightsArtifact",
+    "type": "object",
+    "required": ["artifact_type", "version", "insights"],
+    "properties": {
+      "artifact_type": { "const": "insights" },
+      "version": { "type": "string" },
+      "insights": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["id", "title", "takeaway"],
+          "properties": {
+            "id": { "type": "string" },
+            "title": { "type": "string", "minLength": 1 },
+            "takeaway": { "type": "string", "minLength": 1 },
+            "bullets": { "type": "array", "items": { "type": "string" }, "default": [] },
+            "action_items": { "type": "array", "items": { "type": "string" }, "default": [] },
+            "misconceptions": { "type": "array", "items": { "type": "string" }, "default": [] },
+            "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+            "source_refs": { "type": "array", "items": { "type": "string" }, "default": [] }
+          },
+          "additionalProperties": false
+        }
+      },
+      "provenance": { "type": "object", "additionalProperties": true },
+      "metrics": { "type": "object", "additionalProperties": true }
+    },
+    "additionalProperties": false
+  }
+  

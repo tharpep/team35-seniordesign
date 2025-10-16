@@ -400,7 +400,6 @@ export default function CurrentSession({ onConfigureClick, sessionSettings }: Cu
         if (streamsInitialized) {
             setSessionState('active');
             setSessionTime(0);
-            setCaptureCount(0);
             captureCountRef.current = 0;
             console.log('Session started - streams initialized');
         } else {
@@ -422,7 +421,6 @@ export default function CurrentSession({ onConfigureClick, sessionSettings }: Cu
         cleanupStreams();
         setSessionState('idle');
         setSessionTime(0);
-        setCaptureCount(0);
         captureCountRef.current = 0;
         console.log('Session stopped - streams cleaned up');
     };
@@ -510,7 +508,7 @@ export default function CurrentSession({ onConfigureClick, sessionSettings }: Cu
                     </div>
                     <div className="metric-chip stress">
                         <div className="metric-icon stress"></div>
-                        Stress: Low
+                        Artifacts: 12
                     </div>
                 </div>
             </div>

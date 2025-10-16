@@ -1,0 +1,24 @@
+{
+    "artifact_type": "flashcards",
+    "version": "1.0",
+    "cards": [
+      {
+        "id": "fc_0001",
+        "front": "What is the definition of entropy in information theory?",
+        "back": "Entropy measures the average level of information or uncertainty in a random variable, commonly defined as H(X) = -Σ p(x) log p(x).",
+        "tags": ["info-theory", "definitions"],
+        "difficulty": 2,
+        "source_refs": ["N1"], 
+        "hints": ["Think: average surprise"]
+      }
+    ],
+    "provenance": {
+      "N1": { "note_id": "note_abc123", "similarity": 0.78 }
+    },
+    "metrics": {
+      "tokens_in": 912,
+      "tokens_out": 286,
+      "latency_ms": 740
+    }
+  }
+  

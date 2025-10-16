@@ -1,0 +1,29 @@
+{
+    "artifact_type": "mcq",
+    "version": "1.0",
+    "questions": [
+      {
+        "id": "mcq_0001",
+        "stem": "Which statement best defines overfitting?",
+        "options": [
+          "A model performs better as data size increases.",
+          "A model fits noise in training data, hurting generalization.",
+          "A model under-parameters relative to data complexity.",
+          "A model with zero training error must generalize."
+        ],
+        "answer_index": 1,
+        "rationale": "Overfitting occurs when a model memorizes noise in training data, reducing performance on unseen data.",
+        "bloom_level": "understand",
+        "source_refs": ["N2"]
+      }
+    ],
+    "provenance": {
+      "N2": { "note_id": "note_def456", "similarity": 0.81 }
+    },
+    "metrics": {
+      "tokens_in": 1044,
+      "tokens_out": 312,
+      "latency_ms": 820
+    }
+  }
+  
