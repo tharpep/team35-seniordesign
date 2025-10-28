@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { Button, InputField, Typography, Card } from '../../components/ui';
 import { commonStyles, tokens } from '../../styles/theme';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function CreateAccount() {
   const [firstName, setFirstName] = useState('');
@@ -11,8 +12,11 @@ export default function CreateAccount() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const { register } = useAuth();
+
+  const handleSubmit = async () => {
     // Basic validation
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');
@@ -24,23 +28,46 @@ export default function CreateAccount() {
       return;
     }
     
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters long');
+      return;
+    }
+    
     if (!agreeToTerms) {
       Alert.alert('Error', 'Please agree to the terms and conditions');
       return;
     }
 
-    // Mock account creation
-    console.log('Account creation attempt:', { 
-      firstName, 
-      lastName, 
-      email, 
-      password 
-    });
-    
-    // Navigate back to login after creating account
-    Alert.alert('Success', 'Account created successfully! Please sign in.', [
-      { text: 'OK', onPress: () => router.push('./login') }
-    ]);
+    setIsLoading(true);
+
+    try {
+      const result = await register({
+        email,
+        password,
+        first_name: firstName,
+        last_name: lastName,
+      });
+
+      if (result.success) {
+        // Show success message and navigate to dashboard
+        Alert.alert(
+          'Success',
+          'Your account has been created successfully!',
+          [
+            { 
+              text: 'OK', 
+              onPress: () => router.replace('./dashboard')
+            }
+          ]
+        );
+      } else {
+        Alert.alert('Registration Failed', result.error || 'Could not create account');
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignIn = () => {
@@ -191,12 +218,21 @@ export default function CreateAccount() {
 
             {/* Create Account Button */}
             <Button
-              title="Create Account"
+              title={isLoading ? "Creating Account..." : "Create Account"}
               onPress={handleSubmit}
               variant="primary"
               icon="👤"
               iconPosition="left"
+              disabled={isLoading}
             />
+
+            {isLoading && (
+              <ActivityIndicator 
+                size="small" 
+                color={tokens.colors.primary} 
+                style={{ marginTop: tokens.spacing.md }} 
+              />
+            )}
           </View>
         </Card>
 

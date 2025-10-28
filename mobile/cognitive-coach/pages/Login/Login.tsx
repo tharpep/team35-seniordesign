@@ -1,22 +1,40 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { Button, InputField, Typography, Card } from '../../components/ui';
 import { commonStyles, tokens } from '../../styles/theme';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
+  const { login } = useAuth();
+
+  const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
-    // Mock login - navigate to dashboard
-    console.log('Login attempt:', { email, password, rememberMe });
-    router.push('./dashboard');
+
+    setIsLoading(true);
+
+    try {
+      const result = await login(email, password);
+
+      if (result.success) {
+        // Navigate to dashboard on successful login
+        router.replace('./dashboard');
+      } else {
+        Alert.alert('Login Failed', result.error || 'Invalid credentials');
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignUp = () => {
@@ -117,13 +135,21 @@ export default function Login() {
 
             {/* Login Button */}
             <Button
-              title="Continue"
+              title={isLoading ? "Signing in..." : "Continue"}
               onPress={handleLogin}
               variant="primary"
               icon="→"
               iconPosition="left"
-              
+              disabled={isLoading}
             />
+
+            {isLoading && (
+              <ActivityIndicator 
+                size="small" 
+                color={tokens.colors.primary} 
+                style={{ marginTop: tokens.spacing.md }} 
+              />
+            )}
           </View>
         </Card>
 
