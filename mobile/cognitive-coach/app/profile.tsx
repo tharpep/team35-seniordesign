@@ -1,42 +1,63 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
-import { router } from 'expo-router';
-import { Typography, Card, Button } from '../components/ui';
-import { commonStyles, tokens } from '../styles/theme';
+import React from 'react';
+import {
+  View,
+  Text,
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { Card, Button } from '@/components/ui';
+import { ThemedText } from '@/components/themed-text';
+import { tokens } from '@/styles/theme';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Profile() {
-  const [showPassword, setShowPassword] = useState(false);
-  
-  // Fake user data
-  const userData = {
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@email.com",
-    password: "password123"
-  };
+  const router = useRouter();
+  const { user, logout, isLoading } = useAuth();
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/login');
   };
 
   const handleBackPress = () => {
     router.back();
   };
 
-  const handleLogout = () => {
-    router.push('/login');
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: tokens.colors.background }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={tokens.colors.primary} />
+          <Text style={{ marginTop: tokens.spacing.md, color: tokens.colors.onSurface }}>
+            Loading profile...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Redirect if not authenticated
+  if (!user) {
+    router.replace('/login');
+    return null;
+  }
+
   return (
-    <SafeAreaView style={commonStyles.container}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: tokens.colors.background }}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
-        <Typography variant="titleLarge" style={styles.headerTitle}>
-          Profile
-        </Typography>
+        <ThemedText style={styles.headerTitle}>Profile</ThemedText>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -45,65 +66,41 @@ export default function Profile() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Avatar Section */}
+        {/* Avatar Section */}
         <View style={styles.avatarSection}>
           <View style={styles.avatarContainer}>
             <Text style={styles.avatarText}>
-              {userData.firstName.charAt(0)}{userData.lastName.charAt(0)}
+              {getInitials(user.first_name || '', user.last_name || '')}
             </Text>
           </View>
         </View>
-
-        {/* Profile Information Card */}
         <Card style={styles.infoCard}>
-          <Typography variant="titleMedium" style={styles.cardTitle}>
-            Personal Information
-          </Typography>
+          <ThemedText style={styles.cardTitle}>Personal Information</ThemedText>
           
           <View style={styles.infoField}>
-            <Typography variant="bodySmall" style={styles.fieldLabel}>
-              FIRST NAME
-            </Typography>
-            <Typography variant="bodyLarge" style={styles.fieldValue}>
-              {userData.firstName}
-            </Typography>
+            <Text style={styles.fieldLabel}>FIRST NAME</Text>
+            <ThemedText style={styles.fieldValue}>{user.first_name}</ThemedText>
           </View>
-          
+
           <View style={styles.infoField}>
-            <Typography variant="bodySmall" style={styles.fieldLabel}>
-              LAST NAME
-            </Typography>
-            <Typography variant="bodyLarge" style={styles.fieldValue}>
-              {userData.lastName}
-            </Typography>
+            <Text style={styles.fieldLabel}>LAST NAME</Text>
+            <ThemedText style={styles.fieldValue}>{user.last_name}</ThemedText>
           </View>
-          
+
           <View style={styles.infoField}>
-            <Typography variant="bodySmall" style={styles.fieldLabel}>
-              EMAIL
-            </Typography>
-            <Typography variant="bodyLarge" style={styles.fieldValue}>
-              {userData.email}
-            </Typography>
+            <Text style={styles.fieldLabel}>EMAIL</Text>
+            <ThemedText style={styles.fieldValue}>{user.email}</ThemedText>
           </View>
-          
+
           <View style={styles.infoField}>
-            <Typography variant="bodySmall" style={styles.fieldLabel}>
-              PASSWORD
-            </Typography>
-            <View style={styles.passwordContainer}>
-              <Typography variant="bodyLarge" style={styles.fieldValue}>
-                {showPassword ? userData.password : '••••••••'}
-              </Typography>
-              <TouchableOpacity 
-                style={styles.passwordToggle}
-                onPress={togglePasswordVisibility}
-              >
-                <Text style={styles.passwordToggleIcon}>
-                  {showPassword ? '🙈' : '👁️'}
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.fieldLabel}>MEMBER SINCE</Text>
+            <ThemedText style={styles.fieldValue}>
+              {new Date(user.created_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </ThemedText>
           </View>
         </Card>
 

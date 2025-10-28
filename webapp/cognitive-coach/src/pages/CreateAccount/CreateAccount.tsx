@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './CreateAccount.css';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../../services/api';
 
 export default function CreateAccount() {
     const [firstName, setFirstName] = useState('');
@@ -9,32 +10,40 @@ export default function CreateAccount() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [agreeToTerms, setAgreeToTerms] = useState(false);
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError('');
         
         // Basic validation
         if (password !== confirmPassword) {
-            alert('Passwords do not match');
+            setError('Passwords do not match');
             return;
         }
         
         if (!agreeToTerms) {
-            alert('Please agree to the terms and conditions');
+            setError('Please agree to the terms and conditions');
             return;
         }
 
-        // TODO: Implement account creation logic
-        console.log('Account creation attempt:', { 
-            firstName, 
-            lastName, 
-            email, 
-            password 
-        });
-        
-        // For now, redirect to login after "creating" account
-        navigate('/login');
+        setIsLoading(true);
+
+        try {
+            // Call the API to register with first and last name
+            const response = await api.register(email, password, firstName, lastName);
+            console.log('Account created successfully:', response);
+            
+            // Redirect to login page after successful registration
+            navigate('/login');
+        } catch (err: any) {
+            console.error('Registration failed:', err);
+            setError(err.message || 'Registration failed. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -53,6 +62,20 @@ export default function CreateAccount() {
 
                     <div className="form-section">
                         <form onSubmit={handleSubmit}>
+                            {error && (
+                                <div style={{
+                                    background: '#fce8e6',
+                                    border: '1px solid #ea4335',
+                                    color: '#c5221f',
+                                    padding: '12px 16px',
+                                    borderRadius: '8px',
+                                    marginBottom: '16px',
+                                    fontSize: '14px'
+                                }}>
+                                    {error}
+                                </div>
+                            )}
+
                             <div className="name-fields">
                                 <div className="form-field">
                                     <input 
@@ -63,6 +86,7 @@ export default function CreateAccount() {
                                         value={firstName}
                                         onChange={(e) => setFirstName(e.target.value)}
                                         required 
+                                        disabled={isLoading}
                                     />
                                     <label htmlFor="firstName">First Name</label>
                                 </div>
@@ -76,6 +100,7 @@ export default function CreateAccount() {
                                         value={lastName}
                                         onChange={(e) => setLastName(e.target.value)}
                                         required 
+                                        disabled={isLoading}
                                     />
                                     <label htmlFor="lastName">Last Name</label>
                                 </div>
@@ -90,6 +115,7 @@ export default function CreateAccount() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required 
+                                    disabled={isLoading}
                                 />
                                 <label htmlFor="email">Email</label>
                             </div>
@@ -103,6 +129,8 @@ export default function CreateAccount() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required 
+                                    disabled={isLoading}
+                                    minLength={6}
                                 />
                                 <label htmlFor="password">Password</label>
                             </div>
@@ -116,6 +144,7 @@ export default function CreateAccount() {
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                     required 
+                                    disabled={isLoading}
                                 />
                                 <label htmlFor="confirmPassword">Confirm Password</label>
                             </div>
@@ -136,15 +165,29 @@ export default function CreateAccount() {
                                         checked={agreeToTerms}
                                         onChange={(e) => setAgreeToTerms(e.target.checked)}
                                         required
+                                        disabled={isLoading}
                                     />
                                     <span>I agree to the <a href="#" className="terms-link">Terms of Service</a> and <a href="#" className="terms-link">Privacy Policy</a></span>
                                 </label>
                             </div>
 
                             <div className="create-account-actions">
-                                <button type="submit" className="primary-button">
-                                    <span className="material-icons-round">person_add</span>
-                                    Create Account
+                                <button 
+                                    type="submit" 
+                                    className="primary-button"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? (
+                                        <>
+                                            <span className="material-icons-round">hourglass_empty</span>
+                                            Creating Account...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="material-icons-round">person_add</span>
+                                            Create Account
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </form>
