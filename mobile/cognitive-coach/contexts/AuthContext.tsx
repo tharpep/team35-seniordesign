@@ -29,7 +29,6 @@ interface RegisterData {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AUTH_STORAGE_KEY = '@cognitive_coach_auth';
-const SESSION_STORAGE_KEY = '@cognitive_coach_session';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -49,11 +48,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // Load user data
       const storedUser = await AsyncStorage.getItem(AUTH_STORAGE_KEY);
-      const storedSession = await AsyncStorage.getItem(SESSION_STORAGE_KEY);
       
-      if (storedUser && storedSession) {
+      if (storedUser) {
         setUser(JSON.parse(storedUser));
-        apiService.setSession(storedSession);
         
         // Verify session is still valid
         const isValid = await authService.checkAuth();
@@ -73,10 +70,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /**
    * Save authentication data to storage
    */
-  const saveToStorage = async (userData: User, session: string) => {
+  const saveToStorage = async (userData: User) => {
     try {
       await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
-      await AsyncStorage.setItem(SESSION_STORAGE_KEY, session);
     } catch (error) {
       console.error('Error saving auth to storage:', error);
     }
@@ -88,9 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const clearStoredAuth = async () => {
     try {
       await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
-      await AsyncStorage.removeItem(SESSION_STORAGE_KEY);
       setUser(null);
-      apiService.clearSession();
     } catch (error) {
       console.error('Error clearing stored auth:', error);
     }
@@ -116,11 +110,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userData = response.data.user;
       setUser(userData);
 
-      // Save session
-      const session = apiService.getSession();
-      if (session) {
-        await saveToStorage(userData, session);
-      }
+      // Save user data (axios handles cookies automatically)
+      await saveToStorage(userData);
 
       return { success: true };
     } catch (error: any) {
@@ -151,11 +142,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const newUser = response.data.user;
       setUser(newUser);
 
-      // Save session
-      const session = apiService.getSession();
-      if (session) {
-        await saveToStorage(newUser, session);
-      }
+      // Save user data (axios handles cookies automatically)
+      await saveToStorage(newUser);
 
       return { success: true };
     } catch (error: any) {
@@ -189,11 +177,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.data?.user) {
         setUser(response.data.user);
         
-        // Update storage
-        const session = apiService.getSession();
-        if (session) {
-          await saveToStorage(response.data.user, session);
-        }
+        // Update storage (axios handles cookies automatically)
+        await saveToStorage(response.data.user);
       }
     } catch (error) {
       console.error('Error refreshing user:', error);

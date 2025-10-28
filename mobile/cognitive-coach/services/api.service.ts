@@ -2,10 +2,35 @@
  * API Service
  * 
  * Handles all HTTP requests to the backend API
- * Includes error handling, request/response interceptors, and session management
+ * Uses axios with credentials like the web frontend
  */
 
-import { API_BASE_URL, DEFAULT_HEADERS, REQUEST_TIMEOUT } from '../config/api';
+import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
+
+// Configure axios to send cookies with requests (same as web frontend)
+axios.defaults.withCredentials = true;
+axios.defaults.timeout = 30000; // 30 seconds
+
+// Add response interceptor to log cookies (for debugging)
+axios.interceptors.response.use(
+  (response) => {
+    console.log('[API] Response received:', {
+      url: response.config.url,
+      status: response.status,
+      hasCookies: !!response.headers['set-cookie']
+    });
+    return response;
+  },
+  (error) => {
+    console.error('[API] Request failed:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      message: error.message
+    });
+    return Promise.reject(error);
+  }
+);
 
 export interface ApiResponse<T = any> {
   data?: T;
@@ -35,148 +60,87 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   user: User;
+  sessionId?: string; // Session ID returned by backend
   message: string;
 }
 
 class ApiService {
   private baseURL: string;
-  private sessionCookie: string | null = null;
 
   constructor() {
     this.baseURL = API_BASE_URL;
   }
 
   /**
-   * Make an HTTP request
-   */
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
-    try {
-      const url = `${this.baseURL}${endpoint}`;
-      
-      // Set up headers
-      const headers: Record<string, string> = {
-        ...DEFAULT_HEADERS,
-        ...(options.headers as Record<string, string>),
-      };
-
-      // Add session cookie if available
-      if (this.sessionCookie) {
-        headers['Cookie'] = this.sessionCookie;
-      }
-
-      // Set up request options
-      const config: RequestInit = {
-        ...options,
-        headers,
-        credentials: 'include', // Important for session cookies
-      };
-
-      // Add timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
-      config.signal = controller.signal;
-
-      // Make request
-      const response = await fetch(url, config);
-      clearTimeout(timeoutId);
-
-      // Extract session cookie from response
-      const setCookie = response.headers.get('set-cookie');
-      if (setCookie) {
-        this.sessionCookie = setCookie;
-      }
-
-      // Parse response
-      let data;
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        data = await response.json();
-      } else {
-        data = await response.text();
-      }
-
-      // Handle errors
-      if (!response.ok) {
-        return {
-          error: data.error || 'Request failed',
-          message: data.message || `HTTP ${response.status}`,
-        };
-      }
-
-      return { data };
-    } catch (error: any) {
-      console.error('API request error:', error);
-      
-      if (error.name === 'AbortError') {
-        return {
-          error: 'Request timeout',
-          message: 'The request took too long to complete',
-        };
-      }
-
-      return {
-        error: 'Network error',
-        message: error.message || 'Could not connect to server',
-      };
-    }
-  }
-
-  /**
    * GET request
    */
   async get<T>(endpoint: string): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'GET' });
+    try {
+      console.log(`[API] GET ${this.baseURL}${endpoint}`);
+      const response = await axios.get(`${this.baseURL}${endpoint}`);
+      console.log('[API] GET Success');
+      return { data: response.data };
+    } catch (error: any) {
+      console.error('[API] GET Error:', error.response?.data || error.message);
+      return {
+        error: error.response?.data?.error || 'Request failed',
+        message: error.response?.data?.message || error.message,
+      };
+    }
   }
 
   /**
    * POST request
    */
   async post<T>(endpoint: string, body?: any): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
+    try {
+      console.log(`[API] POST ${this.baseURL}${endpoint}`);
+      const response = await axios.post(`${this.baseURL}${endpoint}`, body);
+      console.log('[API] POST Success');
+      return { data: response.data };
+    } catch (error: any) {
+      console.error('[API] POST Error:', error.response?.data || error.message);
+      return {
+        error: error.response?.data?.error || 'Request failed',
+        message: error.response?.data?.message || error.message,
+      };
+    }
   }
 
   /**
    * PUT request
    */
   async put<T>(endpoint: string, body?: any): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, {
-      method: 'PUT',
-      body: JSON.stringify(body),
-    });
+    try {
+      console.log(`[API] PUT ${this.baseURL}${endpoint}`);
+      const response = await axios.put(`${this.baseURL}${endpoint}`, body);
+      console.log('[API] PUT Success');
+      return { data: response.data };
+    } catch (error: any) {
+      console.error('[API] PUT Error:', error.response?.data || error.message);
+      return {
+        error: error.response?.data?.error || 'Request failed',
+        message: error.response?.data?.message || error.message,
+      };
+    }
   }
 
   /**
    * DELETE request
    */
   async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
-  }
-
-  /**
-   * Clear session cookie
-   */
-  clearSession() {
-    this.sessionCookie = null;
-  }
-
-  /**
-   * Set session cookie manually
-   */
-  setSession(cookie: string) {
-    this.sessionCookie = cookie;
-  }
-
-  /**
-   * Get session cookie
-   */
-  getSession(): string | null {
-    return this.sessionCookie;
+    try {
+      console.log(`[API] DELETE ${this.baseURL}${endpoint}`);
+      const response = await axios.delete(`${this.baseURL}${endpoint}`);
+      console.log('[API] DELETE Success');
+      return { data: response.data };
+    } catch (error: any) {
+      console.error('[API] DELETE Error:', error.response?.data || error.message);
+      return {
+        error: error.response?.data?.error || 'Request failed',
+        message: error.response?.data?.message || error.message,
+      };
+    }
   }
 }
 
