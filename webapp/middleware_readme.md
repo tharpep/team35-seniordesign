@@ -1,355 +1,167 @@
-# Cognitive Coach - Backend Middleware
+# Cognitive Coach Middleware Documentation
 
-This document provides comprehensive documentation for the Cognitive Coach backend middleware, including data structures, API endpoints, setup instructions, and implementation details.
+**Last Updated:** October 29, 2025  
+**Version:** 1.0
 
 ---
 
-## Table of Contents
+## 📋 Table of Contents
 
 1. [Overview](#overview)
 2. [Architecture](#architecture)
-3. [Data Structures](#data-structures)
+3. [Database Structure](#database-structure)
 4. [API Endpoints](#api-endpoints)
-5. [Authentication Flow](#authentication-flow)
-6. [WebSocket Implementation](#websocket-implementation)
-7. [Setup Instructions](#setup-instructions)
-8. [File Structure](#file-structure)
-9. [Data Flow](#data-flow)
-10. [Error Handling](#error-handling)
-11. [Testing](#testing)
-12. [Troubleshooting](#troubleshooting)
+5. [Setup Instructions](#setup-instructions)
+6. [Authentication Flow](#authentication-flow)
+7. [Data Flow](#data-flow)
+8. [Seed Scripts](#seed-scripts)
+9. [Testing](#testing)
+10. [Known Limitations](#known-limitations)
+11. [Troubleshooting](#troubleshooting)
+12. [Next Steps](#next-steps)
 
 ---
 
 ## Overview
 
-### What is the Middleware?
+The Cognitive Coach middleware connects the React frontend with the SQLite database, providing REST API endpoints and WebSocket real-time communication for study session management and artifact generation.
 
-The middleware is a Node.js/Express backend server that:
-- Handles authentication and session management
-- Manages CRUD operations for sessions and study artifacts
-- Processes and stores captured frames from webcam/screen
-- Provides real-time updates via WebSocket (Socket.IO)
-- Interfaces with SQLite database for data persistence
+### Tech Stack
 
-### Technology Stack
+**Backend:**
+- Node.js + Express.js
+- SQLite3 (auto-initialized on startup)
+- Socket.IO (WebSocket server)
+- bcrypt (password hashing)
+- express-session (session management)
+- multer (file uploads)
 
-- **Runtime:** Node.js (v16+)
-- **Framework:** Express.js
-- **Database:** SQLite3
-- **Authentication:** express-session + bcrypt
-- **Real-time:** Socket.IO
-- **File Upload:** Multer
-- **CORS:** cors middleware
-
-### Key Features
-
-✅ Session-based authentication with secure cookies  
-✅ RESTful API endpoints  
-✅ Real-time WebSocket communication  
-✅ File upload handling for captured frames  
-✅ Password hashing with bcrypt  
-✅ SQLite database with foreign key constraints  
-✅ Error handling and validation  
+**Frontend:**
+- React 18 + TypeScript
+- Axios (HTTP client)
+- Socket.IO Client
+- React Router (navigation)
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Frontend (React)                         │
-│  - User Interface                                           │
-│  - API calls via Axios                                      │
-│  - WebSocket client (Socket.IO)                            │
-└─────────────────┬───────────────────────────────────────────┘
-                  │
-                  │ HTTP/WebSocket
-                  │
-┌─────────────────┴───────────────────────────────────────────┐
-│              Backend Middleware (Express)                    │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │ Routes Layer                                         │   │
-│  │  - auth.js, sessions.js, materials.js               │   │
-│  └────────────┬────────────────────────────────────────┘   │
-│               │                                              │
-│  ┌────────────┴────────────────────────────────────────┐   │
-│  │ Controllers Layer                                    │   │
-│  │  - Business logic                                    │   │
-│  │  - Data validation                                   │   │
-│  │  - Response formatting                               │   │
-│  └────────────┬────────────────────────────────────────┘   │
-│               │                                              │
-│  ┌────────────┴────────────────────────────────────────┐   │
-│  │ Middleware Layer                                     │   │
-│  │  - Authentication (session verification)             │   │
-│  │  - File upload (Multer)                             │   │
-│  │  - Error handling                                    │   │
-│  └────────────┬────────────────────────────────────────┘   │
-│               │                                              │
-│  ┌────────────┴────────────────────────────────────────┐   │
-│  │ Database Layer (SQLite)                              │   │
-│  │  - Connection management                             │   │
-│  │  - Query helpers                                     │   │
-│  └──────────────────────────────────────────────────────┘   │
-│                                                              │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │ WebSocket Server (Socket.IO)                         │   │
-│  │  - Real-time communication                           │   │
-│  │  - Room management                                   │   │
-│  └──────────────────────────────────────────────────────┘   │
-└──────────────────────────────────────────────────────────────┘
-                  │
-                  │ SQL Queries
-                  │
-┌─────────────────┴───────────────────────────────────────────┐
-│                SQLite Database                               │
-│  - users, sessions, captured_frames, study_artifacts        │
-│  - session_fatigue_flags, session_distraction_events       │
-└──────────────────────────────────────────────────────────────┘
+┌─────────────────┐
+│  React Frontend │
+│  (Port 5173)    │
+└────────┬────────┘
+         │
+         │ HTTP/REST (Axios)
+         │ WebSocket (Socket.IO)
+         │
+┌────────▼────────┐
+│  Express Server │
+│  (Port 3001)    │
+├─────────────────┤
+│  - Auth Routes  │
+│  - Session Routes│
+│  - Material Routes│
+│  - WebSocket    │
+└────────┬────────┘
+         │
+         │ SQL Queries
+         │
+┌────────▼────────┐
+│  SQLite DB      │
+│  (studycoach.db)│
+├─────────────────┤
+│  - users        │
+│  - sessions     │
+│  - study_artifacts│
+│  - captured_frames│
+└─────────────────┘
 ```
 
 ---
 
-## Data Structures
+## Database Structure
 
-### Database Schema
+### Auto-Initialization
 
-#### 1. Users Table
+The database is **automatically created** when the backend server starts if it doesn't exist. No manual setup required!
 
-Stores user account information.
+### Tables
 
+#### **users**
 ```sql
-CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
-    first_name TEXT,
-    last_name TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+id                INTEGER PRIMARY KEY
+email             TEXT UNIQUE NOT NULL
+password_hash     TEXT NOT NULL
+first_name        TEXT
+last_name         TEXT
+created_at        DATETIME DEFAULT CURRENT_TIMESTAMP
 ```
 
-**Fields:**
-- `id` - Unique user identifier (auto-increment)
-- `email` - User's email address (unique, required)
-- `password_hash` - Bcrypt hashed password (required)
-- `first_name` - User's first name (optional)
-- `last_name` - User's last name (optional)
-- `created_at` - Account creation timestamp
-
-**Indexes:**
-- PRIMARY KEY on `id`
-- UNIQUE constraint on `email`
-
----
-
-#### 2. Sessions Table
-
-Stores study session information.
-
+#### **sessions**
 ```sql
-CREATE TABLE sessions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    title TEXT NOT NULL,
-    start_time DATETIME,
-    end_time DATETIME,
-    duration INTEGER,
-    status TEXT CHECK(status IN ('active', 'paused', 'completed')) DEFAULT 'completed',
-    focus_score INTEGER,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+id                INTEGER PRIMARY KEY
+user_id           INTEGER NOT NULL (FK → users.id)
+title             TEXT NOT NULL
+start_time        DATETIME
+end_time          DATETIME
+duration          INTEGER (seconds)
+status            TEXT ('active', 'paused', 'completed')
+focus_score       INTEGER
+created_at        DATETIME DEFAULT CURRENT_TIMESTAMP
 ```
 
-**Fields:**
-- `id` - Unique session identifier
-- `user_id` - Foreign key to users table (CASCADE delete)
-- `title` - Session title/name (required)
-- `start_time` - Session start timestamp
-- `end_time` - Session end timestamp
-- `duration` - Session duration in seconds
-- `status` - Current status: 'active', 'paused', 'completed'
-- `focus_score` - Overall focus score (0-100) - *placeholder for future graph*
-- `created_at` - Record creation timestamp
-
-**Constraints:**
-- CHECK constraint on `status` (must be one of: active, paused, completed)
-- Foreign key constraint with CASCADE delete
-
-**Notes:**
-- `focus_score` is currently a single value; will be replaced with time-series data in future
-
----
-
-#### 3. Captured Frames Table
-
-Stores metadata for captured webcam/screen frames.
-
+#### **study_artifacts**
 ```sql
-CREATE TABLE captured_frames (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    session_id INTEGER NOT NULL,
-    frame_type TEXT CHECK(frame_type IN ('webcam', 'screen')),
-    file_path TEXT NOT NULL,
-    captured_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
-);
+id                INTEGER PRIMARY KEY
+session_id        INTEGER NOT NULL (FK → sessions.id)
+type              TEXT ('flashcard', 'equation', 'multiple_choice', 'insights')
+title             TEXT NOT NULL
+content           TEXT (JSON string)
+created_at        DATETIME DEFAULT CURRENT_TIMESTAMP
 ```
 
-**Fields:**
-- `id` - Unique frame identifier
-- `session_id` - Foreign key to sessions table
-- `frame_type` - Type of capture: 'webcam' or 'screen'
-- `file_path` - Relative path to stored frame file
-- `captured_at` - Frame capture timestamp
-
-**File Storage:**
-- Actual image files stored in: `/uploads/frames/session_X/[webcam|screen]/`
-- Format: `frame_TIMESTAMP.jpg`
-- Database stores path, not binary data
-
----
-
-#### 4. Study Artifacts Table
-
-Stores AI-generated study materials (formerly study_materials).
-
+#### **captured_frames**
 ```sql
-CREATE TABLE study_artifacts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    session_id INTEGER NOT NULL,
-    type TEXT CHECK(type IN ('flashcard', 'equation', 'multiple_choice', 'insights')),
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
-);
+id                INTEGER PRIMARY KEY
+session_id        INTEGER NOT NULL (FK → sessions.id)
+frame_type        TEXT ('webcam', 'screen')
+file_path         TEXT NOT NULL
+captured_at       DATETIME DEFAULT CURRENT_TIMESTAMP
 ```
 
-**Fields:**
-- `id` - Unique artifact identifier
-- `session_id` - Foreign key to sessions table
-- `type` - Artifact type (constrained to 4 types)
-- `title` - Artifact title/name
-- `content` - Artifact content (JSON string or plain text)
-- `created_at` - Creation timestamp
-
-**Artifact Types:**
-1. **flashcard** - Question/answer pairs
-2. **equation** - Mathematical equations or formulas
-3. **multiple_choice** - Multiple choice questions
-4. **insights** - Study insights or analysis
-
-**Content Format Examples:**
-
-```javascript
-// Flashcard
-{
-  "question": "What is the capital of France?",
-  "answer": "Paris"
-}
-
-// Equation
-{
-  "formula": "E = mc²",
-  "variables": {
-    "E": "Energy",
-    "m": "Mass",
-    "c": "Speed of light"
-  }
-}
-
-// Multiple Choice
-{
-  "question": "What is 2 + 2?",
-  "options": ["3", "4", "5", "6"],
-  "correct": 1
-}
-
-// Insights
-"Your focus was highest during the first 30 minutes. Consider scheduling difficult tasks early in study sessions."
-```
-
----
-
-#### 5. Session Fatigue Flags (Placeholder)
-
-Future implementation for tracking user fatigue during sessions.
-
+#### **session_fatigue_flags** (placeholder)
 ```sql
-CREATE TABLE session_fatigue_flags (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    session_id INTEGER NOT NULL,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    data TEXT,
-    FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
-);
+id                INTEGER PRIMARY KEY
+session_id        INTEGER NOT NULL (FK → sessions.id)
+timestamp         DATETIME DEFAULT CURRENT_TIMESTAMP
+data              TEXT
 ```
 
-**Current Status:** Placeholder table with generic `data` field  
-**Future Implementation:** Will store structured fatigue events with severity, duration, etc.
-
----
-
-#### 6. Session Distraction Events (Placeholder)
-
-Future implementation for tracking distraction events.
-
+#### **session_distraction_events** (placeholder)
 ```sql
-CREATE TABLE session_distraction_events (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    session_id INTEGER NOT NULL,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    data TEXT,
-    FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
-);
+id                INTEGER PRIMARY KEY
+session_id        INTEGER NOT NULL (FK → sessions.id)
+timestamp         DATETIME DEFAULT CURRENT_TIMESTAMP
+data              TEXT
 ```
-
-**Current Status:** Placeholder table with generic `data` field  
-**Future Implementation:** Will store structured distraction events with type, duration, etc.
-
----
-
-### Entity Relationships
-
-```
-users (1) ────── (∞) sessions
-                      │
-                      ├────── (∞) captured_frames
-                      ├────── (∞) study_artifacts
-                      ├────── (∞) session_fatigue_flags
-                      └────── (∞) session_distraction_events
-```
-
-**Key Points:**
-- One user can have many sessions
-- One session can have many frames, artifacts, flags, events
-- All child records CASCADE delete with parent session
-- All sessions CASCADE delete with parent user
 
 ---
 
 ## API Endpoints
 
-### Base URL
-
-```
-http://localhost:3001/api
-```
+Base URL: `http://localhost:3001/api`
 
 ### Authentication Endpoints
 
-#### POST /api/auth/register
+#### **POST /auth/register**
+Create a new user account.
 
-Register a new user account.
-
-**Request Body:**
+**Request:**
 ```json
 {
   "email": "user@example.com",
-  "password": "securepassword",
+  "password": "password123",
   "first_name": "John",
   "last_name": "Doe"
 }
@@ -368,22 +180,14 @@ Register a new user account.
 }
 ```
 
-**Notes:**
-- Password is hashed using bcrypt (10 rounds)
-- User is automatically logged in after registration (session created)
-- Email must be unique
+#### **POST /auth/login**
+Authenticate user and create session.
 
----
-
-#### POST /api/auth/login
-
-Login with existing account.
-
-**Request Body:**
+**Request:**
 ```json
 {
   "email": "user@example.com",
-  "password": "securepassword"
+  "password": "password123"
 }
 ```
 
@@ -395,24 +199,14 @@ Login with existing account.
     "email": "user@example.com",
     "first_name": "John",
     "last_name": "Doe",
-    "created_at": "2025-01-15T10:00:00.000Z"
+    "created_at": "2025-10-29T12:00:00.000Z"
   },
   "message": "Login successful"
 }
 ```
 
-**Notes:**
-- Session cookie is set in response
-- Cookie name: `cognitive_coach_session` (configurable)
-- Cookie is httpOnly and secure (in production)
-
----
-
-#### POST /api/auth/logout
-
-Logout current user.
-
-**Request:** No body required (uses session cookie)
+#### **POST /auth/logout**
+Destroy user session.
 
 **Response (200):**
 ```json
@@ -421,17 +215,8 @@ Logout current user.
 }
 ```
 
-**Notes:**
-- Destroys server-side session
-- Clears session cookie
-
----
-
-#### GET /api/auth/me
-
-Get current logged-in user information.
-
-**Request:** No body required (uses session cookie)
+#### **GET /auth/me**
+Get current logged-in user info.
 
 **Response (200):**
 ```json
@@ -441,22 +226,19 @@ Get current logged-in user information.
     "email": "user@example.com",
     "first_name": "John",
     "last_name": "Doe",
-    "created_at": "2025-01-15T10:00:00.000Z"
+    "created_at": "2025-10-29T12:00:00.000Z"
   }
 }
 ```
-
-**Requires:** Authentication (protected route)
 
 ---
 
 ### Session Endpoints
 
-#### GET /api/sessions
+All session endpoints require authentication.
 
-Get all sessions for the logged-in user.
-
-**Request:** No body required
+#### **GET /sessions**
+Get all sessions for logged-in user.
 
 **Response (200):**
 ```json
@@ -466,29 +248,24 @@ Get all sessions for the logged-in user.
       "id": 1,
       "user_id": 1,
       "title": "Organic Chemistry Review",
-      "start_time": "2025-01-15T14:30:00.000Z",
-      "end_time": "2025-01-15T16:45:00.000Z",
+      "start_time": "2025-10-29T14:30:00.000Z",
+      "end_time": "2025-10-29T16:45:00.000Z",
       "duration": 8100,
       "status": "completed",
       "focus_score": 88,
-      "created_at": "2025-01-15T14:30:00.000Z"
+      "created_at": "2025-10-29T14:30:00.000Z"
     }
   ]
 }
 ```
 
-**Requires:** Authentication
+#### **POST /sessions**
+Create a new study session.
 
----
-
-#### POST /api/sessions
-
-Create a new session.
-
-**Request Body:**
+**Request:**
 ```json
 {
-  "title": "Study Session - Math"
+  "title": "Physics Study Session"
 }
 ```
 
@@ -498,30 +275,17 @@ Create a new session.
   "session": {
     "id": 5,
     "user_id": 1,
-    "title": "Study Session - Math",
-    "start_time": "2025-01-15T15:00:00.000Z",
+    "title": "Physics Study Session",
+    "start_time": "2025-10-29T18:00:00.000Z",
     "status": "active",
-    "created_at": "2025-01-15T15:00:00.000Z"
+    "created_at": "2025-10-29T18:00:00.000Z"
   },
   "message": "Session created successfully"
 }
 ```
 
-**Notes:**
-- `start_time` is automatically set to current time
-- Status defaults to 'active'
-- WebSocket event `session-created` is emitted
-
-**Requires:** Authentication
-
----
-
-#### GET /api/sessions/:id
-
-Get a specific session by ID.
-
-**Parameters:**
-- `id` - Session ID (integer)
+#### **GET /sessions/:id**
+Get single session by ID.
 
 **Response (200):**
 ```json
@@ -530,70 +294,38 @@ Get a specific session by ID.
     "id": 1,
     "user_id": 1,
     "title": "Organic Chemistry Review",
-    "start_time": "2025-01-15T14:30:00.000Z",
-    "end_time": "2025-01-15T16:45:00.000Z",
+    "start_time": "2025-10-29T14:30:00.000Z",
+    "end_time": "2025-10-29T16:45:00.000Z",
     "duration": 8100,
     "status": "completed",
-    "focus_score": 88,
-    "created_at": "2025-01-15T14:30:00.000Z"
+    "focus_score": 88
   }
 }
 ```
 
-**Requires:** Authentication (must own the session)
+#### **PUT /sessions/:id**
+Update session (pause, resume, complete).
 
----
-
-#### PUT /api/sessions/:id
-
-Update a session (pause, resume, stop, change title, etc.).
-
-**Parameters:**
-- `id` - Session ID (integer)
-
-**Request Body:**
+**Request:**
 ```json
 {
   "status": "completed",
-  "end_time": "2025-01-15T16:45:00.000Z",
+  "end_time": "2025-10-29T16:45:00.000Z",
   "duration": 8100,
   "focus_score": 88
 }
 ```
 
-**Allowed Fields:**
-- `status` - 'active', 'paused', 'completed'
-- `title` - Session title
-- `end_time` - ISO datetime string
-- `duration` - Duration in seconds
-- `focus_score` - Integer 0-100
-
 **Response (200):**
 ```json
 {
-  "session": {
-    "id": 1,
-    "status": "completed",
-    "end_time": "2025-01-15T16:45:00.000Z",
-    "duration": 8100
-  },
+  "session": { /* updated session */ },
   "message": "Session updated successfully"
 }
 ```
 
-**Notes:**
-- WebSocket event `session-updated` is emitted to room `session-{id}`
-
-**Requires:** Authentication (must own the session)
-
----
-
-#### DELETE /api/sessions/:id
-
-Delete a session and all associated data.
-
-**Parameters:**
-- `id` - Session ID (integer)
+#### **DELETE /sessions/:id**
+Delete session and all associated data.
 
 **Response (200):**
 ```json
@@ -602,54 +334,27 @@ Delete a session and all associated data.
 }
 ```
 
-**Notes:**
-- CASCADE deletes all captured_frames, study_artifacts, etc.
-- Attempts to delete associated frame files from filesystem
-
-**Requires:** Authentication (must own the session)
-
----
-
-#### POST /api/sessions/:id/frames
-
-Upload a captured frame (webcam or screen).
-
-**Parameters:**
-- `id` - Session ID (integer)
+#### **POST /sessions/:id/frames**
+Upload captured frame (webcam/screen).
 
 **Request:** `multipart/form-data`
-- `frame` - Image file (JPEG)
-- `type` - Frame type: 'webcam' or 'screen'
+- `frame`: Image file (JPEG/PNG, max 10MB)
+- `type`: "webcam" or "screen"
 
 **Response (200):**
 ```json
 {
   "message": "Frame uploaded successfully",
   "file": {
-    "path": "uploads/frames/session_1/webcam/frame_1234567890.jpg",
+    "path": "/path/to/frame.jpg",
     "type": "webcam",
-    "size": 45678
+    "size": 125000
   }
 }
 ```
 
-**File Storage:**
-- Path: `/uploads/frames/session_{id}/{type}/frame_{timestamp}.jpg`
-- Metadata saved to `captured_frames` table
-- Max file size: 10MB (configurable)
-
-**Requires:** Authentication (must own the session)
-
----
-
-### Material/Artifact Endpoints
-
-#### GET /api/sessions/:sessionId/materials
-
-Get all study artifacts for a specific session.
-
-**Parameters:**
-- `sessionId` - Session ID (integer)
+#### **GET /sessions/:sessionId/materials**
+Get all study artifacts for a session.
 
 **Response (200):**
 ```json
@@ -659,307 +364,62 @@ Get all study artifacts for a specific session.
       "id": 1,
       "session_id": 1,
       "type": "flashcard",
-      "title": "Alkene Reactions",
-      "content": "{\"question\":\"What is...\",\"answer\":\"...\"}",
-      "created_at": "2025-01-15T16:00:00.000Z"
+      "title": "What is the major product...",
+      "content": "{\"id\":\"fc_001\",\"front\":\"...\",\"back\":\"...\"}",
+      "created_at": "2025-10-29T14:45:00.000Z"
     }
   ]
 }
 ```
 
-**Requires:** Authentication (must own the session)
-
 ---
 
-#### POST /api/materials
+### Material Endpoints
 
-Create a new study artifact.
+#### **POST /materials**
+Create new study artifact (manual/testing).
 
-**Request Body:**
+**Request:**
 ```json
 {
   "session_id": 1,
   "type": "flashcard",
-  "title": "Test Flashcard",
-  "content": "{\"question\":\"Test?\",\"answer\":\"Yes!\"}"
+  "title": "Alkene Reactions",
+  "content": "{\"front\":\"Q?\",\"back\":\"A!\"}"
 }
 ```
-
-**Allowed Types:**
-- `flashcard`
-- `equation`
-- `multiple_choice`
-- `insights`
 
 **Response (201):**
 ```json
 {
-  "material": {
-    "id": 10,
-    "session_id": 1,
-    "type": "flashcard",
-    "title": "Test Flashcard",
-    "content": "{...}",
-    "created_at": "2025-01-15T16:30:00.000Z"
-  },
+  "material": { /* created material */ },
   "message": "Material created successfully"
 }
 ```
 
-**Notes:**
-- WebSocket event `material-created` is emitted to room `session-{session_id}`
-- Frontend will receive real-time update
+#### **GET /materials/:id**
+Get single material by ID.
 
-**Requires:** Authentication (must own the session)
+#### **PUT /materials/:id**
+Update material.
 
----
-
-#### GET /api/materials/:id
-
-Get a specific artifact by ID.
-
-**Parameters:**
-- `id` - Material ID (integer)
-
-**Response (200):**
-```json
-{
-  "material": {
-    "id": 1,
-    "session_id": 1,
-    "type": "flashcard",
-    "title": "Alkene Reactions",
-    "content": "{...}",
-    "created_at": "2025-01-15T16:00:00.000Z"
-  }
-}
-```
-
-**Requires:** Authentication (must own the session)
-
----
-
-#### PUT /api/materials/:id
-
-Update an existing artifact.
-
-**Parameters:**
-- `id` - Material ID (integer)
-
-**Request Body:**
-```json
-{
-  "title": "Updated Title",
-  "content": "{\"question\":\"Updated?\",\"answer\":\"Yes!\"}"
-}
-```
-
-**Allowed Fields:**
-- `type`
-- `title`
-- `content`
-
-**Response (200):**
-```json
-{
-  "material": {
-    "id": 1,
-    "title": "Updated Title",
-    "content": "{...}"
-  },
-  "message": "Material updated successfully"
-}
-```
-
-**Requires:** Authentication (must own the session)
-
----
-
-#### DELETE /api/materials/:id
-
-Delete an artifact.
-
-**Parameters:**
-- `id` - Material ID (integer)
-
-**Response (200):**
-```json
-{
-  "message": "Material deleted successfully"
-}
-```
-
-**Requires:** Authentication (must own the session)
+#### **DELETE /materials/:id**
+Delete material.
 
 ---
 
 ### Health Check
 
-#### GET /api/health
-
-Check if server is running.
+#### **GET /health**
+Check if backend is running.
 
 **Response (200):**
 ```json
 {
   "status": "ok",
   "message": "Cognitive Coach backend is running",
-  "timestamp": "2025-01-15T10:00:00.000Z"
+  "timestamp": "2025-10-29T18:00:00.000Z"
 }
-```
-
-**Requires:** No authentication
-
----
-
-## Authentication Flow
-
-### Session-Based Authentication
-
-The backend uses express-session for authentication with the following flow:
-
-```
-1. User Registration/Login
-   ↓
-2. Server creates session
-   ↓
-3. Session ID stored in cookie (httpOnly, secure)
-   ↓
-4. Client sends cookie with each request
-   ↓
-5. Server verifies session ID
-   ↓
-6. If valid → Process request
-   If invalid → Return 401 Unauthorized
-```
-
-### Session Configuration
-
-```javascript
-{
-  secret: process.env.SESSION_SECRET,
-  name: 'cognitive_coach_session',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
-    httpOnly: true,  // No JavaScript access
-    maxAge: 86400000 // 24 hours
-  }
-}
-```
-
-### Protected Routes
-
-All routes except `/api/auth/login` and `/api/auth/register` require authentication.
-
-**Middleware:**
-```javascript
-function requireAuth(req, res, next) {
-  if (req.session && req.session.userId) {
-    next(); // User authenticated
-  } else {
-    res.status(401).json({ 
-      error: 'Unauthorized',
-      message: 'Please log in to access this resource'
-    });
-  }
-}
-```
-
-### Password Security
-
-- **Hashing:** bcrypt with 10 rounds
-- **Salt:** Automatically generated per password
-- **Storage:** Only hash stored, never plain password
-
-```javascript
-const saltRounds = 10;
-const hash = await bcrypt.hash(password, saltRounds);
-const isValid = await bcrypt.compare(password, hash);
-```
-
----
-
-## WebSocket Implementation
-
-### Socket.IO Configuration
-
-**Server Setup:**
-```javascript
-const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL,
-    credentials: true
-  }
-});
-```
-
-### Room Management
-
-Sessions use rooms for targeted message broadcasting:
-
-```
-Client connects → Joins room "session-{id}" → Receives updates for that session only
-```
-
-### Events
-
-#### Client → Server
-
-**join-session**
-```javascript
-socket.emit('join-session', { sessionId: 1 });
-```
-Client joins room to receive updates for session 1.
-
-**leave-session**
-```javascript
-socket.emit('leave-session', { sessionId: 1 });
-```
-Client leaves room.
-
-#### Server → Client
-
-**material-created**
-```javascript
-io.to('session-1').emit('material-created', {
-  id: 10,
-  session_id: 1,
-  type: 'flashcard',
-  title: 'New Flashcard',
-  content: '{...}',
-  created_at: '2025-01-15T16:30:00.000Z'
-});
-```
-Broadcast when new material is created.
-
-**session-updated**
-```javascript
-io.to('session-1').emit('session-updated', {
-  sessionId: 1,
-  updates: {
-    status: 'completed',
-    duration: 8100
-  }
-});
-```
-Broadcast when session is updated.
-
-### Connection Handling
-
-```javascript
-io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
-  
-  socket.on('join-session', (data) => {
-    socket.join(`session-${data.sessionId}`);
-  });
-  
-  socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
-  });
-});
 ```
 
 ---
@@ -968,541 +428,481 @@ io.on('connection', (socket) => {
 
 ### Prerequisites
 
-- Node.js v16+
-- npm
-- SQLite3 (or use Node.js sqlite3 package)
+- Node.js 16+ installed
+- npm or yarn
 
-### Installation
+### Backend Setup
 
 ```bash
-# Navigate to backend directory
-cd webapp/backend
+# 1. Navigate to backend folder
+cd backend
 
-# Install dependencies
+# 2. Install dependencies
 npm install
-```
 
-**Dependencies Installed:**
-- express
-- express-session
-- sqlite3
-- bcrypt
-- cors
-- dotenv
-- socket.io
-- multer
-- body-parser
+# 3. Create .env file (optional - has defaults)
+touch .env
 
-### Configuration
+# Add to .env (optional):
+# PORT=3001
+# SESSION_SECRET=your-secret-key-here
+# FRONTEND_URL=http://localhost:5173
+# NODE_ENV=development
 
-Create `.env` file in `/backend` directory:
-
-```env
-# Server Configuration
-PORT=3001
-NODE_ENV=development
-
-# Database Configuration
-DB_PATH=../database/studycoach.db
-
-# Session Configuration
-SESSION_SECRET=your-secret-key-change-this-in-production
-SESSION_NAME=cognitive_coach_session
-SESSION_MAX_AGE=86400000
-
-# File Upload Configuration
-UPLOAD_PATH=../uploads/frames
-MAX_FILE_SIZE=10485760
-
-# CORS Configuration
-FRONTEND_URL=http://localhost:5173
-```
-
-### Database Initialization
-
-```bash
-# Navigate to database directory
-cd ../database
-
-# Initialize database
-node initDatabase.js
-```
-
-### Starting the Server
-
-```bash
-# Development mode (auto-restart on changes)
-npm run dev
-
-# Production mode
+# 4. Start the backend
 npm start
 ```
 
-**Expected Output:**
+**What happens on startup:**
+1. ✅ Checks if database exists
+2. ✅ Creates database with schema if missing
+3. ✅ Connects to database
+4. ✅ Loads routes
+5. ✅ Starts Express server on port 3001
+6. ✅ WebSocket server ready
+
+### Frontend Setup
+
+```bash
+# 1. Navigate to frontend folder
+cd cognitive-coach
+
+# 2. Install dependencies
+npm install
+
+# 3. Start development server
+npm run dev
 ```
-=================================
-🚀 Cognitive Coach Backend Server
-=================================
-✓ Server running on port 3001
-✓ API: http://localhost:3001/api
-✓ WebSocket: ws://localhost:3001
-✓ Environment: development
-✓ Connected to SQLite database
-=================================
-```
+
+Frontend runs on: `http://localhost:5173`
 
 ---
 
-## File Structure
+## Authentication Flow
 
+### Session-Based Authentication
+
+The system uses **cookie-based sessions** (not JWT tokens).
+
+**Flow:**
 ```
-backend/
-├── src/
-│   ├── config/
-│   │   └── database.js           # SQLite connection & helpers
-│   │
-│   ├── controllers/
-│   │   ├── authController.js     # Auth logic (login, register, etc.)
-│   │   ├── sessionController.js  # Session CRUD logic
-│   │   └── materialController.js # Material CRUD logic
-│   │
-│   ├── middleware/
-│   │   └── auth.js               # Authentication middleware
-│   │
-│   ├── routes/
-│   │   ├── auth.js               # Auth endpoints
-│   │   ├── sessions.js           # Session endpoints
-│   │   └── materials.js          # Material endpoints
-│   │
-│   └── server.js                 # Main server file
-│
-├── package.json                  # Dependencies & scripts
-├── .env                          # Environment variables (not in git)
-└── README.md                     # This file
+1. User submits login form
+   ↓
+2. Frontend: POST /api/auth/login
+   ↓
+3. Backend: Verify credentials
+   ↓
+4. Backend: Create session (req.session.userId)
+   ↓
+5. Backend: Send session cookie to browser
+   ↓
+6. Browser: Stores cookie automatically
+   ↓
+7. Future requests: Cookie sent automatically
+   ↓
+8. Backend: requireAuth middleware checks session
 ```
 
-### Key Files
+### Protected Routes
 
-**src/server.js**
-- Main entry point
-- Express app setup
-- Middleware configuration
-- Route mounting
-- WebSocket server initialization
-- Error handling
+All routes except `/auth/login` and `/auth/register` require authentication.
 
-**src/config/database.js**
-- SQLite connection
-- Helper functions (runQuery, getOne, getAll)
-- Database path configuration
+**Middleware:**
+```javascript
+const requireAuth = (req, res, next) => {
+  if (req.session && req.session.userId) {
+    next(); // Allow access
+  } else {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+};
+```
 
-**src/controllers/*.js**
-- Business logic for each feature
-- Data validation
-- Database queries
-- Response formatting
-- WebSocket event emission
-
-**src/routes/*.js**
-- Endpoint definitions
-- Route parameters
-- Middleware application (auth, file upload)
-- Controller function mapping
-
-**src/middleware/auth.js**
-- Session verification
-- Protected route wrapper
-- Authorization checks
+**Frontend:**
+- `ProtectedRoute` component checks authentication
+- Redirects to `/login` if not authenticated
+- Uses `api.getCurrentUser()` to verify session
 
 ---
 
 ## Data Flow
 
-### Example: Creating a Session
+### Dashboard Page
 
 ```
-1. Frontend: User clicks "Start Session"
-   ↓
-2. Frontend: POST /api/sessions with title
-   ↓
-3. Backend: sessionController.createSession()
-   ↓
-4. Backend: Verify user authentication
-   ↓
-5. Backend: Insert into sessions table
-   ↓
-6. Backend: Emit WebSocket event 'session-created'
-   ↓
-7. Backend: Return session object
-   ↓
-8. Frontend: Receive session, store session ID
-   ↓
-9. Frontend: Start capturing frames
-   ↓
-10. Every 5 seconds: POST /api/sessions/:id/frames
+User loads Dashboard
+  ↓
+Frontend: useEffect(() => fetchSessions())
+  ↓
+Frontend: GET /api/sessions
+  ↓
+Backend: Query sessions WHERE user_id = ?
+  ↓
+Backend: Return sessions array
+  ↓
+Frontend: Display session cards
+  ↓
+User clicks session
+  ↓
+Frontend: navigate(`/session/${sessionId}`)
 ```
 
-### Example: Real-time Material Update
+### Session Detail Page
 
 ```
-1. Backend Process: Generates new material
-   ↓
-2. Backend: POST /api/materials (or direct DB insert)
-   ↓
-3. Backend: materialController.createMaterial()
-   ↓
-4. Backend: Insert into study_artifacts table
-   ↓
-5. Backend: io.to(`session-${id}`).emit('material-created', material)
-   ↓
-6. Frontend: WebSocket listener receives event
-   ↓
-7. Frontend: Updates materials array in state
-   ↓
-8. Frontend: React re-renders with new material
+User loads Session Detail
+  ↓
+Frontend: useEffect(() => fetchArtifacts())
+  ↓
+Frontend: GET /api/sessions/:sessionId/materials
+  ↓
+Backend: Verify session ownership
+  ↓
+Backend: Query study_artifacts WHERE session_id = ?
+  ↓
+Backend: Return artifacts array
+  ↓
+Frontend: Parse JSON content
+  ↓
+Frontend: Display artifacts by type
 ```
 
 ---
 
-## Error Handling
+## Seed Scripts
 
-### HTTP Error Responses
+### Location
+All seed scripts are in the `database/` folder.
 
-All errors follow this format:
+### Available Scripts
 
+#### **1. Seed Users & Sessions**
+```bash
+cd database
+npm run seed:users
+```
+
+**Creates:**
+- 1 test user (test@example.com / password)
+- 4 study sessions with realistic data
+
+**Sessions:**
+1. Organic Chemistry Review (2h 15m, Focus: 88%)
+2. Calculus Problem Solving (1h 45m, Focus: 92%)
+3. World History Reading (3h 20m, Focus: 76%)
+4. Physics Lab Analysis (2h 50m, Focus: 94%)
+
+#### **2. Seed Artifacts**
+```bash
+cd database
+npm run seed:artifacts
+```
+
+**Creates (for Session 1 only):**
+- 10 Flashcards (from `mockFlashcards.json`)
+- 12 MCQ Questions (from `mockMCQ.json`)
+- 5 Insights (from `mockInsights.json`)
+- 3 Equations (static data)
+- **Total: 30 artifacts**
+
+#### **3. Seed Everything**
+```bash
+cd database
+npm run seed:all
+```
+
+Runs both scripts in sequence.
+
+### Artifact Content Structure
+
+All artifacts store JSON in the `content` field:
+
+**Flashcard:**
 ```json
 {
-  "error": "Error Type",
-  "message": "Human-readable error message"
+  "id": "fc_001",
+  "front": "What is the major product?",
+  "back": "2-bromo-2-methylpropane",
+  "tags": ["alkenes", "reactions"],
+  "difficulty": 3,
+  "hints": ["Consider Markovnikov's rule"]
 }
 ```
 
-### Status Codes
-
-- `200` - Success
-- `201` - Created
-- `400` - Bad Request (validation error)
-- `401` - Unauthorized (not logged in)
-- `403` - Forbidden (not allowed to access resource)
-- `404` - Not Found
-- `409` - Conflict (e.g., email already exists)
-- `500` - Internal Server Error
-
-### Common Errors
-
-**Authentication Required (401)**
+**MCQ:**
 ```json
 {
-  "error": "Unauthorized",
-  "message": "Please log in to access this resource"
+  "id": "mcq_001",
+  "stem": "Which statement is correct?",
+  "options": ["A", "B", "C", "D"],
+  "answer_index": 1,
+  "rationale": "Because...",
+  "bloom_level": "apply"
 }
 ```
 
-**Resource Not Found (404)**
+**Equation:**
 ```json
 {
-  "error": "Not found",
-  "message": "Session not found"
+  "title": "Markovnikov Addition",
+  "equation": "R₂C=CH₂ + HX → R₂CH-CH₂X",
+  "description": "Hydrogen adds to carbon with more hydrogens"
 }
-```
-
-**Validation Error (400)**
-```json
-{
-  "error": "Missing fields",
-  "message": "session_id, type, title, and content are required"
-}
-```
-
-**Duplicate Email (409)**
-```json
-{
-  "error": "User exists",
-  "message": "An account with this email already exists"
-}
-```
-
-### Server Error Handling
-
-```javascript
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({ 
-    error: 'Server error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'An error occurred'
-  });
-});
 ```
 
 ---
 
 ## Testing
 
-### Manual Testing with cURL
+### Backend Testing
 
-**Register User:**
+#### **1. Test Health Endpoint**
 ```bash
-curl -X POST http://localhost:3001/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password","first_name":"Test","last_name":"User"}' \
-  -c cookies.txt
+curl http://localhost:3001/api/health
 ```
 
-**Login:**
+#### **2. Test All Routes**
+```bash
+cd backend
+node testRoutes.js
+```
+
+**Expected output:**
+```
+✓ Health check passed
+✓ Login endpoint exists
+✓ Register endpoint exists
+```
+
+#### **3. Test Login**
 ```bash
 curl -X POST http://localhost:3001/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password"}' \
-  -c cookies.txt
+  -d '{"email":"test@example.com","password":"password"}'
 ```
 
-**Create Session:**
+#### **4. Test Sessions**
 ```bash
-curl -X POST http://localhost:3001/api/sessions \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Test Session"}' \
-  -b cookies.txt
+# Requires authentication cookie
+curl http://localhost:3001/api/sessions \
+  -H "Cookie: cognitive_coach_session=..."
 ```
 
-**Get Materials:**
+#### **5. Test Artifacts**
 ```bash
 curl http://localhost:3001/api/sessions/1/materials \
-  -b cookies.txt
+  -H "Cookie: cognitive_coach_session=..."
 ```
 
-### Testing WebSocket
+### Frontend Testing
 
-Use a WebSocket client or browser console:
+#### **1. Login Flow**
+- Navigate to `http://localhost:5173/login`
+- Enter: test@example.com / password
+- Should redirect to dashboard
+- Should see 4 sessions
 
-```javascript
-const socket = io('http://localhost:3001');
+#### **2. Session List**
+- Dashboard should display all 4 sessions
+- Each card shows: title, date, duration, focus score
+- Click any session → navigate to detail page
 
-socket.on('connect', () => {
-  console.log('Connected:', socket.id);
-  socket.emit('join-session', { sessionId: 1 });
-});
+#### **3. Artifacts Display**
+- Click "Organic Chemistry Review"
+- Should show 30 artifacts total
+- Tabs: Flashcards (10), MCQ (12), Equations (3)
+- Click artifact → opens popup (existing functionality)
 
-socket.on('material-created', (material) => {
-  console.log('New material:', material);
-});
-```
+#### **4. Logout**
+- Click user avatar (initials in header)
+- Profile popup opens
+- Click "Sign Out"
+- Redirects to login page
+- Try accessing dashboard → redirected to login
 
-### Database Inspection
+#### **5. Create Account**
+- Click "Create account" on login page
+- Fill form with new credentials
+- Submit → redirects to login
+- Login with new account → works
 
-```bash
-cd ../database
-node -e "const sqlite3 = require('sqlite3').verbose(); const db = new sqlite3.Database('./studycoach.db'); db.all('SELECT * FROM users', (err, rows) => { console.table(rows); db.close(); });"
-```
+---
+
+## Known Limitations
+
+### Current Scope
+- ✅ Authentication working (login, logout, register)
+- ✅ Sessions displayed from database
+- ✅ Artifacts displayed from database
+- ✅ User-specific data filtering
+- ✅ Auto database initialization
+
+### Not Yet Implemented
+- ⏳ Artifact popup still uses mock data imports (needs update)
+- ⏳ Session metadata in detail page (timeline, chat) still mocked
+- ⏳ Only Session 1 has artifacts (others empty)
+- ⏳ AI processing of frames (placeholder)
+- ⏳ Real-time artifact generation during sessions
+- ⏳ Focus tracking and analytics
+- ⏳ Distraction/fatigue detection
+- ⏳ Password reset
+- ⏳ Email verification
+- ⏳ Profile editing
+
+### Database
+- SQLite used (dev) → PostgreSQL recommended (production)
+- Session storage in memory → Redis recommended (production)
+- No migration system yet
+- Frames stored locally → Cloud storage needed (production)
 
 ---
 
 ## Troubleshooting
 
-### Issue: Port Already in Use
+### Backend Won't Start
 
-**Error:** `EADDRINUSE: address already in use :::3001`
-
-**Solution:**
+**Issue:** Port 3001 already in use
 ```bash
 # Find process using port 3001
-lsof -i :3001
+lsof -i :3001          # Mac/Linux
+netstat -ano | findstr :3001  # Windows
 
-# Kill process
-kill -9 <PID>
+# Kill process or change port in .env
 ```
 
-Or change `PORT` in `.env`
-
----
-
-### Issue: Database Not Found
-
-**Error:** `SQLITE_CANTOPEN: unable to open database file`
-
-**Solution:**
+**Issue:** Database errors
 ```bash
-# Ensure database exists
-cd ../database
-node initDatabase.js
+# Delete and recreate database
+rm database/studycoach.db
+npm start  # Auto-creates new database
+npm run seed:all  # Re-seed data
+```
 
-# Check DB_PATH in backend/.env
-# Should be: DB_PATH=../database/studycoach.db
+### Frontend Can't Connect
+
+**Issue:** 404 on API calls
+- Check backend is running on port 3001
+- Check `api.ts` has correct BASE_URL
+- Check CORS settings in server.js
+
+**Issue:** CORS errors
+- Verify `FRONTEND_URL` in backend .env
+- Check `axios.defaults.withCredentials = true` in api.ts
+
+### Authentication Issues
+
+**Issue:** Login returns 404
+- Check routes are loaded in correct order
+- Verify auth routes registered after database init
+- Check `testRoutes.js` output
+
+**Issue:** Always redirected to login
+- Check session cookie is being set
+- Verify `withCredentials: true` in axios
+- Check browser dev tools → Application → Cookies
+
+### Artifacts Not Showing
+
+**Issue:** Empty artifact list
+- Verify artifacts seeded: `sqlite3 database/studycoach.db "SELECT COUNT(*) FROM study_artifacts;"`
+- Check session ID matches (only session 1 has artifacts)
+- Verify API endpoint: `curl http://localhost:3001/api/sessions/1/materials`
+- Check browser console for errors
+
+---
+
+## Next Steps
+
+### Immediate Priorities
+1. Update ArtifactPopupController to use API data
+2. Fetch real session metadata for detail page
+3. Distribute artifacts across all sessions
+4. Implement real-time artifact generation
+
+### Short-term Goals
+1. Frame processing pipeline
+2. AI integration for content analysis
+3. Focus tracking implementation
+4. Timeline generation from session data
+5. Real AI chat integration
+
+### Long-term Goals
+1. Production deployment (Heroku, AWS, DigitalOcean)
+2. PostgreSQL migration
+3. Redis session store
+4. Cloud storage for frames (S3, GCS)
+5. Advanced analytics dashboard
+6. Mobile app integration
+7. Multi-device sync
+
+---
+
+## File Structure Reference
+
+```
+webapp/
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   │   ├── database.js           # DB connection + helpers
+│   │   │   └── initDatabase.js       # Auto-initialization
+│   │   ├── controllers/
+│   │   │   ├── authController.js     # Auth logic
+│   │   │   ├── sessionController.js  # Session CRUD
+│   │   │   └── materialController.js # Artifact CRUD
+│   │   ├── middleware/
+│   │   │   └── auth.js               # requireAuth
+│   │   ├── routes/
+│   │   │   ├── auth.js               # Auth endpoints
+│   │   │   ├── sessions.js           # Session + material endpoints
+│   │   │   └── materials.js          # Material CRUD
+│   │   └── server.js                 # Main entry point
+│   ├── .env                          # Configuration
+│   ├── package.json
+│   └── testRoutes.js                 # Testing utility
+├── cognitive-coach/
+│   └── src/
+│       ├── components/
+│       │   ├── ArtifactPopup/
+│       │   ├── ConfigurePopup/
+│       │   ├── CurrentSession/
+│       │   ├── DistractionTimeline/
+│       │   ├── FocusAnalytics/
+│       │   ├── FocusChart/
+│       │   ├── ProfilePopup/
+│       │   ├── StudyArtifacts/
+│       │   └── ProtectedRoute.tsx
+│       ├── pages/
+│       │   ├── CreateAccount/
+│       │   ├── Dashboard/
+│       │   ├── Login/
+│       │   └── SessionDetail/
+│       ├── services/
+│       │   ├── api.ts               # API client
+│       │   └── socket.ts            # WebSocket client
+│       ├── assets/data/             # Mock data files
+│       ├── App.tsx
+│       └── AppRouter.tsx
+└── database/
+    ├── schema.sql                   # Database schema
+    ├── seedUsersAndSessions.js      # User/session seed
+    ├── seedArtifacts.js             # Artifact seed
+    ├── studycoach.db                # SQLite database
+    └── package.json
 ```
 
 ---
 
-### Issue: CORS Errors
+## Support & Contact
 
-**Error:** `Access to XMLHttpRequest blocked by CORS policy`
-
-**Solution:**
-- Check `FRONTEND_URL` in `.env` matches frontend URL
-- Ensure `withCredentials: true` in frontend axios config
-- Restart backend after changing `.env`
-
----
-
-### Issue: Session Not Persisting
-
-**Symptoms:** User gets logged out on page refresh
-
-**Solution:**
-- Check `SESSION_SECRET` is set in `.env`
-- Verify `withCredentials: true` in frontend
-- Check cookie settings in browser DevTools
-- Ensure frontend and backend on same domain (localhost)
+For questions, issues, or contributions:
+- Check this README first
+- Review console logs (backend and frontend)
+- Test API endpoints with curl
+- Check database contents with sqlite3
 
 ---
 
-### Issue: File Upload Fails
-
-**Error:** `LIMIT_FILE_SIZE` or upload errors
-
-**Solution:**
-- Check `MAX_FILE_SIZE` in `.env`
-- Ensure `uploads/frames/` directory exists
-- Verify file is under size limit (default 10MB)
-- Check multer configuration in `sessions.js` route
-
----
-
-### Issue: WebSocket Not Connecting
-
-**Symptoms:** No real-time updates
-
-**Solution:**
-- Check backend console for Socket.IO connection logs
-- Verify Socket.IO client version matches server version
-- Check browser console for connection errors
-- Ensure `join-session` event is emitted by client
-- Check CORS configuration for WebSocket
-
----
-
-### Debug Mode
-
-Enable verbose logging:
-
-```javascript
-// In src/server.js, add:
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`);
-  next();
-});
-
-// For WebSocket:
-io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
-  
-  socket.onAny((event, ...args) => {
-    console.log(`Event: ${event}`, args);
-  });
-});
-```
-
----
-
-## Performance Considerations
-
-### Database Optimization
-
-- Add indexes for frequently queried fields
-- Use prepared statements (already implemented)
-- Consider connection pooling for high traffic
-- Regular VACUUM for SQLite maintenance
-
-### File Storage
-
-- Consider cloud storage (S3, GCS) for production
-- Implement cleanup for old sessions
-- Add file compression for frames
-- Set up CDN for frame delivery
-
-### Session Management
-
-- Consider Redis for session storage in production
-- Implement session cleanup for expired sessions
-- Add rate limiting to prevent abuse
-
-### WebSocket Scaling
-
-- For multiple server instances, use Redis adapter
-- Implement connection limits
-- Add heartbeat for connection health
-
----
-
-## Security Best Practices
-
-✅ **Implemented:**
-- Password hashing with bcrypt
-- httpOnly cookies
-- CORS configuration
-- Session-based authentication
-- SQL injection prevention (parameterized queries)
-- File type validation
-- File size limits
-
-⚠️ **TODO for Production:**
-- HTTPS enforcement
-- Rate limiting
-- Input sanitization
-- CSRF protection
-- Content Security Policy headers
-- Helmet.js for security headers
-- Regular security audits
-- Environment variable validation
-
----
-
-## Future Improvements
-
-### Planned Features
-
-1. **Focus Score Graph**
-   - Replace single value with time-series data
-   - New table: `session_focus_data`
-   - Track focus changes throughout session
-
-2. **Fatigue Flags Timeline**
-   - Implement structured fatigue tracking
-   - Severity levels, durations
-   - Visualization support
-
-3. **Distraction Events**
-   - Track distraction types and patterns
-   - Integration with AI analysis
-   - Timeline visualization
-
-4. **AI Processing Pipeline**
-   - Process captured frames with AI
-   - Auto-generate study artifacts
-   - Real-time analysis and insights
-
-### Technical Debt
-
-- Add comprehensive test suite (Jest)
-- Implement logging framework (Winston)
-- Add API documentation (Swagger)
-- Set up CI/CD pipeline
-- Add database migrations system
-- Implement proper error tracking (Sentry)
-
----
-
-## Support
-
-For issues or questions:
-
-1. Check [Troubleshooting](#troubleshooting) section
-2. Review console logs (backend and frontend)
-3. Inspect database contents
-4. Verify environment variables
-5. Check API response in browser Network tab
-
----
-
-**Version:** 2.0  
-**Last Updated:** January 2025  
-**Maintained By:** Team 35 - Senior Design
+**Last Updated:** October 29, 2025  
+**Version:** 1.0  
+**Status:** ✅ Core middleware functional, ready for development
