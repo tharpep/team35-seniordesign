@@ -12,6 +12,9 @@ const {
   deleteSession,
   uploadFrame
 } = require('../controllers/sessionController');
+const {
+  getMaterialsBySession
+} = require('../controllers/materialController');
 
 // Configure multer for frame uploads
 const storage = multer.diskStorage({
@@ -57,6 +60,9 @@ router.post('/', createSession);
 
 // GET /api/sessions/:id - Get session by ID
 router.get('/:id', getSessionById);
+
+// GET /api/sessions/:sessionId/materials - Get all materials for a session
+router.get('/:sessionId/materials', getMaterialsBySession);
 
 // PUT /api/sessions/:id - Update session
 router.put('/:id', updateSession);

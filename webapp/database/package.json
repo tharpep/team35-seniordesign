@@ -1,16 +1,14 @@
 {
-  "name": "database",
+  "name": "studycoach-database",
   "version": "1.0.0",
-  "description": "",
-  "main": "createTestUser.js",
+  "description": "Database setup and seeding scripts for Study Coach",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "seed:all": "node seedUsersAndSessions.js && node seedArtifacts.js",
+    "seed:users": "node seedUsersAndSessions.js",
+    "seed:artifacts": "node seedArtifacts.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "bcrypt": "^6.0.0",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.6",
+    "bcrypt": "^5.1.1"
   }
 }

@@ -26,8 +26,16 @@
 .status-dot {
     width: var(--spacing-sm);
     height: var(--spacing-sm);
-    background: var(--md-success);
     border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.status-dot.green {
+    background: var(--md-success);
+}
+
+.status-dot.red {
+    background: var(--md-error);
 }
 
 .session-timer {

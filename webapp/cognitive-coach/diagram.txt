@@ -1,0 +1,68 @@
+flowchart LR
+    %% Sections
+    subgraph BuildTooling["Build Tooling"]
+        Vite --> main
+        SWC --> main
+    end
+
+    subgraph Entry
+        main --> App
+        App --> AppRouter
+    end
+
+    subgraph Pages
+        Dashboard
+        Login
+        SessionDetail
+        CreateAccount
+    end
+
+    subgraph Components
+        ConfigurePopup
+        CurrentSession
+        StudyArtifacts
+        FocusAnalytics
+        ArtifactPopupController
+    end
+
+    subgraph Preview
+        ScreenRecordingPreview
+        WebcamPreview
+        ExternalCameraPreview
+    end
+    
+    subgraph Analytics
+        DistractionTimeline
+        FocusChart
+    end
+
+    subgraph Artifacts
+        EquationContent
+        FlashcardContent
+        MCQContent
+    end
+    %% Connections from Entry to Pages
+    AppRouter --> Dashboard
+    AppRouter --> Login
+    AppRouter --> SessionDetail
+    AppRouter --> CreateAccount
+
+    %% Connections from Pages to Components
+    Dashboard --> ConfigurePopup
+    Dashboard --> CurrentSession
+
+    SessionDetail --> FocusAnalytics
+    SessionDetail --> StudyArtifacts
+    SessionDetail --> ArtifactPopupController
+
+    %% Configure popup connects to previews
+    ConfigurePopup --> ScreenRecordingPreview
+    ConfigurePopup --> WebcamPreview
+    ConfigurePopup --> ExternalCameraPreview
+
+    FocusAnalytics --> FocusChart
+    FocusAnalytics --> DistractionTimeline
+
+    ArtifactPopupController --> EquationContent
+    ArtifactPopupController --> FlashcardContent
+    ArtifactPopupController --> MCQContent

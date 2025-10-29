@@ -1,0 +1,74 @@
+import React from 'react';
+import type { PopupState } from './types';
+import { mockFlashcards } from '../../assets/data';
+
+interface FlashcardContentProps {
+    popup: PopupState;
+    setPopup: React.Dispatch<React.SetStateAction<PopupState>>;
+}
+
+export default function FlashcardContent({ popup, setPopup }: FlashcardContentProps) {
+    const card = mockFlashcards.cards[popup.currentIndex];
+    if (!card) return null;
+
+    return (
+        <div className="flashcard-popup">
+            {/* Clickable Flashcard - Simplified */}
+            <div className="flashcard-simple-container">
+                <div 
+                    className="flashcard-simple"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setPopup(prev => ({ ...prev, showBack: !prev.showBack }));
+                    }}
+                >
+                    {!popup.showBack ? (
+                        // Front Side
+                        <div className="flashcard-side front">
+                            <div className="flashcard-content">
+                                <p>{card.front}</p>
+                            </div>
+                            {card.hints && card.hints.length > 0 && (
+                                <div 
+                                    className={`flashcard-hint-expandable ${popup.showHint ? 'expanded' : ''}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setPopup(prev => ({ ...prev, showHint: !prev.showHint }));
+                                    }}
+                                >
+                                    <div className="hint-pill-header">
+                                        <span className="material-icons-round">lightbulb</span>
+                                        {popup.showHint ? 'Hide Hint' : 'Hint'}
+                                    </div>
+                                    {popup.showHint && (
+                                        <div className="hint-expanded-content">
+                                            {card.hints.map((hint, index) => (
+                                                <p key={index}>{hint}</p>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                            <div className="flashcard-prompt">
+                                <span className="material-icons-round">touch_app</span>
+                                Click to reveal answer
+                            </div>
+                        </div>
+                    ) : (
+                        // Back Side
+                        <div className="flashcard-side back">
+                            <div className="flashcard-content">
+                                <p>{card.back}</p>
+                            </div>
+                            <div className="flashcard-prompt">
+                                <span className="material-icons-round">touch_app</span>
+                                Click to show question
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}

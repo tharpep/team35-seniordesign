@@ -135,19 +135,6 @@ export default function Login() {
                                 </button>
                             </div>
                         </form>
-
-                        <div style={{
-                            marginTop: '16px',
-                            padding: '12px',
-                            background: '#e8f0fe',
-                            borderRadius: '8px',
-                            fontSize: '13px',
-                            color: '#1a73e8'
-                        }}>
-                            <strong>Test Account:</strong><br />
-                            Email: test@example.com<br />
-                            Password: password
-                        </div>
                     </div>
 
                     <div className="signup-link">
