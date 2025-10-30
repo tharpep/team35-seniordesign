@@ -4,44 +4,37 @@ import type { PopupState } from './types';
 interface EquationContentProps {
     popup: PopupState;
     setPopup: React.Dispatch<React.SetStateAction<PopupState>>;
+    artifact: {
+        id: number;
+        type: string;
+        title: string;
+        content: string;
+    };
 }
 
-const equationArtifacts = [
-    {
-        id: 'eq1',
-        title: 'Henderson-Hasselbalch Equation',
-        preview: 'pH = pKa + log([A⁻]/[HA])',
-        content: 'pH = pKa + log([A⁻]/[HA])',
-        description: 'Used to calculate the pH of buffer solutions'
-    },
-    {
-        id: 'eq2', 
-        title: 'Arrhenius Equation',
-        preview: 'k = Ae^(-Ea/RT)',
-        content: 'k = Ae^(-Ea/RT)',
-        description: 'Describes the temperature dependence of reaction rates'
-    },
-    {
-        id: 'eq3',
-        title: 'Beer-Lambert Law',
-        preview: 'A = εbc',
-        content: 'A = εbc',
-        description: 'Relates the absorption of light to the properties of the material'
+export default function EquationContent({ popup, artifact }: EquationContentProps) {
+    // Parse JSON content
+    let equation;
+    try {
+        equation = JSON.parse(artifact.content);
+    } catch (error) {
+        console.error('Error parsing equation content:', error);
+        return <div>Error loading equation</div>;
     }
-];
-
-export default function EquationContent({ popup }: EquationContentProps) {
-    const equation = equationArtifacts[popup.currentIndex];
-    if (!equation) return null;
 
     return (
         <div className="equation-popup">
             <div className="equation-title">
-                <h4>{equation.title}</h4>
+                <h4>{equation.title || artifact.title}</h4>
             </div>
             <div className="equation-content">
-                <p>{equation.preview}</p>
+                <p>{equation.equation}</p>
             </div>
+            {equation.description && (
+                <div className="equation-description" style={{ marginTop: '16px', padding: '12px', background: '#f5f5f5', borderRadius: '8px' }}>
+                    <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>{equation.description}</p>
+                </div>
+            )}
         </div>
     );
 }

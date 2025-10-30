@@ -16,7 +16,7 @@ interface DisplayArtifact {
 
 interface StudyArtifactsProps {
     artifacts: RawArtifact[];
-    onArtifactClick: (artifactType: 'flashcard' | 'MCQ' | 'equation') => void;
+    onArtifactClick: (artifactType: 'flashcard' | 'MCQ' | 'equation', artifactId: number) => void;
 }
 
 export default function StudyArtifacts({ artifacts, onArtifactClick }: StudyArtifactsProps) {
@@ -24,57 +24,56 @@ export default function StudyArtifacts({ artifacts, onArtifactClick }: StudyArti
 
     // Transform API artifacts into display format
     const displayArtifacts = useMemo(() => {
-        return artifacts.map((artifact) => {
-            try {
-                const content = JSON.parse(artifact.content);
-                
-                // Flashcards
-                if (artifact.type === 'flashcard') {
-                    return {
-                        id: `fc_${artifact.id}`,
-                        type: 'flashcard' as const,
-                        title: '',
-                        preview: content.front || artifact.title
-                    };
+        return artifacts
+            .filter(artifact => {
+                // Only include flashcards, multiple_choice, and equations
+                // Filter out insights (they're displayed in the sidebar)
+                return artifact.type === 'flashcard' || 
+                       artifact.type === 'multiple_choice' || 
+                       artifact.type === 'equation';
+            })
+            .map((artifact) => {
+                try {
+                    const content = JSON.parse(artifact.content);
+                    
+                    // Flashcards
+                    if (artifact.type === 'flashcard') {
+                        return {
+                            id: `fc_${artifact.id}`,
+                            type: 'flashcard' as const,
+                            title: '',
+                            preview: content.front || artifact.title
+                        };
+                    }
+                    
+                    // Multiple Choice Questions
+                    if (artifact.type === 'multiple_choice') {
+                        return {
+                            id: `mcq_${artifact.id}`,
+                            type: 'MCQ' as const,
+                            title: '',
+                            preview: content.stem || artifact.title
+                        };
+                    }
+                    
+                    // Equations
+                    if (artifact.type === 'equation') {
+                        return {
+                            id: `eq_${artifact.id}`,
+                            type: 'equation' as const,
+                            title: content.title || artifact.title,
+                            preview: content.equation || content.title
+                        };
+                    }
+                    
+                    // Should never reach here due to filter above
+                    return null;
+                } catch (error) {
+                    console.error('Error parsing artifact content:', error);
+                    return null;
                 }
-                
-                // Multiple Choice Questions
-                if (artifact.type === 'multiple_choice') {
-                    return {
-                        id: `mcq_${artifact.id}`,
-                        type: 'MCQ' as const,
-                        title: '',
-                        preview: content.stem || artifact.title
-                    };
-                }
-                
-                // Equations
-                if (artifact.type === 'equation') {
-                    return {
-                        id: `eq_${artifact.id}`,
-                        type: 'equation' as const,
-                        title: content.title || artifact.title,
-                        preview: content.equation || content.title
-                    };
-                }
-                
-                // Fallback for unknown types
-                return {
-                    id: `artifact_${artifact.id}`,
-                    type: 'equation' as const,
-                    title: artifact.title,
-                    preview: 'Unknown artifact type'
-                };
-            } catch (error) {
-                console.error('Error parsing artifact content:', error);
-                return {
-                    id: `artifact_${artifact.id}`,
-                    type: 'equation' as const,
-                    title: artifact.title,
-                    preview: 'Error loading artifact'
-                };
-            }
-        });
+            })
+            .filter((artifact): artifact is DisplayArtifact => artifact !== null);
     }, [artifacts]);
 
     const filteredArtifacts = useMemo(() => {
@@ -139,22 +138,27 @@ export default function StudyArtifacts({ artifacts, onArtifactClick }: StudyArti
                 </button>
             </div>
             <div className="artifact-grid">
-                {filteredArtifacts.map((artifact) => (
-                    <div 
-                        key={artifact.id} 
-                        className="artifact-card"
-                        onClick={() => onArtifactClick(artifact.type)}
-                    >
-                        <div className={`artifact-type ${artifact.type}`}>
-                            {artifact.type === 'MCQ' ? 'MCQ' : 
-                             artifact.type.charAt(0).toUpperCase() + artifact.type.slice(1)}
+                {filteredArtifacts.map((artifact) => {
+                    // Extract the original artifact ID from the display artifact ID
+                    const originalId = parseInt(artifact.id.split('_')[1]);
+                    
+                    return (
+                        <div 
+                            key={artifact.id} 
+                            className="artifact-card"
+                            onClick={() => onArtifactClick(artifact.type, originalId)}
+                        >
+                            <div className={`artifact-type ${artifact.type}`}>
+                                {artifact.type === 'MCQ' ? 'MCQ' : 
+                                 artifact.type.charAt(0).toUpperCase() + artifact.type.slice(1)}
+                            </div>
+                            {artifact.type === 'equation' && artifact.title && (
+                                <div className="artifact-title">{artifact.title}</div>
+                            )}
+                            <div className="artifact-preview">{artifact.preview}</div>
                         </div>
-                        {artifact.type === 'equation' && artifact.title && (
-                            <div className="artifact-title">{artifact.title}</div>
-                        )}
-                        <div className="artifact-preview">{artifact.preview}</div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );

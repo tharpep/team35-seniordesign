@@ -1,15 +1,26 @@
 import React from 'react';
 import type { PopupState } from './types';
-import { mockMCQ } from '../../assets/data';
 
 interface MCQContentProps {
     popup: PopupState;
     setPopup: React.Dispatch<React.SetStateAction<PopupState>>;
+    artifact: {
+        id: number;
+        type: string;
+        title: string;
+        content: string;
+    };
 }
 
-export default function MCQContent({ popup, setPopup }: MCQContentProps) {
-    const question = mockMCQ.questions[popup.currentIndex];
-    if (!question) return null;
+export default function MCQContent({ popup, setPopup, artifact }: MCQContentProps) {
+    // Parse JSON content
+    let question;
+    try {
+        question = JSON.parse(artifact.content);
+    } catch (error) {
+        console.error('Error parsing MCQ content:', error);
+        return <div>Error loading question</div>;
+    }
 
     const handleAnswerClick = (answerIndex: number) => {
         setPopup(prev => ({ 
@@ -26,7 +37,7 @@ export default function MCQContent({ popup, setPopup }: MCQContentProps) {
             </div>
 
             <div className="mcq-options">
-                {question.options.map((option, index) => (
+                {question.options.map((option: string, index: number) => (
                     <label key={index} className="mcq-option">
                         <input
                             type="radio"
