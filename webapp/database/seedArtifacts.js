@@ -16,7 +16,7 @@ console.log('Seeding study artifacts...\n');
 // Helper to run async database operations
 const runAsync = (sql, params = []) => {
   return new Promise((resolve, reject) => {
-    db.run(sql, params, function(err) {
+    db.run(sql, params, function (err) {
       if (err) reject(err);
       else resolve(this.lastID);
     });
@@ -35,32 +35,35 @@ const getAllAsync = (sql, params = []) => {
 async function seedArtifacts() {
   try {
     // 1. Get all sessions
-    console.log('📋 Fetching sessions...');
+    console.log('Fetching sessions...');
     const sessions = await getAllAsync('SELECT id, title FROM sessions ORDER BY id');
-    
+
     if (sessions.length === 0) {
-      console.error('❌ No sessions found! Run seedUsersAndSessions.js first.');
+      console.error('No sessions found! Run seedUsersAndSessions.js first.');
       process.exit(1);
     }
-    
-    console.log(`✓ Found ${sessions.length} sessions\n`);
+
+    console.log(`Found ${sessions.length} sessions\n`);
 
     // 2. Read mock data files
-    console.log('📂 Reading mock data files...');
+    console.log('Reading mock data files...');
     const mockFlashcards = JSON.parse(fs.readFileSync(mockFlashcardsPath, 'utf8'));
     const mockMCQ = JSON.parse(fs.readFileSync(mockMCQPath, 'utf8'));
     const mockInsights = JSON.parse(fs.readFileSync(mockInsightsPath, 'utf8'));
-    console.log('✓ Mock data loaded\n');
+    console.log('Mock data loaded\n');
 
-    // We'll assign artifacts to the first session (Organic Chemistry Review)
-    const targetSession = sessions[0];
-    console.log(`📝 Adding artifacts to session: "${targetSession.title}" (ID: ${targetSession.id})\n`);
-
+    const sessionCount = sessions.length;
     let totalArtifacts = 0;
+    let totalFlashcards = 0;
+    let totalMCQ = 0;
+    let totalInsights = 0;
+    let totalEquations = 0;
 
-    // 3. Insert Flashcards
-    console.log('💳 Inserting flashcards...');
-    for (const card of mockFlashcards.cards) {
+    // 3. Insert Flashcards (round-robin across sessions)
+    console.log('Inserting flashcards across sessions...');
+    for (let i = 0; i < mockFlashcards.cards.length; i++) {
+      const card = mockFlashcards.cards[i];
+      const target = sessions[i % sessionCount];
       const content = JSON.stringify({
         id: card.id,
         front: card.front,
@@ -70,18 +73,21 @@ async function seedArtifacts() {
         source_refs: card.source_refs || [],
         hints: card.hints || []
       });
-      
+
       await runAsync(
         'INSERT INTO study_artifacts (session_id, type, title, content) VALUES (?, ?, ?, ?)',
-        [targetSession.id, 'flashcard', card.front.substring(0, 50) + '...', content]
+        [target.id, 'flashcard', (card.front || '').substring(0, 50) + '...', content]
       );
       totalArtifacts++;
+      totalFlashcards++;
     }
-    console.log(`✓ Inserted ${mockFlashcards.cards.length} flashcards`);
+    console.log(`Inserted ${totalFlashcards} flashcards.`);
 
-    // 4. Insert MCQ Questions
-    console.log('❓ Inserting MCQ questions...');
-    for (const question of mockMCQ.questions) {
+    // 4. Insert MCQ Questions (round-robin across sessions)
+    console.log('Inserting MCQ questions across sessions...');
+    for (let i = 0; i < mockMCQ.questions.length; i++) {
+      const question = mockMCQ.questions[i];
+      const target = sessions[i % sessionCount];
       const content = JSON.stringify({
         id: question.id,
         stem: question.stem,
@@ -91,85 +97,95 @@ async function seedArtifacts() {
         bloom_level: question.bloom_level,
         source_refs: question.source_refs || []
       });
-      
+
       await runAsync(
         'INSERT INTO study_artifacts (session_id, type, title, content) VALUES (?, ?, ?, ?)',
-        [targetSession.id, 'multiple_choice', question.stem.substring(0, 50) + '...', content]
+        [target.id, 'multiple_choice', (question.stem || '').substring(0, 50) + '...', content]
       );
       totalArtifacts++;
+      totalMCQ++;
     }
-    console.log(`✓ Inserted ${mockMCQ.questions.length} MCQ questions`);
+    console.log(`Inserted ${totalMCQ} MCQ questions.`);
 
-    // 5. Insert Insights
-    console.log('💡 Inserting insights...');
-    for (const insight of mockInsights.insights) {
-      const content = JSON.stringify({
-        id: insight.id,
-        title: insight.title,
-        takeaway: insight.takeaway,
-        bullets: insight.bullets || [],
-        action_items: insight.action_items || [],
-        misconceptions: insight.misconceptions || [],
-        confidence: insight.confidence,
-        source_refs: insight.source_refs || []
-      });
-      
-      await runAsync(
-        'INSERT INTO study_artifacts (session_id, type, title, content) VALUES (?, ?, ?, ?)',
-        [targetSession.id, 'insights', insight.title, content]
-      );
-      totalArtifacts++;
+    // 5. Insert Insights (max 3 per session)
+    console.log('Inserting insights (max 3 per session)...');
+    let insightIdx = 0;
+    for (const session of sessions) {
+      let insertedForSession = 0;
+      while (insertedForSession < 3 && insightIdx < mockInsights.insights.length) {
+        const insight = mockInsights.insights[insightIdx++];
+        const content = JSON.stringify({
+          id: insight.id,
+          title: insight.title,
+          takeaway: insight.takeaway,
+          bullets: insight.bullets || [],
+          action_items: insight.action_items || [],
+          misconceptions: insight.misconceptions || [],
+          confidence: insight.confidence,
+          source_refs: insight.source_refs || []
+        });
+        await runAsync(
+          'INSERT INTO study_artifacts (session_id, type, title, content) VALUES (?, ?, ?, ?)',
+          [session.id, 'insights', insight.title, content]
+        );
+        insertedForSession++;
+        totalArtifacts++;
+        totalInsights++;
+      }
     }
-    console.log(`✓ Inserted ${mockInsights.insights.length} insights`);
+    console.log(`Inserted ${totalInsights} insights across ${sessions.length} session(s).`);
 
-    // 6. Insert Equations (static data)
-    console.log('➗ Inserting equations...');
+    // 6. Insert Equations (static data, round-robin)
+    console.log('Inserting equations across sessions...');
     const equations = [
       {
         title: 'Markovnikov Addition',
-        equation: 'R₂C=CH₂ + HX → R₂CH-CH₂X',
+        equation: 'R2C=CH2 + HX -> R2CH-CH2X',
         description: 'In the addition of HX to an alkene, hydrogen adds to the carbon with more hydrogens.'
       },
       {
         title: 'E2 Elimination',
-        equation: 'R₃C-CHR-X + Base → R₂C=CR + HX + Base-H⁺',
-        description: 'Single-step elimination requiring anti-coplanar geometry between β-hydrogen and leaving group.'
+        equation: 'R3C-CHR-X + Base -> R2C=CR + HX + Base-H',
+        description: 'Single-step elimination requiring anti-coplanar geometry between beta-hydrogen and leaving group.'
       },
       {
         title: 'Ozonolysis',
-        equation: 'R₂C=CR₂ + O₃ → R₂C=O + O=CR₂',
+        equation: 'R2C=CR2 + O3 -> R2C=O + O=CR2',
         description: 'Oxidative cleavage of alkenes using ozone to form carbonyl compounds.'
       }
     ];
 
-    for (const eq of equations) {
+    for (let i = 0; i < equations.length; i++) {
+      const eq = equations[i];
+      const target = sessions[i % sessionCount];
       const content = JSON.stringify({
         title: eq.title,
         equation: eq.equation,
         description: eq.description
       });
-      
+
       await runAsync(
         'INSERT INTO study_artifacts (session_id, type, title, content) VALUES (?, ?, ?, ?)',
-        [targetSession.id, 'equation', eq.title, content]
+        [target.id, 'equation', eq.title, content]
       );
       totalArtifacts++;
+      totalEquations++;
     }
-    console.log(`✓ Inserted ${equations.length} equations`);
+    console.log(`Inserted ${totalEquations} equations.`);
 
     console.log('\n' + '='.repeat(50));
-    console.log('✅ ARTIFACTS SEED COMPLETE');
+    console.log('ARTIFACTS SEED COMPLETE');
     console.log('='.repeat(50));
-    console.log(`\nInserted ${totalArtifacts} artifacts into session "${targetSession.title}"`);
+    console.log(`\nInserted ${totalArtifacts} artifacts across ${sessions.length} session(s).`);
     console.log('\nBreakdown:');
-    console.log(`  - ${mockFlashcards.cards.length} flashcards`);
-    console.log(`  - ${mockMCQ.questions.length} MCQ questions`);
-    console.log(`  - ${mockInsights.insights.length} insights`);
-    console.log(`  - ${equations.length} equations`);
+    console.log(`  - ${totalFlashcards} flashcards`);
+    console.log(`  - ${totalMCQ} MCQ questions`);
+    console.log(`  - ${totalInsights} insights (max 3 per session)`);
+    console.log(`  - ${totalEquations} equations`);
     console.log('\nReady to test in the frontend!\n');
 
   } catch (error) {
-    console.error('❌ Error seeding artifacts:', error);
+    console.error('Error seeding artifacts:', error);
     process.exit(1);
   } finally {
     db.close();
@@ -177,3 +193,4 @@ async function seedArtifacts() {
 }
 
 seedArtifacts();
+
