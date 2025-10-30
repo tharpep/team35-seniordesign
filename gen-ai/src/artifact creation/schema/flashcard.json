@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "FlashcardsArtifact",
+    "type": "object",
+    "required": ["artifact_type", "version", "cards"],
+    "properties": {
+      "artifact_type": { "const": "flashcards" },
+      "version": { "type": "string" },
+      "cards": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["id", "front", "back"],
+          "properties": {
+            "id": { "type": "string" },
+            "front": { "type": "string", "minLength": 1 },
+            "back": { "type": "string", "minLength": 1 },
+            "tags": { "type": "array", "items": { "type": "string" }, "default": [] },
+            "difficulty": { "type": "integer", "minimum": 1, "maximum": 5 },
+            "source_refs": { "type": "array", "items": { "type": "string" }, "default": [] },
+            "hints": { "type": "array", "items": { "type": "string" }, "default": [] }
+          },
+          "additionalProperties": false
+        }
+      },
+      "provenance": { "type": "object", "additionalProperties": true },
+      "metrics": { "type": "object", "additionalProperties": true }
+    },
+    "additionalProperties": false
+  }
+  
