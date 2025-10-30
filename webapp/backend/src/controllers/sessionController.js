@@ -2,7 +2,7 @@ const { getOne, getAll, runQuery } = require('../config/database');
 const fs = require('fs').promises;
 const path = require('path');
 
-// Get all sessions for logged-in user
+// Get all sessions for logged-in user with artifact counts
 const getAllSessions = async (req, res) => {
   try {
     const userId = req.session.userId;
@@ -14,7 +14,41 @@ const getAllSessions = async (req, res) => {
       [userId]
     );
 
-    res.json({ sessions });
+    // Get artifact counts for each session
+    const sessionsWithCounts = await Promise.all(
+      sessions.map(async (session) => {
+        const counts = await getAll(
+          `SELECT type, COUNT(*) as count 
+           FROM study_artifacts 
+           WHERE session_id = ? 
+           GROUP BY type`,
+          [session.id]
+        );
+
+        // Transform counts into object
+        const artifactCounts = {
+          flashcard: 0,
+          equation: 0,
+          multiple_choice: 0,
+          insights: 0
+        };
+
+        counts.forEach(row => {
+          artifactCounts[row.type] = row.count;
+        });
+
+        // Calculate total
+        const total = Object.values(artifactCounts).reduce((sum, count) => sum + count, 0);
+
+        return {
+          ...session,
+          artifact_counts: artifactCounts,
+          total_artifacts: total
+        };
+      })
+    );
+
+    res.json({ sessions: sessionsWithCounts });
 
   } catch (error) {
     console.error('Get sessions error:', error);

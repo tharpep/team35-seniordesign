@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { requireAuth } = require('../middleware/auth');
 const {
-  getMaterialsBySession,
   getMaterialById,
   createMaterial,
   updateMaterial,
@@ -12,8 +11,7 @@ const {
 // All routes require authentication
 router.use(requireAuth);
 
-// GET /api/sessions/:sessionId/materials - Get all materials for a session
-router.get('/sessions/:sessionId/materials', getMaterialsBySession);
+// NOTE: getMaterialsBySession is now in sessions.js at /api/sessions/:sessionId/materials
 
 // POST /api/materials - Create new material (for testing/manual insertion)
 router.post('/', createMaterial);

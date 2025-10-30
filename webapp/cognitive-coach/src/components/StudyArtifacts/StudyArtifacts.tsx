@@ -1,8 +1,13 @@
-import { useState } from 'react';
-import mockFlashcards from '../../assets/data/mockFlashcards.json';
-import mockMCQ from '../../assets/data/mockMCQ.json';
+import { useState, useMemo } from 'react';
 
-interface Artifact {
+interface RawArtifact {
+    id: number;
+    type: string;
+    title: string;
+    content: string;
+}
+
+interface DisplayArtifact {
     id: string;
     type: 'flashcard' | 'MCQ' | 'equation';
     title: string;
@@ -10,67 +15,96 @@ interface Artifact {
 }
 
 interface StudyArtifactsProps {
+    artifacts: RawArtifact[];
     onArtifactClick: (artifactType: 'flashcard' | 'MCQ' | 'equation') => void;
 }
 
-// Export artifact counts for use by parent components
-export const getArtifactCounts = () => {
-    const flashcardCount = mockFlashcards.cards.length;
-    const mcqCount = mockMCQ.questions.length;
-    const equationCount = 3; // Static count for equations
-    
-    return {
-        flashcard: flashcardCount,
-        MCQ: mcqCount,
-        equation: equationCount,
-        total: flashcardCount + mcqCount + equationCount
-    };
-};
-
-export default function StudyArtifacts({ onArtifactClick }: StudyArtifactsProps) {
+export default function StudyArtifacts({ artifacts, onArtifactClick }: StudyArtifactsProps) {
     const [activeArtifactTab, setActiveArtifactTab] = useState<'all' | 'flashcard' | 'MCQ' | 'equation'>('all');
 
-    // Create artifacts from mock data - show all examples
-    const flashcardArtifacts: Artifact[] = mockFlashcards.cards.map((card, index) => ({
-        id: `fc_${index + 1}`,
-        type: 'flashcard' as const,
-        title: '', // No title needed for flashcards
-        preview: card.front
-    }));
+    // Transform API artifacts into display format
+    const displayArtifacts = useMemo(() => {
+        return artifacts.map((artifact) => {
+            try {
+                const content = JSON.parse(artifact.content);
+                
+                // Flashcards
+                if (artifact.type === 'flashcard') {
+                    return {
+                        id: `fc_${artifact.id}`,
+                        type: 'flashcard' as const,
+                        title: '',
+                        preview: content.front || artifact.title
+                    };
+                }
+                
+                // Multiple Choice Questions
+                if (artifact.type === 'multiple_choice') {
+                    return {
+                        id: `mcq_${artifact.id}`,
+                        type: 'MCQ' as const,
+                        title: '',
+                        preview: content.stem || artifact.title
+                    };
+                }
+                
+                // Equations
+                if (artifact.type === 'equation') {
+                    return {
+                        id: `eq_${artifact.id}`,
+                        type: 'equation' as const,
+                        title: content.title || artifact.title,
+                        preview: content.equation || content.title
+                    };
+                }
+                
+                // Fallback for unknown types
+                return {
+                    id: `artifact_${artifact.id}`,
+                    type: 'equation' as const,
+                    title: artifact.title,
+                    preview: 'Unknown artifact type'
+                };
+            } catch (error) {
+                console.error('Error parsing artifact content:', error);
+                return {
+                    id: `artifact_${artifact.id}`,
+                    type: 'equation' as const,
+                    title: artifact.title,
+                    preview: 'Error loading artifact'
+                };
+            }
+        });
+    }, [artifacts]);
 
-    const mcqArtifacts: Artifact[] = mockMCQ.questions.map((question, index) => ({
-        id: `mcq_${index + 1}`,
-        type: 'MCQ' as const,
-        title: '', // No title needed for MCQ
-        preview: question.stem
-    }));
+    const filteredArtifacts = useMemo(() => {
+        return activeArtifactTab === 'all' 
+            ? displayArtifacts 
+            : displayArtifacts.filter(artifact => artifact.type === activeArtifactTab);
+    }, [displayArtifacts, activeArtifactTab]);
 
-    const equationArtifacts: Artifact[] = [
-        {
-            id: 'eq_1',
-            type: 'equation' as const,
-            title: 'Markovnikov Addition',
-            preview: 'R₂C=CH₂ + HX → R₂CH-CH₂X'
-        },
-        {
-            id: 'eq_2',
-            type: 'equation' as const,
-            title: 'E2 Elimination',
-            preview: 'R₃C-CHR-X + Base → R₂C=CR + HX + Base-H⁺'
-        },
-        {
-            id: 'eq_3',
-            type: 'equation' as const,
-            title: 'Ozonolysis',
-            preview: 'R₂C=CR₂ + O₃ → R₂C=O + O=CR₂'
-        }
-    ];
+    const counts = useMemo(() => {
+        return {
+            flashcard: displayArtifacts.filter(a => a.type === 'flashcard').length,
+            MCQ: displayArtifacts.filter(a => a.type === 'MCQ').length,
+            equation: displayArtifacts.filter(a => a.type === 'equation').length,
+            total: displayArtifacts.length
+        };
+    }, [displayArtifacts]);
 
-    const artifacts: Artifact[] = [...flashcardArtifacts, ...mcqArtifacts, ...equationArtifacts];
-
-    const filteredArtifacts = activeArtifactTab === 'all' 
-        ? artifacts 
-        : artifacts.filter(artifact => artifact.type === activeArtifactTab);
+    if (artifacts.length === 0) {
+        return (
+            <div className="section card">
+                <h2>
+                    <span className="material-icons-round section-icon">auto_awesome</span>
+                    Study Artifacts
+                </h2>
+                <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                    No artifacts generated for this session yet.
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="section card">
@@ -83,25 +117,25 @@ export default function StudyArtifacts({ onArtifactClick }: StudyArtifactsProps)
                     className={`tab ${activeArtifactTab === 'all' ? 'active' : ''}`}
                     onClick={() => setActiveArtifactTab('all')}
                 >
-                    All Artifacts
+                    All Artifacts ({counts.total})
                 </button>
                 <button 
                     className={`tab ${activeArtifactTab === 'flashcard' ? 'active' : ''}`}
                     onClick={() => setActiveArtifactTab('flashcard')}
                 >
-                    Flashcards ({artifacts.filter(a => a.type === 'flashcard').length})
+                    Flashcards ({counts.flashcard})
                 </button>
                 <button 
                     className={`tab ${activeArtifactTab === 'MCQ' ? 'active' : ''}`}
                     onClick={() => setActiveArtifactTab('MCQ')}
                 >
-                    MCQ ({artifacts.filter(a => a.type === 'MCQ').length})
+                    MCQ ({counts.MCQ})
                 </button>
                 <button 
                     className={`tab ${activeArtifactTab === 'equation' ? 'active' : ''}`}
                     onClick={() => setActiveArtifactTab('equation')}
                 >
-                    Equations ({artifacts.filter(a => a.type === 'equation').length})
+                    Equations ({counts.equation})
                 </button>
             </div>
             <div className="artifact-grid">
@@ -112,9 +146,10 @@ export default function StudyArtifacts({ onArtifactClick }: StudyArtifactsProps)
                         onClick={() => onArtifactClick(artifact.type)}
                     >
                         <div className={`artifact-type ${artifact.type}`}>
-                            {artifact.type.charAt(0).toUpperCase() + artifact.type.slice(1)}
+                            {artifact.type === 'MCQ' ? 'MCQ' : 
+                             artifact.type.charAt(0).toUpperCase() + artifact.type.slice(1)}
                         </div>
-                        {artifact.type === 'equation' && (
+                        {artifact.type === 'equation' && artifact.title && (
                             <div className="artifact-title">{artifact.title}</div>
                         )}
                         <div className="artifact-preview">{artifact.preview}</div>

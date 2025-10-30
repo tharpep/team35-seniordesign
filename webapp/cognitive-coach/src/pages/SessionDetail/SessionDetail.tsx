@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { api } from '../../services/api';
 import './SessionDetail.css';
 import mockInsights from '../../assets/data/mockInsights.json';
 import ArtifactPopupController from '../../components/ArtifactPopup/ArtifactPopupController';
-import StudyArtifacts, { getArtifactCounts } from '../../components/StudyArtifacts/StudyArtifacts';
+import StudyArtifacts from '../../components/StudyArtifacts/StudyArtifacts';
 import FocusAnalytics from '../../components/FocusAnalytics/FocusAnalytics';
 import type { PopupState } from '../../components/ArtifactPopup/types';
 
@@ -26,6 +27,13 @@ interface ChatMessage {
     timestamp: string;
 }
 
+interface Artifact {
+    id: number;
+    type: string;
+    title: string;
+    content: string;
+}
+
 export default function SessionDetail() {
     const navigate = useNavigate();
     const { sessionId } = useParams();
@@ -34,7 +42,7 @@ export default function SessionDetail() {
         {
             id: '1',
             type: 'ai',
-            text: "Hi! I can help answer questions about your Organic Chemistry session. Ask me anything about the topics you covered, clarify concepts, or get additional practice problems!",
+            text: "Hi! I can help answer questions about your session. Ask me anything about the topics you covered, clarify concepts, or get additional practice problems!",
             timestamp: 'Just now'
         }
     ]);
@@ -50,21 +58,54 @@ export default function SessionDetail() {
         showExplanation: false
     });
 
-    // Mock data - in real app, this would come from API based on sessionId
-    console.log('Session ID:', sessionId); // TODO: Use sessionId to fetch actual data
-    const sessionData = {
-        title: 'Organic Chemistry Review',
-        date: 'Today, 2:30 PM - 4:45 PM',
-        duration: '2h 15m',
-        sessionId: '#2847',
-        status: 'Completed',
-        metrics: {
-            focusScore: 88,
-            emotion: "focused",
-            materials: 34,
-            artifacts: 15
-        }
-    };
+    const [sessionData, setSessionData] = useState<any>(null);
+    const [artifacts, setArtifacts] = useState<Artifact[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [artifactCounts, setArtifactCounts] = useState({ flashcard: 0, MCQ: 0, equation: 0, total: 0 });
+
+    // Fetch session data and artifacts
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!sessionId) return;
+            
+            setIsLoading(true);
+            try {
+                // Fetch artifacts
+                const artifactsData = await api.getMaterials(sessionId);
+                setArtifacts(artifactsData || []);
+                
+                // Calculate artifact counts
+                const counts = {
+                    flashcard: artifactsData.filter((a: Artifact) => a.type === 'flashcard').length,
+                    MCQ: artifactsData.filter((a: Artifact) => a.type === 'multiple_choice').length,
+                    equation: artifactsData.filter((a: Artifact) => a.type === 'equation').length,
+                    total: artifactsData.length
+                };
+                setArtifactCounts(counts);
+
+                // For now, use mock session data (TODO: fetch from API)
+                setSessionData({
+                    title: 'Organic Chemistry Review',
+                    date: 'Today, 2:30 PM - 4:45 PM',
+                    duration: '2h 15m',
+                    sessionId: '#' + sessionId,
+                    status: 'Completed',
+                    metrics: {
+                        focusScore: 88,
+                        emotion: "focused",
+                        materials: artifactsData.length,
+                        artifacts: artifactsData.length
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching session data:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [sessionId]);
 
     const timelineEvents: TimelineEvent[] = [
         { time: '2:30', title: 'Session Started', description: 'All cameras initialized' },
@@ -106,7 +147,7 @@ export default function SessionDetail() {
         } else if (message.includes("focus") || message.includes("attention")) {
             return "I noticed your focus was highest during the alkene reactions section (around 3:00-3:20). This suggests you learn best when working with specific mechanisms. Try breaking down complex topics into step-by-step mechanisms like you did with those reactions!";
         } else {
-            return "That's a great question! Based on your session, you showed strong understanding of reaction mechanisms. Could you be more specific about which aspect of organic chemistry you'd like me to explain? I can help with alkenes, stereochemistry, or any other topics you covered.";
+            return "That's a great question! Based on your session, you showed strong understanding of reaction mechanisms. Could you be more specific about which aspect you'd like me to explain? I can help with any topics you covered.";
         }
     };
 
@@ -120,12 +161,10 @@ export default function SessionDetail() {
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
 
-        // Add user message
         setChatHistory(prev => [...prev, userMessage]);
         setChatMessage('');
         setIsTyping(true);
 
-        // Simulate AI thinking time
         setTimeout(() => {
             const aiResponse: ChatMessage = {
                 id: (Date.now() + 1).toString(),
@@ -136,7 +175,7 @@ export default function SessionDetail() {
 
             setChatHistory(prev => [...prev, aiResponse]);
             setIsTyping(false);
-        }, 1500); // 1.5 second delay to simulate AI processing
+        }, 1500);
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -157,8 +196,6 @@ export default function SessionDetail() {
         });
     };
 
-
-
     const closePopup = () => {
         setPopup({
             isOpen: false,
@@ -174,7 +211,6 @@ export default function SessionDetail() {
     const navigatePopup = (direction: 'next' | 'prev') => {
         if (!popup.type) return;
         
-        const artifactCounts = getArtifactCounts();
         let maxIndex = 0;
         if (popup.type === 'flashcard') maxIndex = artifactCounts.flashcard - 1;
         else if (popup.type === 'MCQ') maxIndex = artifactCounts.MCQ - 1;
@@ -194,7 +230,21 @@ export default function SessionDetail() {
         }));
     };
 
+    if (isLoading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                Loading session...
+            </div>
+        );
+    }
 
+    if (!sessionData) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                Session not found
+            </div>
+        );
+    }
 
     return (
         <>
@@ -259,7 +309,7 @@ export default function SessionDetail() {
                             <div className="label">Emotion</div>
                         </div>
                         <div className="overview-metric artifacts">
-                            <div className="value">{getArtifactCounts().total}</div>
+                            <div className="value">{artifactCounts.total}</div>
                             <div className="label">Study Artifacts</div>
                         </div>
                     </div>
@@ -269,7 +319,10 @@ export default function SessionDetail() {
                     <div className="main-content">
                         <FocusAnalytics focusScore={sessionData.metrics.focusScore} />
 
-                        <StudyArtifacts onArtifactClick={handleArtifactClick} />
+                        <StudyArtifacts 
+                            artifacts={artifacts}
+                            onArtifactClick={handleArtifactClick} 
+                        />
 
                         <div className="section card">
                             <h2>
@@ -384,9 +437,9 @@ export default function SessionDetail() {
                     navigatePopup={navigatePopup}
                     setPopup={setPopup}
                     totalCount={
-                        popup.type === 'flashcard' ? getArtifactCounts().flashcard :
-                        popup.type === 'MCQ' ? getArtifactCounts().MCQ :
-                        popup.type === 'equation' ? getArtifactCounts().equation :
+                        popup.type === 'flashcard' ? artifactCounts.flashcard :
+                        popup.type === 'MCQ' ? artifactCounts.MCQ :
+                        popup.type === 'equation' ? artifactCounts.equation :
                         0
                     }
                 />
