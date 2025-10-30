@@ -13,7 +13,15 @@ interface Session {
     end_time?: string;
     duration: number;
     focusScore: number;
+    focus_score?: number;
     status: string;
+    artifact_counts?: {
+        flashcard: number;
+        equation: number;
+        multiple_choice: number;
+        insights: number;
+    };
+    total_artifacts?: number;
 }
 
 export default function Dashboard() {
@@ -112,6 +120,50 @@ export default function Dashboard() {
         }
     };
 
+    // Render artifact chips for a session
+    const renderArtifactChips = (session: Session) => {
+        const counts = session.artifact_counts;
+        if (!counts || session.total_artifacts === 0) {
+            return (
+                <div className="artifact-chip">
+                    <span className="material-icons-round" style={{fontSize: '12px'}}>auto_awesome</span>
+                    No artifacts yet
+                </div>
+            );
+        }
+
+        const chips = [];
+        
+        if (counts.equation > 0) {
+            chips.push(
+                <div key="equations" className="artifact-chip equation">
+                    <span className="material-icons-round" style={{fontSize: '12px'}}>functions</span>
+                    {counts.equation} {counts.equation === 1 ? 'equation' : 'equations'}
+                </div>
+            );
+        }
+        
+        if (counts.flashcard > 0) {
+            chips.push(
+                <div key="flashcards" className="artifact-chip flashcard">
+                    <span className="material-icons-round" style={{fontSize: '12px'}}>quiz</span>
+                    {counts.flashcard} {counts.flashcard === 1 ? 'flashcard' : 'flashcards'}
+                </div>
+            );
+        }
+        
+        if (counts.multiple_choice > 0) {
+            chips.push(
+                <div key="mcq" className="artifact-chip question">
+                    <span className="material-icons-round" style={{fontSize: '12px'}}>help</span>
+                    {counts.multiple_choice} {counts.multiple_choice === 1 ? 'question' : 'questions'}
+                </div>
+            );
+        }
+
+        return chips;
+    };
+
     return (
         <>
             <header className="header">
@@ -188,10 +240,7 @@ export default function Dashboard() {
                                 </div>
 
                                 <div className="session-artifacts">
-                                    <div className="artifact-chip">
-                                        <span className="material-icons-round" style={{fontSize: '12px'}}>auto_awesome</span>
-                                        View artifacts
-                                    </div>
+                                    {renderArtifactChips(session)}
                                 </div>
                             </div>
                         ))}
