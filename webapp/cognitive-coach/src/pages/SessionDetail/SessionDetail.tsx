@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../services/api';
 import './SessionDetail.css';
-import mockInsights from '../../assets/data/mockInsights.json';
 import ArtifactPopupController from '../../components/ArtifactPopup/ArtifactPopupController';
 import StudyArtifacts from '../../components/StudyArtifacts/StudyArtifacts';
 import FocusAnalytics from '../../components/FocusAnalytics/FocusAnalytics';
@@ -115,18 +114,34 @@ export default function SessionDetail() {
         { time: '4:45', title: 'Session Ended', description: 'Review completed' }
     ];
 
+    // Parse insights from database artifacts
+    const insights: Insight[] = artifacts
+        .filter(artifact => artifact.type === 'insights')
+        .slice(0, 3) // Only take first 3 insights
+        .map((artifact, index) => {
+            try {
+                const content = JSON.parse(artifact.content);
+                return {
+                    title: content.title || artifact.title,
+                    description: content.takeaway || 'No description available',
+                    icon: index === 0 ? 'trending_up' : index === 1 ? 'psychology' : 'balance'
+                };
+            } catch (error) {
+                console.error('Error parsing insight:', error);
+                return {
+                    title: artifact.title,
+                    description: 'Error loading insight',
+                    icon: 'lightbulb'
+                };
+            }
+        });
+
     // Auto-scroll to bottom when new messages are added
     useEffect(() => {
         if (chatMessagesRef.current) {
             chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
         }
     }, [chatHistory, isTyping]);
-
-    const insights: Insight[] = mockInsights.insights.slice(0, 3).map((insight, index) => ({
-        title: insight.title,
-        description: insight.takeaway,
-        icon: index === 0 ? 'trending_up' : index === 1 ? 'psychology' : 'balance'
-    }));
 
     // Mock AI responses based on keywords
     const getMockAIResponse = (userMessage: string): string => {
@@ -423,19 +438,25 @@ export default function SessionDetail() {
                                 <span className="material-icons-round section-icon">lightbulb</span>
                                 AI Insights
                             </h2>
-                            <div className="insights-list">
-                                {insights.map((insight, index) => (
-                                    <div key={index} className="insight-item">
-                                        <div className="insight-title">
-                                            <span className="material-icons-round" style={{fontSize: '14px'}}>
-                                                {insight.icon}
-                                            </span>
-                                            {insight.title}
+                            {insights.length > 0 ? (
+                                <div className="insights-list">
+                                    {insights.map((insight, index) => (
+                                        <div key={index} className="insight-item">
+                                            <div className="insight-title">
+                                                <span className="material-icons-round" style={{fontSize: '14px'}}>
+                                                    {insight.icon}
+                                                </span>
+                                                {insight.title}
+                                            </div>
+                                            <div className="insight-desc">{insight.description}</div>
                                         </div>
-                                        <div className="insight-desc">{insight.description}</div>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div style={{ textAlign: 'center', padding: '20px', color: '#666', fontSize: '14px' }}>
+                                    No insights generated for this session yet.
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
