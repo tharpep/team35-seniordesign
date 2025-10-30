@@ -184,11 +184,23 @@ export default function SessionDetail() {
         }
     };
 
-    const handleArtifactClick = (artifactType: 'flashcard' | 'MCQ' | 'equation') => {
+    const handleArtifactClick = (artifactType: 'flashcard' | 'MCQ' | 'equation', artifactId: number) => {
+        // Filter artifacts by type
+        const typeMapping: { [key: string]: string } = {
+            'flashcard': 'flashcard',
+            'MCQ': 'multiple_choice',
+            'equation': 'equation'
+        };
+        
+        const filteredArtifacts = artifacts.filter(a => a.type === typeMapping[artifactType]);
+        
+        // Find the index of the clicked artifact
+        const clickedIndex = filteredArtifacts.findIndex(a => a.id === artifactId);
+        
         setPopup({
             isOpen: true,
             type: artifactType,
-            currentIndex: 0,
+            currentIndex: clickedIndex >= 0 ? clickedIndex : 0,
             showHint: false,
             showBack: false,
             selectedAnswer: null,
@@ -436,6 +448,7 @@ export default function SessionDetail() {
                     closePopup={closePopup}
                     navigatePopup={navigatePopup}
                     setPopup={setPopup}
+                    artifacts={artifacts}
                     totalCount={
                         popup.type === 'flashcard' ? artifactCounts.flashcard :
                         popup.type === 'MCQ' ? artifactCounts.MCQ :
