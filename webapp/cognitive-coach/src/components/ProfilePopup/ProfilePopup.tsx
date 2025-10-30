@@ -12,10 +12,10 @@ interface UserData {
     firstName: string;
     lastName: string;
     email: string;
+    memberSince: string; // YYYY-MM-DD
 }
 
 export default function ProfilePopup({ isOpen, onClose }: ProfilePopupProps) {
-    const [showPassword, setShowPassword] = useState(false);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
@@ -33,10 +33,13 @@ export default function ProfilePopup({ isOpen, onClose }: ProfilePopupProps) {
         try {
             const user = await api.getCurrentUser();
             if (user) {
+                const rawCreated = user.created_at || '';
+                const memberSince = typeof rawCreated === 'string' ? rawCreated.substring(0, 10) : '';
                 setUserData({
                     firstName: user.first_name || '',
                     lastName: user.last_name || '',
-                    email: user.email || ''
+                    email: user.email || '',
+                    memberSince
                 });
             } else {
                 setError('Failed to load user data');
@@ -57,26 +60,14 @@ export default function ProfilePopup({ isOpen, onClose }: ProfilePopupProps) {
         }
     };
 
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-    };
-
     const handleSignOut = async () => {
         try {
-            // Call logout API
             await api.logout();
-            
-            // Clear any stored user data
             localStorage.removeItem('user');
-            
-            // Close popup
             onClose();
-            
-            // Navigate to login
             navigate('/login');
         } catch (err) {
             console.error('Error signing out:', err);
-            // Still navigate to login even if API call fails
             localStorage.removeItem('user');
             onClose();
             navigate('/login');
@@ -92,16 +83,16 @@ export default function ProfilePopup({ isOpen, onClose }: ProfilePopupProps) {
                         <span className="material-icons-round">close</span>
                     </button>
                 </div>
-                
+
                 <div className="profile-popup-content">
                     {isLoading ? (
                         <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
                             Loading...
                         </div>
                     ) : error ? (
-                        <div style={{ 
-                            textAlign: 'center', 
-                            padding: '20px', 
+                        <div style={{
+                            textAlign: 'center',
+                            padding: '20px',
                             color: '#ea4335',
                             background: '#fce8e6',
                             borderRadius: '8px',
@@ -115,37 +106,24 @@ export default function ProfilePopup({ isOpen, onClose }: ProfilePopupProps) {
                                 <label>First Name</label>
                                 <div className="profile-value">{userData.firstName}</div>
                             </div>
-                            
+
                             <div className="profile-field">
                                 <label>Last Name</label>
                                 <div className="profile-value">{userData.lastName}</div>
                             </div>
-                            
+
                             <div className="profile-field">
                                 <label>Email</label>
                                 <div className="profile-value">{userData.email}</div>
                             </div>
-                            
+
                             <div className="profile-field">
-                                <label>Password</label>
-                                <div className="profile-password-container">
-                                    <div className="profile-value">
-                                        {showPassword ? '••••••••' : '••••••••'}
-                                    </div>
-                                    <button 
-                                        className="password-toggle-button"
-                                        onClick={togglePasswordVisibility}
-                                        title={showPassword ? 'Hide password' : 'Show password'}
-                                    >
-                                        <span className="material-icons-round">
-                                            {showPassword ? 'visibility_off' : 'visibility'}
-                                        </span>
-                                    </button>
-                                </div>
+                                <label>Member Since</label>
+                                <div className="profile-value">{userData.memberSince || '-'}</div>
                             </div>
                         </>
                     ) : null}
-                    
+
                     <div className="profile-actions">
                         <button className="sign-out-button" onClick={handleSignOut}>
                             <span className="material-icons-round">logout</span>
@@ -157,3 +135,4 @@ export default function ProfilePopup({ isOpen, onClose }: ProfilePopupProps) {
         </div>
     );
 }
+

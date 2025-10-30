@@ -6,6 +6,7 @@ import ArtifactPopupController from '../../components/ArtifactPopup/ArtifactPopu
 import StudyArtifacts from '../../components/StudyArtifacts/StudyArtifacts';
 import FocusAnalytics from '../../components/FocusAnalytics/FocusAnalytics';
 import type { PopupState } from '../../components/ArtifactPopup/types';
+import ProfilePopup from '../../components/ProfilePopup/ProfilePopup';
 
 interface TimelineEvent {
     time: string;
@@ -36,6 +37,8 @@ interface Artifact {
 export default function SessionDetail() {
     const navigate = useNavigate();
     const { sessionId } = useParams();
+    const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
+    const [userInitials, setUserInitials] = useState('');
     const [chatMessage, setChatMessage] = useState('');
     const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
         {
@@ -61,6 +64,25 @@ export default function SessionDetail() {
     const [artifacts, setArtifacts] = useState<Artifact[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [artifactCounts, setArtifactCounts] = useState({ flashcard: 0, MCQ: 0, equation: 0, total: 0 });
+
+    // Fetch user initials
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const user = await api.getCurrentUser();
+                if (user && user.first_name && user.last_name) {
+                    const initials = `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
+                    setUserInitials(initials);
+                } else {
+                    setUserInitials('?');
+                }
+            } catch (error) {
+                console.error('Error fetching user:', error);
+                setUserInitials('?');
+            }
+        };
+        fetchUser();
+    }, []);
 
     // Fetch session data and artifacts
     useEffect(() => {
@@ -105,6 +127,14 @@ export default function SessionDetail() {
 
         fetchData();
     }, [sessionId]);
+
+    const handleProfileClick = () => {
+        setIsProfilePopupOpen(true);
+    };
+
+    const handleCloseProfilePopup = () => {
+        setIsProfilePopupOpen(false);
+    };
 
     const timelineEvents: TimelineEvent[] = [
         { time: '2:30', title: 'Session Started', description: 'All cameras initialized' },
@@ -290,7 +320,9 @@ export default function SessionDetail() {
                         <button className="icon-button" title="Settings">
                             <span className="material-icons-round">settings</span>
                         </button>
-                        <div className="user-avatar" title="Profile">JD</div>
+                        <button className="user-avatar" title="Profile" onClick={handleProfileClick}>
+                            {userInitials || 'JD'}
+                        </button>
                     </div>
                 </div>
             </header>
@@ -461,6 +493,11 @@ export default function SessionDetail() {
                     </div>
                 </div>
             </main>
+
+            <ProfilePopup 
+                isOpen={isProfilePopupOpen}
+                onClose={handleCloseProfilePopup}
+            />
 
             {/* Artifact Popup */}
             {popup.isOpen && (
