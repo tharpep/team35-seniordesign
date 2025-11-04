@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 import './ProfilePopup.css';
 
 interface ProfilePopupProps {
@@ -18,8 +18,9 @@ interface UserData {
 export default function ProfilePopup({ isOpen, onClose }: ProfilePopupProps) {
     const [userData, setUserData] = useState<UserData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [error, setError] = useState('');
-    const navigate = useNavigate();
+    const { logout } = useAuth();
 
     useEffect(() => {
         if (isOpen) {
@@ -61,16 +62,20 @@ export default function ProfilePopup({ isOpen, onClose }: ProfilePopupProps) {
     };
 
     const handleSignOut = async () => {
+        setIsLoggingOut(true);
         try {
-            await api.logout();
-            localStorage.removeItem('user');
+            // Call logout from AuthContext
+            // This will handle API call, cleanup, navigation, and notify other tabs
+            await logout();
+            
+            // Close the popup
             onClose();
-            navigate('/login');
         } catch (err) {
             console.error('Error signing out:', err);
-            localStorage.removeItem('user');
+            // AuthContext logout handles cleanup even on error
             onClose();
-            navigate('/login');
+        } finally {
+            setIsLoggingOut(false);
         }
     };
 
@@ -125,9 +130,13 @@ export default function ProfilePopup({ isOpen, onClose }: ProfilePopupProps) {
                     ) : null}
 
                     <div className="profile-actions">
-                        <button className="sign-out-button" onClick={handleSignOut}>
+                        <button 
+                            className="sign-out-button" 
+                            onClick={handleSignOut}
+                            disabled={isLoggingOut}
+                        >
                             <span className="material-icons-round">logout</span>
-                            Sign Out
+                            {isLoggingOut ? 'Signing Out...' : 'Sign Out'}
                         </button>
                     </div>
                 </div>

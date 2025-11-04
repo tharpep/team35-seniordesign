@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ export default function Login() {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const { refreshAuth } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -24,6 +26,9 @@ export default function Login() {
             if (rememberMe) {
                 localStorage.setItem('user', JSON.stringify(response.user));
             }
+            
+            // Refresh auth context and notify other tabs
+            await refreshAuth();
             
             // Redirect to dashboard
             navigate('/');
