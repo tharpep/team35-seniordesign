@@ -346,6 +346,38 @@ def run_config():
     return 0
 
 
+def run_start():
+    """Start the FastAPI server"""
+    if not check_venv():
+        return 1
+    
+    print("=== Starting FastAPI Server ===")
+    print("Server: http://127.0.0.1:8000")
+    print("Docs: http://127.0.0.1:8000/docs")
+    print("")
+    print("Press Ctrl+C to stop the server")
+    print("")
+    
+    python_cmd = get_python_cmd()
+    
+    try:
+        # Run uvicorn with the FastAPI app
+        result = subprocess.run([
+            python_cmd, "-m", "uvicorn",
+            "src.api.main:app",
+            "--host", "127.0.0.1",
+            "--port", "8000",
+            "--reload"
+        ])
+        return result.returncode
+    except KeyboardInterrupt:
+        print("\n\n Server stopped by user")
+        return 0
+    except Exception as e:
+        print(f"\n Error starting server: {e}")
+        return 1
+
+
 def main():
     """Main CLI function"""
     if len(sys.argv) < 2:
@@ -355,6 +387,7 @@ def main():
         print("")
         print("Commands:")
         print("  setup  - Setup virtual environment and install dependencies")
+        print("  start  - Start the FastAPI server")
         print("  test   - Interactive test selection menu")
         print("  test all - Run all tests")
         print("  demo   - RAG demo selection (automated/interactive)")
@@ -370,6 +403,8 @@ def main():
     
     if command == "setup":
         return run_setup()
+    elif command == "start":
+        return run_start()
     elif command == "test":
         return run_tests()
     elif command == "demo":
@@ -383,6 +418,7 @@ def main():
         print("")
         print("Commands:")
         print("  setup  - Setup virtual environment and install dependencies")
+        print("  start  - Start the FastAPI server (http://127.0.0.1:8000)")
         print("  test   - Interactive test selection menu")
         print("  test all - Run all tests")
         print("  demo   - RAG demo selection (automated/interactive)")
@@ -395,6 +431,7 @@ def main():
         print("")
         print("Examples:")
         print("  python run setup     # First time setup")
+        print("  python run start     # Start FastAPI server")
         print("  python run test      # Choose which tests to run")
         print("  python run demo      # Choose demo type and mode")
         print("  python run config    # View current settings")
@@ -402,7 +439,7 @@ def main():
     else:
         print(f"Unknown command: '{command}'")
         print("")
-        print("Available commands: setup, test, demo, config, help")
+        print("Available commands: setup, start, test, demo, config, help")
         print("Use 'python run help' for more information")
         return 1
 
