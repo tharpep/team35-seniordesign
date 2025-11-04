@@ -10,9 +10,10 @@ interface SessionSettings {
 interface CurrentSessionProps {
     onConfigureClick: () => void;
     sessionSettings?: SessionSettings;
+    onSessionStateChange?: (state: SessionState) => void;
 }
 
-export default function CurrentSession({ onConfigureClick, sessionSettings }: CurrentSessionProps) {
+export default function CurrentSession({ onConfigureClick, sessionSettings, onSessionStateChange }: CurrentSessionProps) {
     const [sessionState, setSessionState] = useState<SessionState>('idle');
     const [sessionTime, setSessionTime] = useState(0); // in seconds
     const [captureCount, setCaptureCount] = useState(0);
@@ -55,6 +56,13 @@ export default function CurrentSession({ onConfigureClick, sessionSettings }: Cu
         
         enumerateDevices();
     }, []);
+
+    // Notify parent when session state changes
+    useEffect(() => {
+        if (onSessionStateChange) {
+            onSessionStateChange(sessionState);
+        }
+    }, [sessionState, onSessionStateChange]);
 
     // Timer effect - runs every second when session is active
     useEffect(() => {
