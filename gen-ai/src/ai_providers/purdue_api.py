@@ -40,13 +40,14 @@ class PurdueGenAI(BaseLLMClient):
             raise ValueError("API key is required. Provide it directly or set PURDUE_API_KEY environment variable.")
         self.base_url = "https://genai.rcac.purdue.edu/api/chat/completions"
     
-    def chat(self, messages: Any, model: Optional[str] = None, **kwargs) -> str:
+    def chat(self, messages: Any, model: Optional[str] = None, max_tokens: Optional[int] = None, **kwargs) -> str:
         """
         Send a message and get a response
         
         Args:
             messages: Your message (str) or messages list
             model: Model to use (default: llama3.1:latest)
+            max_tokens: Maximum tokens in response (optional)
             
         Returns:
             str: AI response
@@ -74,6 +75,10 @@ class PurdueGenAI(BaseLLMClient):
                 "messages": messages,
                 "stream": False
             }
+            
+            # Add max_tokens if specified
+            if max_tokens is not None:
+                body["max_tokens"] = max_tokens
             
             # Make request
             data = json.dumps(body).encode('utf-8')

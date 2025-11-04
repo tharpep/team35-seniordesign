@@ -1,0 +1,50 @@
+{
+  "artifact_type": "insights",
+  "version": "1.0",
+  "insights": [
+    {
+      "id": "ins_001",
+      "title": "Understanding Newton's Second Law",
+      "takeaway": "Newton's second law of motion, F = ma, shows that force (F) applied to an object is equal to the mass (m) of the object multiplied by its acceleration (a). This law highlights the direct relationship between force and acceleration, and the inverse relationship between mass and acceleration. It is crucial for solving physics problems involving motion, force, and mass."
+    }
+  ],
+  "provenance": {
+    "N1": {
+      "note_id": "note_001",
+      "similarity": 0.291,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N2": {
+      "note_id": "note_002",
+      "similarity": 0.291,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N3": {
+      "note_id": "note_003",
+      "similarity": 0.263,
+      "preview": "ems - Work on eigenvalue calculations - Complete Python class implementation - Review physics formul..."
+    },
+    "N4": {
+      "note_id": "note_004",
+      "similarity": 0.263,
+      "preview": "ems - Work on eigenvalue calculations - Complete Python class implementation - Review physics formul..."
+    },
+    "N5": {
+      "note_id": "note_005",
+      "similarity": 0.231,
+      "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+    }
+  },
+  "metrics": {
+    "tokens_in": 67,
+    "tokens_out": 140,
+    "latency_ms": 5498.51,
+    "retrieval_scores": [
+      0.2914213024044007,
+      0.2914213024044007,
+      0.26306214506402464,
+      0.2630621450640246,
+      0.23104673204371856
+    ]
+  }
+}

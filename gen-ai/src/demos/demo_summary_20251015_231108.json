@@ -1,0 +1,426 @@
+{
+  "demo_timestamp": "20251015_231108",
+  "total_specifications": 6,
+  "successful_specifications": 4,
+  "success_rate": 0.6666666666666666,
+  "results": {
+    "Artifact Generation": {
+      "specification": "Artifact Generation",
+      "target": "3+ artifact types",
+      "achieved": 3,
+      "success": true,
+      "artifact_types": [
+        "insights",
+        "flashcards",
+        "mcq"
+      ],
+      "generation_times": {
+        "flashcard": 4.133185386657715,
+        "mcq": 3.1708521842956543,
+        "insight": 4.394133806228638
+      },
+      "artifacts": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "cards": [
+            {
+              "id": "fc_001",
+              "front": "What are Newton's three laws of motion?",
+              "back": "1. An object at rest stays at rest, and an object in motion stays in motion with the same speed and direction unless acted upon by an unbalanced force.\n2. The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass (F = ma).\n3. For every action, there is an equal and opposite reaction.",
+              "tags": [
+                "Newton's laws",
+                "Physics"
+              ],
+              "difficulty": 1,
+              "source_refs": [],
+              "hints": [
+                "Consider the principle of inertia for the first law.",
+                "Think about force and mass relationship in the second law.",
+                "Reflect on interactions between two objects for the third law."
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.326,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.326,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.267,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 115,
+            "tokens_out": 217,
+            "latency_ms": 4133.19,
+            "retrieval_scores": [
+              0.3263943637517775,
+              0.3263943637517775,
+              0.26727875439091253
+            ]
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "questions": [
+            {
+              "id": "mcq_001",
+              "stem": "Which of Newton's laws states that an object at rest will stay at rest and an object in motion will remain in motion with the same speed and direction unless acted upon by an external force?",
+              "options": [
+                "Newton's First Law of Motion (Law of Inertia)",
+                "Newton's Second Law of Motion",
+                "Newton's Third Law of Motion",
+                "The law of universal gravitation"
+              ],
+              "answer_index": 0,
+              "rationale": "This question tests understanding of Newton's laws, specifically identifying the First Law of Motion which describes inertia.",
+              "bloom_level": "understand",
+              "source_refs": [
+                "N1"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.31,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.31,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.278,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 136,
+            "tokens_out": 192,
+            "latency_ms": 3170.85,
+            "retrieval_scores": [
+              0.31034498605561445,
+              0.31034498605561445,
+              0.2780847222570504
+            ]
+          }
+        },
+        "insight": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "Application of Newton's Laws in Problem Solving",
+              "takeaway": "Understanding and applying Newton's laws of motion can simplify complex physics problems by providing a structured approach to analyze forces, acceleration, and motion. Focusing on real-world examples where these principles are applied can enhance comprehension and retention."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.329,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.329,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.279,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 95,
+            "tokens_out": 121,
+            "latency_ms": 4394.13,
+            "retrieval_scores": [
+              0.32896752206368574,
+              0.32896752206368574,
+              0.2785555112613333
+            ]
+          }
+        }
+      }
+    },
+    "Schema Compliance": {
+      "specification": "Schema Compliance",
+      "target": "Fixed JSON schema per artifact type",
+      "success": true,
+      "validation_results": {
+        "flashcard": true,
+        "mcq": true,
+        "insight": true
+      },
+      "artifacts": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "cards": [
+            {
+              "id": "fc_001",
+              "front": "What are the basic components of a machine learning system?",
+              "back": "The basic components of a machine learning system include data preprocessing, feature extraction, model training, and evaluation.",
+              "tags": [
+                "Machine Learning Basics"
+              ],
+              "difficulty": 2,
+              "source_refs": [],
+              "hints": []
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.249,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.249,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.233,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 115,
+            "tokens_out": 113,
+            "latency_ms": 1916.69,
+            "retrieval_scores": [
+              0.24878626018948963,
+              0.24878626018948963,
+              0.23251623431246693
+            ]
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "questions": [
+            {
+              "id": "mcq_001",
+              "stem": "Which of the following is a type of machine learning algorithm?",
+              "options": [
+                "Decision Tree",
+                "HTML Parsing",
+                "SQL Querying",
+                "File Encryption"
+              ],
+              "answer_index": 0,
+              "rationale": "A Decision Tree is a widely used supervised learning algorithm for classification and regression tasks. It splits data into branches to make predictions, unlike HTML Parsing or SQL Querying which are related to web development and database management respectively, and File Encryption which pertains to cybersecurity.",
+              "bloom_level": "understand",
+              "source_refs": [
+                "N1"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.273,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.251,
+              "preview": "y optimization, connection pooling ### Security Principles - **Input Validation**: Checking and sani..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.25,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 136,
+            "tokens_out": 178,
+            "latency_ms": 2879.46,
+            "retrieval_scores": [
+              0.27346547056935333,
+              0.25051668600085586,
+              0.24990016721100466
+            ]
+          }
+        },
+        "insight": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "Understanding Core Concepts in Machine Learning",
+              "takeaway": "Machine learning revolves around developing algorithms that enable computers to learn from and make predictions or decisions based on data, emphasizing the importance of data preprocessing, model selection, and evaluation for effective algorithm performance."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.286,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.281,
+              "preview": "essions over time rather than massing - **Forgetting Curve**: Memory retention decreases over time w..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.255,
+              "preview": "ferent operations - **Status Codes**: HTTP response codes indicating request results - **API Documen..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 95,
+            "tokens_out": 116,
+            "latency_ms": 1990.09,
+            "retrieval_scores": [
+              0.28648801813169394,
+              0.2807844499012929,
+              0.2550540302695117
+            ]
+          }
+        }
+      }
+    },
+    "Token Management": {
+      "specification": "Token Management",
+      "target": "<500 tokens per artifact, <150 per chat",
+      "success": false,
+      "artifact_tokens": {
+        "flashcard": {
+          "tokens": 215,
+          "limit": 500,
+          "within_limit": true
+        },
+        "mcq": {
+          "tokens": 163,
+          "limit": 500,
+          "within_limit": true
+        },
+        "insight": {
+          "tokens": 88,
+          "limit": 500,
+          "within_limit": true
+        }
+      },
+      "chat_tokens": [
+        {
+          "query": "What is inheritance?",
+          "tokens": 183,
+          "limit": 150,
+          "within_limit": false
+        },
+        {
+          "query": "Explain polymorphism",
+          "tokens": 198,
+          "limit": 150,
+          "within_limit": false
+        },
+        {
+          "query": "How does encapsulation work?",
+          "tokens": 213,
+          "limit": 150,
+          "within_limit": false
+        }
+      ]
+    },
+    "Processing Latency": {
+      "specification": "Processing Latency",
+      "target": "<5.0s at 95th percentile",
+      "achieved": 2.9445154666900635,
+      "success": true,
+      "avg_latency": 2.6299202919006346,
+      "p95_latency": 2.9445154666900635,
+      "max_latency": 2.9445154666900635,
+      "min_latency": 2.4504234790802,
+      "response_times": [
+        2.687603712081909,
+        2.6268913745880127,
+        2.4504234790802,
+        2.5854833126068115,
+        2.621248245239258,
+        2.726135015487671,
+        2.491586685180664,
+        2.6364402770996094,
+        2.5288753509521484,
+        2.9445154666900635
+      ]
+    },
+    "Factual Accuracy": {
+      "specification": "Factual Accuracy",
+      "target": "90% accuracy, <5% hallucination",
+      "achieved_accuracy": 0.4719675643286754,
+      "achieved_hallucination": 95.6319529236196,
+      "success": false,
+      "llm_accuracy": 0.5,
+      "hitl_accuracy": 0.8722222222222223,
+      "individual_scores": {
+        "llm_scores": [
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "hitl_scores": [
+          0.8500000000000001,
+          0.8500000000000001,
+          0.8500000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.8500000000000001,
+          0.8500000000000001,
+          0.9000000000000001
+        ]
+      }
+    },
+    "System Reliability": {
+      "specification": "System Reliability",
+      "target": "98% uptime, <2% drop rate",
+      "achieved_uptime": 1.0,
+      "achieved_drop_rate": 0.0,
+      "success": true,
+      "reliability_results": {
+        "success_rate": 1.0,
+        "failure_rate": 0.0,
+        "avg_response_time": 2.6972287972768147,
+        "p95_response_time": 2.6972287972768147,
+        "total_requests": 15,
+        "successful_requests": 15,
+        "failed_requests": 0
+      },
+      "degradation_results": {
+        "graceful_handling": true,
+        "response_time": 2.5852344036102295,
+        "has_response": true,
+        "response_length": 863,
+        "context_docs_retrieved": 3,
+        "avg_context_score": 0.22788490371055584
+      }
+    }
+  }
+}

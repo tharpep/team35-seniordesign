@@ -15,6 +15,18 @@
 - **Schema Compliance**: All generated artifacts must conform to a fixed JSON schema per artifact type for consistent structure and formatting
 - **Token Management**: Maximum 500 tokens per artifact generation, 150 tokens per chatbot response for optimal speed and cost efficiency
 
+## Specification Demonstrations
+
+Each specification will be validated through comprehensive testing in the `subsystem_demo.py`:
+
+- **Artifact Generation**: Generate flashcards, MCQs, and insights from ingested documents, validate JSON schema compliance, and measure generation success rates
+- **Data Security**: Mock encryption/decryption demonstration using base64 encoding to simulate data protection mechanisms
+- **Factual Accuracy**: LLM-based evaluation of generated content against source documents, measuring correctness and context alignment with target of 90% accuracy
+- **Processing Latency**: Measure end-to-end response times for artifact generation and chatbot responses, ensuring 95th percentile under 5.0 seconds
+- **System Reliability**: Simulate multiple concurrent requests, measure success/failure rates, and demonstrate graceful degradation when no relevant documents are found
+- **Schema Compliance**: Validate all generated artifacts against predefined JSON schemas, ensuring consistent structure and formatting
+- **Token Management**: Monitor and enforce token limits for both artifact generation (500 tokens) and chatbot responses (150 tokens), with tolerance for slight overages
+
 ## Subsystem Interactions
 
 [Design Document 2]

@@ -1,0 +1,61 @@
+{
+  "artifact_type": "mcq",
+  "version": "1.0",
+  "questions": [
+    {
+      "id": "mcq_001",
+      "stem": "Which of the following Newton's laws of motion states that for every action, there is an equal and opposite reaction?",
+      "options": [
+        "First Law (Law of Inertia)",
+        "Second Law (Law of Acceleration)",
+        "Third Law (Law of Action and Reaction)",
+        "Fourth Law (Law of Cooling)"
+      ],
+      "answer_index": 2,
+      "rationale": "The Third Law of motion describes the relationship between two interacting bodies, stating that for every action there is an equal and opposite reaction.",
+      "bloom_level": "understand",
+      "source_refs": [
+        "N1"
+      ]
+    }
+  ],
+  "provenance": {
+    "N1": {
+      "note_id": "note_001",
+      "similarity": 0.31,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N2": {
+      "note_id": "note_002",
+      "similarity": 0.31,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N3": {
+      "note_id": "note_003",
+      "similarity": 0.278,
+      "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+    },
+    "N4": {
+      "note_id": "note_004",
+      "similarity": 0.274,
+      "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+    },
+    "N5": {
+      "note_id": "note_005",
+      "similarity": 0.274,
+      "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+    }
+  },
+  "metrics": {
+    "tokens_in": 136,
+    "tokens_out": 165,
+    "latency_ms": 2893.21,
+    "retrieval_scores": [
+      0.31034498605561445,
+      0.31034498605561445,
+      0.2780847222570504,
+      0.2744206196373778,
+      0.2744206196373778
+    ]
+  }
+}

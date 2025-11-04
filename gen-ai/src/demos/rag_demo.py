@@ -99,6 +99,7 @@ def run_rag_demo(mode="automated"):
                             context_scores = []
                         
                         print(f"RAG: {answer}")
+                        print(f"[TIME] Response time: {response_time:.2f}s")
                         
                         # Log the result
                         log_rag_result(
@@ -122,10 +123,7 @@ def run_rag_demo(mode="automated"):
             test_queries = [
                 "What is the derivative of x squared?",
                 "Explain object-oriented programming principles",
-                "What are Newton's laws of motion?",
-                "How can I improve my study habits?",
-                "What is the proper way to cite sources in academic writing?",
-                "Explain how memory works in learning"
+                "How can I improve my study habits?"
             ]
             
             for query in test_queries:
@@ -145,6 +143,7 @@ def run_rag_demo(mode="automated"):
                         context_scores = []
                     
                     print(f"A: {answer[:200]}...")  # Truncate long answers
+                    print(f"[TIME] Response time: {response_time:.2f}s")
                     
                     # Log the result
                     log_rag_result(

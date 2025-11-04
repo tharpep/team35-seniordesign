@@ -14,12 +14,7 @@
           "properties": {
             "id": { "type": "string" },
             "title": { "type": "string", "minLength": 1 },
-            "takeaway": { "type": "string", "minLength": 1 },
-            "bullets": { "type": "array", "items": { "type": "string" }, "default": [] },
-            "action_items": { "type": "array", "items": { "type": "string" }, "default": [] },
-            "misconceptions": { "type": "array", "items": { "type": "string" }, "default": [] },
-            "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
-            "source_refs": { "type": "array", "items": { "type": "string" }, "default": [] }
+            "takeaway": { "type": "string", "minLength": 1 }
           },
           "additionalProperties": false
         }

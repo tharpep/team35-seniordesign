@@ -1,0 +1,51 @@
+{
+  "artifact_type": "flashcards",
+  "version": "1.0",
+  "cards": [
+    {
+      "id": "fc_001",
+      "front": "What are Newton's three laws of motion?",
+      "back": "Newton's laws are: 1) The law of inertia (F=0, a=0), 2) The law of acceleration (F=ma), and 3) The law of reciprocal actions (for every action, there is an equal and opposite reaction).",
+      "tags": [
+        "physics",
+        "Newton's laws"
+      ],
+      "difficulty": 2,
+      "source_refs": [
+        "N1"
+      ],
+      "hints": [
+        "Use the acronym 'FILO' to remember the first law (F=0, Inertia, Lazy Object)",
+        "Think of a car accelerating forward as an example of the second law",
+        "Consider a person walking as an example of the third law"
+      ]
+    }
+  ],
+  "provenance": {
+    "N1": {
+      "note_id": "note_001",
+      "similarity": 0.31,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N2": {
+      "note_id": "note_002",
+      "similarity": 0.31,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N3": {
+      "note_id": "note_003",
+      "similarity": 0.253,
+      "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+    }
+  },
+  "metrics": {
+    "tokens_in": 87,
+    "tokens_out": 175,
+    "latency_ms": 7810.08,
+    "retrieval_scores": [
+      0.3100051922665924,
+      0.3100051922665924,
+      0.2529165236007659
+    ]
+  }
+}
