@@ -37,21 +37,34 @@
     margin-bottom: 24px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
-    padding: 8px;
+    padding: 12px 16px;
     border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
     transition: background-color 0.2s ease;
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
 }
 
 .sessions-header:hover {
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: #e9ecef;
 }
 
 .sessions-header h2 {
-    font-size: var(--spacing-xl);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 24px;
     font-weight: 400;
     color: var(--md-on-surface);
-    margin-bottom: 0;
+    margin: 0;
+}
+
+.sessions-header .section-icon {
+    font-size: 28px;
+    color: #1976d2;
 }
 
 .sessions-list {

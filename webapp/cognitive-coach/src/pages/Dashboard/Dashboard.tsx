@@ -36,6 +36,17 @@ export default function Dashboard() {
     const [isPreviousSessionsExpanded, setIsPreviousSessionsExpanded] = useState(true);
     const [currentSessionState, setCurrentSessionState] = useState<SessionState>('idle');
 
+    // Auto-collapse/expand Previous Sessions based on current session state
+    useEffect(() => {
+        if (currentSessionState === 'active' || currentSessionState === 'paused') {
+            // Collapse previous sessions when session starts
+            setIsPreviousSessionsExpanded(false);
+        } else if (currentSessionState === 'idle') {
+            // Expand previous sessions when session ends
+            setIsPreviousSessionsExpanded(true);
+        }
+    }, [currentSessionState]);
+
     // Fetch user data on component mount
     useEffect(() => {
         const fetchUser = async () => {
@@ -209,7 +220,10 @@ export default function Dashboard() {
 
                 {/* Previous Sessions Section */}
                 <div className="sessions-header" style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => setIsPreviousSessionsExpanded(!isPreviousSessionsExpanded)}>
-                    <h2>Previous sessions</h2>
+                    <h2>
+                        <span className="material-icons-round section-icon">history</span>
+                        Previous sessions
+                    </h2>
                     <button 
                         className="icon-button" 
                         style={{ marginLeft: 'auto' }}
