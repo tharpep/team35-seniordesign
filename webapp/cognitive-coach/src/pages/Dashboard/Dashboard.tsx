@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import './Dashboard.css';
 import ConfigurePopup from '../../components/ConfigurePopup/ConfigurePopup';
@@ -25,7 +24,6 @@ interface Session {
 }
 
 export default function Dashboard() {
-    const navigate = useNavigate();
     const [isConfigurePopupOpen, setIsConfigurePopupOpen] = useState(false);
     const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
     const [sessionSettings, setSessionSettings] = useState({ photoInterval: 2 });
@@ -70,7 +68,7 @@ export default function Dashboard() {
     }, []);
 
     const handleSessionClick = (sessionId: number) => {
-        navigate(`/session/${sessionId}`);
+        window.open(`/session/${sessionId}`, '_blank');
     };
 
     const handleConfigureClick = () => {
