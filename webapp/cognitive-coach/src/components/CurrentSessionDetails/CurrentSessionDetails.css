@@ -1,0 +1,129 @@
+.current-session-details-section {
+    margin-bottom: 32px;
+}
+
+.current-session-details-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+}
+
+.current-session-details-header:hover {
+    background-color: #e9ecef;
+}
+
+.current-session-details-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--md-on-surface);
+    margin: 0;
+}
+
+.current-session-details-header .section-icon {
+    font-size: 28px;
+    color: #1976d2;
+}
+
+.current-session-details-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 16px;
+}
+
+.session-detail-card {
+    min-height: 200px;
+}
+
+/* AI Chat Mini Styles */
+.ai-chat-mini {
+    padding: 16px 0;
+}
+
+.ai-intro-text {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.chat-input-form {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 24px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.chat-input:focus {
+    border-color: #1976d2;
+}
+
+.send-button {
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    background-color: #1976d2;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.send-button:hover:not(:disabled) {
+    background-color: #1565c0;
+}
+
+.send-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.send-button .material-icons-round {
+    font-size: 20px;
+}
+
+.suggested-questions-mini {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.suggestion-btn-mini {
+    padding: 8px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    background-color: white;
+    color: #666;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.suggestion-btn-mini:hover {
+    border-color: #1976d2;
+    color: #1976d2;
+    background-color: #f0f7ff;
+}

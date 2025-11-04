@@ -4,6 +4,9 @@ import './Dashboard.css';
 import ConfigurePopup from '../../components/ConfigurePopup/ConfigurePopup';
 import CurrentSession from '../../components/CurrentSession/CurrentSession';
 import ProfilePopup from '../../components/ProfilePopup/ProfilePopup';
+import CurrentSessionDetails from '../../components/CurrentSessionDetails/CurrentSessionDetails';
+
+type SessionState = 'idle' | 'active' | 'paused';
 
 interface Session {
     id: number;
@@ -31,6 +34,7 @@ export default function Dashboard() {
     const [sessions, setSessions] = useState<Session[]>([]);
     const [isLoadingSessions, setIsLoadingSessions] = useState(true);
     const [isPreviousSessionsExpanded, setIsPreviousSessionsExpanded] = useState(true);
+    const [currentSessionState, setCurrentSessionState] = useState<SessionState>('idle');
 
     // Fetch user data on component mount
     useEffect(() => {
@@ -192,7 +196,16 @@ export default function Dashboard() {
                 <CurrentSession 
                     onConfigureClick={handleConfigureClick} 
                     sessionSettings={sessionSettings}
+                    onSessionStateChange={setCurrentSessionState}
                 />
+
+                {/* Current Session Details Section - Only show when session is active or paused */}
+                {(currentSessionState === 'active' || currentSessionState === 'paused') && (
+                    <CurrentSessionDetails 
+                        artifacts={[]}
+                        focusScore={85}
+                    />
+                )}
 
                 {/* Previous Sessions Section */}
                 <div className="sessions-header" style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => setIsPreviousSessionsExpanded(!isPreviousSessionsExpanded)}>
