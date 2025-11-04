@@ -67,7 +67,7 @@ class AIGateway:
             )
             self.providers["ollama"] = OllamaClient(ollama_config)
     
-    def chat(self, message: str, provider: Optional[str] = None, model: Optional[str] = None, max_tokens: Optional[int] = None) -> str:
+    def chat(self, message: str, provider: Optional[str] = None, model: Optional[str] = None, max_tokens: Optional[int] = None, system_prompt: Optional[str] = None) -> str:
         """
         Send a chat message to specified AI provider
         
@@ -76,6 +76,7 @@ class AIGateway:
             provider: AI provider to use (auto-selects based on availability)
             model: Model to use (uses provider default if not specified)
             max_tokens: Maximum tokens in response (optional)
+            system_prompt: System prompt to set AI behavior (optional)
             
         Returns:
             str: AI response
@@ -101,16 +102,30 @@ class AIGateway:
         
         # Handle different provider types
         if provider == "ollama":
-            return self._chat_ollama(provider_client, message, model, max_tokens)
+            return self._chat_ollama(provider_client, message, model, max_tokens, system_prompt)
         else:
             # Use config model for Purdue API if no model specified
             model = model or self.rag_config.model_name
-            return provider_client.chat(message, model, max_tokens)
+            return self._chat_with_system_prompt(provider_client, message, model, max_tokens, system_prompt)
     
-    def _chat_ollama(self, client: OllamaClient, message: str, model: Optional[str] = None, max_tokens: Optional[int] = None) -> str:
+    def _chat_ollama(self, client: OllamaClient, message: str, model: Optional[str] = None, max_tokens: Optional[int] = None, system_prompt: Optional[str] = None) -> str:
         """Helper to handle Ollama calls"""
-        # Now that OllamaClient.chat() is synchronous, we can call it directly
+        # For now, Ollama doesn't support system prompts in our current implementation
+        # Just use the message directly
         return client.chat(message, model=model, max_tokens=max_tokens)
+    
+    def _chat_with_system_prompt(self, client, message: str, model: Optional[str] = None, max_tokens: Optional[int] = None, system_prompt: Optional[str] = None) -> str:
+        """Helper to handle calls with system prompt"""
+        if system_prompt:
+            # Create messages list with system prompt
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": message}
+            ]
+            return client.chat(messages, model, max_tokens)
+        else:
+            # Use simple string message
+            return client.chat(message, model, max_tokens)
     
     def get_available_providers(self) -> List[str]:
         """Get list of available providers"""
