@@ -35,13 +35,23 @@
 /* Previous Sessions */
 .sessions-header {
     margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.sessions-header:hover {
+    background-color: rgba(0, 0, 0, 0.04);
 }
 
 .sessions-header h2 {
     font-size: var(--spacing-xl);
     font-weight: 400;
     color: var(--md-on-surface);
-    margin-bottom: var(--spacing-xs);
+    margin-bottom: 0;
 }
 
 .sessions-list {
