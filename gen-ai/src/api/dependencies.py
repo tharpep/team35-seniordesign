@@ -12,10 +12,12 @@ from typing import Optional
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from src.rag.rag_setup import BasicRAG
+from src.rag.vector_store import VectorStore
 from src.artifact_creation.generators.flashcard_generator import FlashcardGenerator
 from src.artifact_creation.generators.mcq_generator import MCQGenerator
 from src.artifact_creation.generators.insights_generator import InsightsGenerator
 from src.llm_chat.chat_service import ChatService
+from config import get_rag_config
 from logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -32,6 +34,9 @@ class AppState:
         self.initialized = False
         self.startup_time: Optional[float] = None
         self.initialization_errors = {}
+        
+        # Shared Qdrant client (single instance to avoid database locks)
+        self.shared_vector_store: Optional[VectorStore] = None
         
         # Heavy components (initialized at startup)
         self.rag_system: Optional[BasicRAG] = None
@@ -75,10 +80,25 @@ async def initialize_app():
     logger.info("Starting application initialization...")
     app_state.startup_time = time.time()
     
+    # Create shared VectorStore instance to avoid Qdrant database lock conflicts
     try:
-        # Initialize RAG system for artifacts
+        config = get_rag_config()
+        logger.info("Creating shared Qdrant client...")
+        app_state.shared_vector_store = VectorStore(use_persistent=config.use_persistent)
+        logger.info("Shared Qdrant client created")
+    except Exception as e:
+        logger.error(f"Failed to create shared VectorStore: {e}")
+        app_state.initialization_errors["vector_store"] = str(e)
+        # Continue without shared store (will create separate instances)
+        app_state.shared_vector_store = None
+    
+    try:
+        # Initialize RAG system for artifacts (using shared vector store)
         logger.info("Initializing RAG system...")
-        app_state.rag_system = BasicRAG(collection_name="persistant_docs")
+        app_state.rag_system = BasicRAG(
+            collection_name="persistant_docs",
+            vector_store=app_state.shared_vector_store
+        )
         logger.info("RAG system initialized")
     except Exception as e:
         logger.error(f"Failed to initialize RAG system: {e}")
@@ -119,9 +139,12 @@ async def initialize_app():
         app_state.initialization_errors["generators"] = str(e)
     
     try:
-        # Initialize chat service
+        # Initialize chat service (using shared vector store to avoid Qdrant lock)
         logger.info("Initializing chat service...")
-        app_state.chat_service = ChatService(system_prompt=app_state.system_prompt)
+        app_state.chat_service = ChatService(
+            system_prompt=app_state.system_prompt,
+            vector_store=app_state.shared_vector_store
+        )
         logger.info("Chat service initialized")
     except Exception as e:
         logger.error(f"Failed to initialize chat service: {e}")

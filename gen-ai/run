@@ -53,16 +53,44 @@ def check_venv_health():
         print("❌ Pip not working")
         return False
     
-    # Check if key packages are installed
-    key_packages = [
-        ("torch", "torch"),
-        ("transformers", "transformers"), 
-        ("sentence-transformers", "sentence_transformers"),
-        ("qdrant-client", "qdrant_client"),
-        ("pytest", "pytest"),
-        ("pytest-asyncio", "pytest_asyncio"),
-        ("httpx", "httpx")
-    ]
+    # Parse requirements.txt to get all packages
+    key_packages = []
+    requirements_file = Path("requirements.txt")
+    
+    if requirements_file.exists():
+        with open(requirements_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                # Skip comments and empty lines
+                if not line or line.startswith('#'):
+                    continue
+                
+                # Parse package name (handle version specifiers and extras)
+                # Examples: "fastapi>=0.104.0" -> "fastapi", "uvicorn[standard]>=0.24.0" -> "uvicorn"
+                package_name = line.split('>=')[0].split('==')[0].split('<=')[0].split('[')[0].strip()
+                
+                # Convert package name to import name (replace hyphens with underscores)
+                import_name = package_name.replace('-', '_')
+                
+                # Skip if already added
+                if (package_name, import_name) not in key_packages:
+                    key_packages.append((package_name, import_name))
+    else:
+        print("⚠️  requirements.txt not found, using default package list")
+        # Fallback to default packages if requirements.txt doesn't exist
+        key_packages = [
+            ("torch", "torch"),
+            ("transformers", "transformers"), 
+            ("sentence-transformers", "sentence_transformers"),
+            ("qdrant-client", "qdrant_client"),
+            ("pytest", "pytest"),
+            ("pytest-asyncio", "pytest_asyncio"),
+            ("httpx", "httpx"),
+            ("fastapi", "fastapi"),
+            ("uvicorn", "uvicorn"),
+            ("pydantic", "pydantic")
+        ]
+    
     missing_packages = []
     
     for package_name, import_name in key_packages:

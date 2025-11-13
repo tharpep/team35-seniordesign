@@ -31,12 +31,13 @@ class ChatService:
     - System prompt integration
     """
     
-    def __init__(self, system_prompt: str = None):
+    def __init__(self, system_prompt: str = None, vector_store=None):
         """
         Initialize chat service with single global session
         
         Args:
             system_prompt: System prompt for LLM (loaded from file if not provided)
+            vector_store: Optional shared VectorStore instance for Qdrant client sharing
         """
         self.config = get_rag_config()
         self.gateway = AIGateway()
@@ -53,10 +54,12 @@ class ChatService:
         self.system_prompt = system_prompt or self._load_system_prompt()
         
         # Initialize RAG system for context storage
+        # Use shared vector_store if provided to avoid Qdrant client conflicts
         self.context_rag = BasicRAG(
             config=self.config,
             collection_name="context_docs",
-            use_persistent=True
+            use_persistent=True,
+            vector_store=vector_store
         )
         
         logger.info("ChatService initialized with single global session")
