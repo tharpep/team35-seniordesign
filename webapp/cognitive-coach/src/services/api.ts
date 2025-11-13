@@ -29,6 +29,23 @@ export const api = {
     }
   },
 
+  // Get incomplete session (active or paused)
+  getIncompleteSession: async (): Promise<any | null> => {
+    try {
+      console.log('API: Fetching incomplete session from:', `${API_BASE}/sessions/incomplete`);
+      const response = await axios.get(`${API_BASE}/sessions/incomplete`);
+      console.log('API: Incomplete session response:', response.data);
+      return response.data.session;
+    } catch (error) {
+      console.error('Error fetching incomplete session:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Response status:', error.response?.status);
+        console.error('Response data:', error.response?.data);
+      }
+      return null;
+    }
+  },
+
   // Create new session
   createSession: async (sessionData: any): Promise<any> => {
     try {
@@ -52,11 +69,11 @@ export const api = {
   },
 
   // Upload captured frame
-  uploadFrame: async (sessionId: string, frameData: Blob, frameType: 'webcam' | 'screen'): Promise<any> => {
+  uploadFrame: async (sessionId: string, frameData: Blob, frameType: 'webcam' | 'screen' | 'external'): Promise<any> => {
     try {
       const formData = new FormData();
+      formData.append('type', frameType); // append metadata first so multer can read it in destination callback
       formData.append('frame', frameData, `${frameType}_${Date.now()}.jpg`);
-      formData.append('type', frameType);
       
       const response = await axios.post(
         `${API_BASE}/sessions/${sessionId}/frames`,

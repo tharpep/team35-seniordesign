@@ -8,6 +8,7 @@ require('dotenv').config();
 
 // Import database initialization
 const { initializeDatabase } = require('./config/initDatabase');
+const { startCleanupScheduler } = require('./services/frameCleanup');
 
 // Initialize Express app
 const app = express();
@@ -106,6 +107,14 @@ io.on('connection', (socket) => {
     console.log(`[Socket.IO] Client ${socket.id} left session-${sessionId}`);
   });
 
+  // Handle artifact injection broadcasts
+  socket.on('inject-artifact', (data) => {
+    console.log(`[Socket.IO] Broadcasting injected artifact for session ${data.session_id}`);
+    // Broadcast to all clients and session room
+    io.emit('material-created', data);
+    io.to(`session-${data.session_id}`).emit('material-created', data);
+  });
+
   // Disconnect
   socket.on('disconnect', () => {
     console.log(`[Socket.IO] Client disconnected: ${socket.id}`);
@@ -178,6 +187,9 @@ const startServer = async () => {
       console.log(`✓ WebSocket: ws://localhost:${PORT}`);
       console.log(`✓ Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log('=================================\n');
+      
+      // Start frame cleanup scheduler after server is running
+      startCleanupScheduler();
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error.message);

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { api } from '../../services/api';
+import { socket } from '../../services/socket';
 import './Dashboard.css';
 import ConfigurePopup from '../../components/ConfigurePopup/ConfigurePopup';
 import CurrentSession from '../../components/CurrentSession/CurrentSession';
@@ -35,6 +36,12 @@ export default function Dashboard() {
     const [isLoadingSessions, setIsLoadingSessions] = useState(true);
     const [isPreviousSessionsExpanded, setIsPreviousSessionsExpanded] = useState(true);
     const [currentSessionState, setCurrentSessionState] = useState<SessionState>('idle');
+    const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
+    const [currentSessionArtifacts, setCurrentSessionArtifacts] = useState<any[]>([]);
+    const [cameraSelections, setCameraSelections] = useState<{ webcam: string | null; external: string | null }>({
+        webcam: null,
+        external: null
+    });
 
     // Auto-collapse/expand Previous Sessions based on current session state
     useEffect(() => {
@@ -46,6 +53,23 @@ export default function Dashboard() {
             setIsPreviousSessionsExpanded(true);
         }
     }, [currentSessionState]);
+
+    // Listen for real-time artifact updates
+    useEffect(() => {
+        if (!currentSessionId) return;
+
+        const handleMaterialCreated = (material: any) => {
+            console.log('[Dashboard] Received material-created event:', material);
+            // Add new artifact to current session artifacts
+            setCurrentSessionArtifacts(prev => [...prev, material]);
+        };
+
+        socket.on('material-created', handleMaterialCreated);
+
+        return () => {
+            socket.off('material-created', handleMaterialCreated);
+        };
+    }, [currentSessionId]);
 
     // Fetch user data on component mount
     useEffect(() => {
@@ -208,12 +232,16 @@ export default function Dashboard() {
                     onConfigureClick={handleConfigureClick} 
                     sessionSettings={sessionSettings}
                     onSessionStateChange={setCurrentSessionState}
+                    onSessionIdChange={setCurrentSessionId}
+                    onArtifactsChange={setCurrentSessionArtifacts}
+                    webcamDeviceId={cameraSelections.webcam}
+                    externalDeviceId={cameraSelections.external}
                 />
 
                 {/* Current Session Details Section - Only show when session is active or paused */}
                 {(currentSessionState === 'active' || currentSessionState === 'paused') && (
                     <CurrentSessionDetails 
-                        artifacts={[]}
+                        artifacts={currentSessionArtifacts}
                         focusScore={85}
                     />
                 )}
@@ -291,6 +319,8 @@ export default function Dashboard() {
                 isOpen={isConfigurePopupOpen}
                 onClose={handleCloseConfigurePopup}
                 onSettingsChange={handleSettingsChange}
+                cameraSelections={cameraSelections}
+                onCameraSelectionChange={setCameraSelections}
             />
             
             <ProfilePopup 

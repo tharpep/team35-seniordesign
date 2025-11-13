@@ -128,6 +128,47 @@
     margin-top: 24px;
 }
 
+.camera-config-selectors {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+}
+
+.camera-select {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1 1 220px;
+}
+
+.camera-select label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #3c4043;
+}
+
+.camera-select select {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #dadce0;
+    font-size: 14px;
+    color: #202124;
+    background: #ffffff;
+    transition: border-color 0.2s ease;
+}
+
+.camera-select select:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15);
+}
+
+.camera-select small {
+    color: #5f6368;
+    font-size: 12px;
+}
+
 .preview-container {
     background: #f8f9fa;
     border: 2px dashed #dadce0;

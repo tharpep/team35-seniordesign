@@ -1,9 +1,6 @@
 import React from 'react';
-import type { PopupState } from './types';
 
 interface EquationContentProps {
-    popup: PopupState;
-    setPopup: React.Dispatch<React.SetStateAction<PopupState>>;
     artifact: {
         id: number;
         type: string;
@@ -12,7 +9,7 @@ interface EquationContentProps {
     };
 }
 
-export default function EquationContent({ popup, artifact }: EquationContentProps) {
+export default function EquationContent({ artifact }: EquationContentProps) {
     // Parse JSON content
     let equation;
     try {
