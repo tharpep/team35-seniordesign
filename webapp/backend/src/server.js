@@ -107,6 +107,14 @@ io.on('connection', (socket) => {
     console.log(`[Socket.IO] Client ${socket.id} left session-${sessionId}`);
   });
 
+  // Handle artifact injection broadcasts
+  socket.on('inject-artifact', (data) => {
+    console.log(`[Socket.IO] Broadcasting injected artifact for session ${data.session_id}`);
+    // Broadcast to all clients and session room
+    io.emit('material-created', data);
+    io.to(`session-${data.session_id}`).emit('material-created', data);
+  });
+
   // Disconnect
   socket.on('disconnect', () => {
     console.log(`[Socket.IO] Client disconnected: ${socket.id}`);

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { api } from '../../services/api';
+import { socket } from '../../services/socket';
 import './Dashboard.css';
 import ConfigurePopup from '../../components/ConfigurePopup/ConfigurePopup';
 import CurrentSession from '../../components/CurrentSession/CurrentSession';
@@ -52,6 +53,23 @@ export default function Dashboard() {
             setIsPreviousSessionsExpanded(true);
         }
     }, [currentSessionState]);
+
+    // Listen for real-time artifact updates
+    useEffect(() => {
+        if (!currentSessionId) return;
+
+        const handleMaterialCreated = (material: any) => {
+            console.log('[Dashboard] Received material-created event:', material);
+            // Add new artifact to current session artifacts
+            setCurrentSessionArtifacts(prev => [...prev, material]);
+        };
+
+        socket.on('material-created', handleMaterialCreated);
+
+        return () => {
+            socket.off('material-created', handleMaterialCreated);
+        };
+    }, [currentSessionId]);
 
     // Fetch user data on component mount
     useEffect(() => {
