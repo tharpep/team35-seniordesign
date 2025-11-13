@@ -6,6 +6,7 @@ const fs = require('fs');
 const { requireAuth } = require('../middleware/auth');
 const {
   getAllSessions,
+  getIncompleteSession,
   getSessionById,
   createSession,
   updateSession,
@@ -16,11 +17,26 @@ const {
   getMaterialsBySession
 } = require('../controllers/materialController');
 
+const FRAME_TYPES = new Set(['webcam', 'screen', 'external']);
+
+const resolveFrameType = (req, file) => {
+  const candidates = [
+    req.body?.type,
+    req.headers['x-frame-type'],
+    req.query?.type,
+    file?.originalname?.split('_')?.[0]
+  ];
+
+  const match = candidates.find(value => typeof value === 'string' && FRAME_TYPES.has(value));
+  return match || 'unknown';
+};
+
 // Configure multer for frame uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const sessionId = req.params.id;
-    const frameType = req.body.type || 'unknown';
+    const frameType = resolveFrameType(req, file);
+    req.resolvedFrameType = frameType;
     const uploadDir = path.join(__dirname, '../../../uploads/frames', `session_${sessionId}`, frameType);
     
     // Create directory if it doesn't exist
@@ -55,14 +71,14 @@ router.use(requireAuth);
 // GET /api/sessions - Get all sessions for logged-in user
 router.get('/', getAllSessions);
 
+// GET /api/sessions/incomplete - Get incomplete session (MUST be before /:id routes)
+router.get('/incomplete', getIncompleteSession);
+
 // POST /api/sessions - Create new session
 router.post('/', createSession);
 
 // GET /api/sessions/:id - Get session by ID
 router.get('/:id', getSessionById);
-
-// GET /api/sessions/:sessionId/materials - Get all materials for a session
-router.get('/:sessionId/materials', getMaterialsBySession);
 
 // PUT /api/sessions/:id - Update session
 router.put('/:id', updateSession);
@@ -72,5 +88,8 @@ router.delete('/:id', deleteSession);
 
 // POST /api/sessions/:id/frames - Upload captured frame
 router.post('/:id/frames', upload.single('frame'), uploadFrame);
+
+// GET /api/sessions/:sessionId/materials - Get all materials for a session
+router.get('/:sessionId/materials', getMaterialsBySession);
 
 module.exports = router;

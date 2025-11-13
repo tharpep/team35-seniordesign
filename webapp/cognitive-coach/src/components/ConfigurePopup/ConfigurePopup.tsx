@@ -1,13 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './ConfigurePopup.css';
 import WebcamPreview from './WebcamPreview';
 import ScreenRecordingPreview from './ScreenRecordingPreview';
 import ExternalCameraPreview from './ExternalCameraPreview';
 
+interface CameraSelections {
+    webcam: string | null;
+    external: string | null;
+}
+
 interface ConfigurePopupProps {
     isOpen: boolean;
     onClose: () => void;
     onSettingsChange?: (settings: { photoInterval: number }) => void;
+    cameraSelections: CameraSelections;
+    onCameraSelectionChange?: (selection: CameraSelections) => void;
 }
 
 interface VideoDevice {
@@ -18,12 +25,41 @@ interface VideoDevice {
 type PreviewType = 'screen' | 'webcam' | 'external';
 type ConfigSection = 'camera' | 'settings';
 
-export default function ConfigurePopup({ isOpen, onClose, onSettingsChange }: ConfigurePopupProps) {
+export default function ConfigurePopup({ isOpen, onClose, onSettingsChange, cameraSelections, onCameraSelectionChange }: ConfigurePopupProps) {
     const [selectedSection, setSelectedSection] = useState<ConfigSection>('camera');
     const [selectedPreview, setSelectedPreview] = useState<PreviewType>('screen');
     const [videoDevices, setVideoDevices] = useState<VideoDevice[]>([]);
-    const [externalDeviceId, setExternalDeviceId] = useState<string | null>(null);
     const [photoInterval, setPhotoInterval] = useState<number>(2); // Default 2 seconds
+
+    const ensureDeviceSelections = useCallback((devices: VideoDevice[]) => {
+        if (!onCameraSelectionChange || devices.length === 0) {
+            return;
+        }
+
+        let nextWebcam = cameraSelections.webcam;
+        let nextExternal = cameraSelections.external;
+        let changed = false;
+
+        if (!nextWebcam || !devices.some(device => device.deviceId === nextWebcam)) {
+            nextWebcam = devices[0]?.deviceId || null;
+            changed = true;
+        }
+
+        const externalCandidate = devices.find(device => device.deviceId !== nextWebcam);
+        if (devices.length < 2) {
+            if (nextExternal !== null) {
+                nextExternal = null;
+                changed = true;
+            }
+        } else if (!nextExternal || !devices.some(device => device.deviceId === nextExternal) || nextExternal === nextWebcam) {
+            nextExternal = externalCandidate ? externalCandidate.deviceId : null;
+            changed = true;
+        }
+
+        if (changed) {
+            onCameraSelectionChange({ webcam: nextWebcam, external: nextExternal });
+        }
+    }, [cameraSelections, onCameraSelectionChange]);
 
     // Enumerate video devices when popup opens
     useEffect(() => {
@@ -43,11 +79,7 @@ export default function ConfigurePopup({ isOpen, onClose, onSettingsChange }: Co
                         }));
                     
                     setVideoDevices(videoInputs);
-                    
-                    // Set external device as the second camera if available
-                    if (videoInputs.length > 1) {
-                        setExternalDeviceId(videoInputs[1].deviceId);
-                    }
+                    ensureDeviceSelections(videoInputs);
                 } catch (error) {
                     console.error('Error enumerating devices:', error);
                 }
@@ -55,7 +87,14 @@ export default function ConfigurePopup({ isOpen, onClose, onSettingsChange }: Co
             
             enumerateDevices();
         }
-    }, [isOpen]);
+    }, [isOpen, ensureDeviceSelections]);
+
+    useEffect(() => {
+        if (!isOpen || videoDevices.length === 0) {
+            return;
+        }
+        ensureDeviceSelections(videoDevices);
+    }, [isOpen, videoDevices, ensureDeviceSelections]);
 
     // Notify parent component when settings change
     useEffect(() => {
@@ -74,7 +113,31 @@ export default function ConfigurePopup({ isOpen, onClose, onSettingsChange }: Co
 
     const changeSelectedPreview = (preview: PreviewType) => {
         setSelectedPreview(preview);
-    }
+    };
+
+    const handleCameraSelectChange = (type: 'webcam' | 'external', value: string) => {
+        if (!onCameraSelectionChange) return;
+        const normalizedValue = value || null;
+        const nextSelection: CameraSelections = {
+            ...cameraSelections,
+            [type]: normalizedValue
+        };
+
+        if (type === 'webcam' && normalizedValue && normalizedValue === nextSelection.external) {
+            const fallback = videoDevices.find(device => device.deviceId !== normalizedValue);
+            nextSelection.external = fallback ? fallback.deviceId : null;
+        }
+
+        if (type === 'external' && normalizedValue && normalizedValue === nextSelection.webcam) {
+            const fallback = videoDevices.find(device => device.deviceId !== normalizedValue);
+            nextSelection.webcam = fallback ? fallback.deviceId : nextSelection.webcam;
+        }
+
+        onCameraSelectionChange(nextSelection);
+    };
+
+    const getDeviceLabel = (deviceId: string | null | undefined) =>
+        videoDevices.find(device => device.deviceId === deviceId)?.label;
 
     return (
         <div className="popup-overlay" onClick={handleOverlayClick}>
@@ -136,16 +199,29 @@ export default function ConfigurePopup({ isOpen, onClose, onSettingsChange }: Co
                             </div>
                         </div>
                         
+                        <div className="camera-config-selectors">
+                            {/* Camera selection moved to individual preview windows */}
+                        </div>
+
                             <div className="camera-preview">
                                 {selectedPreview === 'screen' ? (
                                     <ScreenRecordingPreview isActive={selectedPreview === 'screen'} />
                                 ) : selectedPreview === 'webcam' ? (
-                                    <WebcamPreview isActive={selectedPreview === 'webcam'} />
+                                    <WebcamPreview 
+                                        isActive={selectedPreview === 'webcam'}
+                                        deviceId={cameraSelections.webcam}
+                                        deviceLabel={getDeviceLabel(cameraSelections.webcam) || 'Webcam'}
+                                        availableDevices={videoDevices}
+                                        onDeviceChange={(deviceId) => handleCameraSelectChange('webcam', deviceId)}
+                                    />
                                 ) : (
                                     <ExternalCameraPreview 
                                         isActive={selectedPreview === 'external'} 
-                                        deviceId={externalDeviceId}
-                                        deviceLabel={videoDevices.find(d => d.deviceId === externalDeviceId)?.label || 'External Camera'}
+                                        deviceId={cameraSelections.external}
+                                        deviceLabel={getDeviceLabel(cameraSelections.external) || 'External Camera'}
+                                        availableDevices={videoDevices}
+                                        onDeviceChange={(deviceId) => handleCameraSelectChange('external', deviceId)}
+                                        excludeDeviceId={cameraSelections.webcam}
                                     />
                                 )}
                             </div>

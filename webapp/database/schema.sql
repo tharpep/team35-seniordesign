@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 CREATE TABLE IF NOT EXISTS captured_frames (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     session_id INTEGER NOT NULL,
-    frame_type TEXT CHECK(frame_type IN ('webcam', 'screen')),
+    frame_type TEXT CHECK(frame_type IN ('webcam', 'screen', 'external')),
     file_path TEXT NOT NULL,
     captured_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE

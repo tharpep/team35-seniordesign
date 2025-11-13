@@ -59,6 +59,52 @@ const getAllSessions = async (req, res) => {
   }
 };
 
+// Get incomplete session (active or paused) for current user
+const getIncompleteSession = async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    
+    console.log('[getIncompleteSession] Fetching for user:', userId);
+
+    const session = await getOne(
+      `SELECT * FROM sessions 
+       WHERE user_id = ? AND status IN ('active', 'paused')
+       ORDER BY created_at DESC 
+       LIMIT 1`,
+      [userId]
+    );
+
+    console.log('[getIncompleteSession] Found session:', session);
+
+    if (!session) {
+      console.log('[getIncompleteSession] No incomplete session found');
+      return res.json({ session: null });
+    }
+
+    // Get artifact count for this session
+    const artifacts = await getAll(
+      'SELECT * FROM study_artifacts WHERE session_id = ?',
+      [session.id]
+    );
+
+    console.log('[getIncompleteSession] Artifact count:', artifacts.length);
+
+    res.json({ 
+      session: {
+        ...session,
+        artifact_count: artifacts.length
+      }
+    });
+
+  } catch (error) {
+    console.error('Get incomplete session error:', error);
+    res.status(500).json({ 
+      error: 'Server error',
+      message: 'Could not retrieve incomplete session'
+    });
+  }
+};
+
 // Get single session by ID
 const getSessionById = async (req, res) => {
   try {
@@ -93,6 +139,14 @@ const createSession = async (req, res) => {
   try {
     const userId = req.session.userId;
     const { title } = req.body;
+
+    // First, mark any existing incomplete sessions as completed
+    await runQuery(
+      `UPDATE sessions 
+       SET status = 'completed' 
+       WHERE user_id = ? AND status IN ('active', 'paused')`,
+      [userId]
+    );
 
     const result = await runQuery(
       `INSERT INTO sessions (user_id, title, start_time, status) 
@@ -240,12 +294,30 @@ const uploadFrame = async (req, res) => {
   try {
     const { id: sessionId } = req.params;
     const userId = req.session.userId;
-    const frameType = req.body.type; // 'webcam' or 'screen'
+    const frameType = req.body.type 
+      || req.resolvedFrameType 
+      || req.headers['x-frame-type']
+      || req.query?.type
+      || req.file?.originalname?.split('_')?.[0]
+      || 'unknown';
+
+    console.log(`📸 Upload frame request - Session: ${sessionId}, Type: ${frameType}, File: ${req.file ? 'present' : 'missing'}`);
 
     if (!req.file) {
+      console.error('❌ No file in request');
       return res.status(400).json({ 
         error: 'No file',
         message: 'No frame file uploaded'
+      });
+    }
+
+    // Validate frame type
+    const validTypes = ['webcam', 'screen', 'external'];
+    if (!validTypes.includes(frameType)) {
+      console.error(`❌ Invalid frame type: ${frameType}`);
+      return res.status(400).json({ 
+        error: 'Invalid type',
+        message: `Frame type must be one of: ${validTypes.join(', ')}`
       });
     }
 
@@ -256,11 +328,14 @@ const uploadFrame = async (req, res) => {
     );
 
     if (!session) {
+      console.error(`❌ Session ${sessionId} not found for user ${userId}`);
       return res.status(404).json({ 
         error: 'Not found',
         message: 'Session not found'
       });
     }
+
+    console.log(`✓ Saving frame to database - Path: ${req.file.path}`);
 
     // Save frame record to database
     await runQuery(
@@ -268,6 +343,8 @@ const uploadFrame = async (req, res) => {
        VALUES (?, ?, ?)`,
       [sessionId, frameType, req.file.path]
     );
+
+    console.log(`✓ Frame uploaded successfully - Type: ${frameType}, Size: ${req.file.size} bytes`);
 
     res.json({ 
       message: 'Frame uploaded successfully',
@@ -279,16 +356,25 @@ const uploadFrame = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Upload frame error:', error);
+    console.error('❌ Upload frame error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      sessionId: req.params.id,
+      frameType: req.body.type,
+      hasFile: !!req.file
+    });
     res.status(500).json({ 
       error: 'Server error',
-      message: 'Could not upload frame'
+      message: error.message || 'Could not upload frame',
+      details: error.message
     });
   }
 };
 
 module.exports = {
   getAllSessions,
+  getIncompleteSession,
   getSessionById,
   createSession,
   updateSession,

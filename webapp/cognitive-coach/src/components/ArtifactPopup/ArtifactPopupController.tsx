@@ -70,7 +70,7 @@ export default function ArtifactPopupController({
             case 'MCQ':
                 return <MCQContent popup={popup} setPopup={setPopup} artifact={currentArtifact} />;
             case 'equation':
-                return <EquationContent popup={popup} setPopup={setPopup} artifact={currentArtifact} />;
+                return <EquationContent artifact={currentArtifact} />;
             default:
                 return null;
         }

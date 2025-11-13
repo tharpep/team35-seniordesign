@@ -35,6 +35,12 @@ export default function Dashboard() {
     const [isLoadingSessions, setIsLoadingSessions] = useState(true);
     const [isPreviousSessionsExpanded, setIsPreviousSessionsExpanded] = useState(true);
     const [currentSessionState, setCurrentSessionState] = useState<SessionState>('idle');
+    const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
+    const [currentSessionArtifacts, setCurrentSessionArtifacts] = useState<any[]>([]);
+    const [cameraSelections, setCameraSelections] = useState<{ webcam: string | null; external: string | null }>({
+        webcam: null,
+        external: null
+    });
 
     // Auto-collapse/expand Previous Sessions based on current session state
     useEffect(() => {
@@ -208,12 +214,16 @@ export default function Dashboard() {
                     onConfigureClick={handleConfigureClick} 
                     sessionSettings={sessionSettings}
                     onSessionStateChange={setCurrentSessionState}
+                    onSessionIdChange={setCurrentSessionId}
+                    onArtifactsChange={setCurrentSessionArtifacts}
+                    webcamDeviceId={cameraSelections.webcam}
+                    externalDeviceId={cameraSelections.external}
                 />
 
                 {/* Current Session Details Section - Only show when session is active or paused */}
                 {(currentSessionState === 'active' || currentSessionState === 'paused') && (
                     <CurrentSessionDetails 
-                        artifacts={[]}
+                        artifacts={currentSessionArtifacts}
                         focusScore={85}
                     />
                 )}
@@ -291,6 +301,8 @@ export default function Dashboard() {
                 isOpen={isConfigurePopupOpen}
                 onClose={handleCloseConfigurePopup}
                 onSettingsChange={handleSettingsChange}
+                cameraSelections={cameraSelections}
+                onCameraSelectionChange={setCameraSelections}
             />
             
             <ProfilePopup 

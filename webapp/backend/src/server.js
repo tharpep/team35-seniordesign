@@ -8,6 +8,7 @@ require('dotenv').config();
 
 // Import database initialization
 const { initializeDatabase } = require('./config/initDatabase');
+const { startCleanupScheduler } = require('./services/frameCleanup');
 
 // Initialize Express app
 const app = express();
@@ -178,6 +179,9 @@ const startServer = async () => {
       console.log(`✓ WebSocket: ws://localhost:${PORT}`);
       console.log(`✓ Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log('=================================\n');
+      
+      // Start frame cleanup scheduler after server is running
+      startCleanupScheduler();
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error.message);

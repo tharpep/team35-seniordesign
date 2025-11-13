@@ -7,13 +7,19 @@ interface ExternalCameraPreviewProps {
     deviceId: string | null;
     deviceLabel?: string;
     onStreamChange?: (stream: MediaStream | null) => void;
+    availableDevices?: Array<{ deviceId: string; label: string }>;
+    onDeviceChange?: (deviceId: string) => void;
+    excludeDeviceId?: string | null;
 }
 
 export default function ExternalCameraPreview({ 
     isActive, 
     deviceId, 
     deviceLabel = 'External Camera',
-    onStreamChange 
+    onStreamChange,
+    availableDevices = [],
+    onDeviceChange,
+    excludeDeviceId
 }: ExternalCameraPreviewProps) {
     const [cameraState, setCameraState] = useState<CameraState>('idle');
     const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
@@ -88,14 +94,64 @@ export default function ExternalCameraPreview({
             {cameraState === 'no-device' && (
                 <>
                     <span className="material-icons-round preview-icon">camera_alt</span>
-                    <h4>No External Camera Found</h4>
-                    <p>Connect an external camera (like smart glasses) to preview it here</p>
+                    <h4>External Camera</h4>
+                    {availableDevices.length > 0 && onDeviceChange && (
+                        <div style={{ width: '100%', maxWidth: '400px', marginBottom: '20px' }}>
+                            <select
+                                value={deviceId || ''}
+                                onChange={(e) => onDeviceChange(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '10px',
+                                    fontSize: '14px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #ddd',
+                                    backgroundColor: 'white'
+                                }}
+                            >
+                                <option value="">Do not use</option>
+                                {availableDevices
+                                    .filter(device => device.deviceId !== excludeDeviceId)
+                                    .map(device => (
+                                        <option key={device.deviceId} value={device.deviceId}>
+                                            {device.label}
+                                        </option>
+                                    ))}
+                            </select>
+                        </div>
+                    )}
+                    <p>Connect an external camera or select from available devices</p>
                 </>
             )}
             {cameraState === 'idle' && deviceId && (
                 <>
                     <span className="material-icons-round preview-icon">camera_alt</span>
-                    <h4>{deviceLabel} Preview</h4>
+                    <h4>External Camera Preview</h4>
+                    {availableDevices.length > 0 && onDeviceChange && (
+                        <div style={{ width: '100%', maxWidth: '400px', marginBottom: '20px' }}>
+                            <select
+                                value={deviceId || ''}
+                                onChange={(e) => onDeviceChange(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '10px',
+                                    fontSize: '14px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #ddd',
+                                    backgroundColor: 'white'
+                                }}
+                            >
+                                <option value="">Do not use</option>
+                                {availableDevices
+                                    .filter(device => device.deviceId !== excludeDeviceId)
+                                    .map(device => (
+                                        <option key={device.deviceId} value={device.deviceId}>
+                                            {device.label}
+                                        </option>
+                                    ))}
+                            </select>
+                        </div>
+                    )}
                     <p>Click the button below to enable camera access</p>
                     <button className="start-recording-button" onClick={startCamera}>
                         <span className="material-icons-round">play_circle</span>
