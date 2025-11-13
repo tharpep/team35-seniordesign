@@ -1,10 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import './Dashboard.css';
 import ConfigurePopup from '../../components/ConfigurePopup/ConfigurePopup';
 import CurrentSession from '../../components/CurrentSession/CurrentSession';
 import ProfilePopup from '../../components/ProfilePopup/ProfilePopup';
+import CurrentSessionDetails from '../../components/CurrentSessionDetails/CurrentSessionDetails';
+
+type SessionState = 'idle' | 'active' | 'paused';
 
 interface Session {
     id: number;
@@ -25,13 +27,25 @@ interface Session {
 }
 
 export default function Dashboard() {
-    const navigate = useNavigate();
     const [isConfigurePopupOpen, setIsConfigurePopupOpen] = useState(false);
     const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
     const [sessionSettings, setSessionSettings] = useState({ photoInterval: 2 });
     const [userInitials, setUserInitials] = useState('');
     const [sessions, setSessions] = useState<Session[]>([]);
     const [isLoadingSessions, setIsLoadingSessions] = useState(true);
+    const [isPreviousSessionsExpanded, setIsPreviousSessionsExpanded] = useState(true);
+    const [currentSessionState, setCurrentSessionState] = useState<SessionState>('idle');
+
+    // Auto-collapse/expand Previous Sessions based on current session state
+    useEffect(() => {
+        if (currentSessionState === 'active' || currentSessionState === 'paused') {
+            // Collapse previous sessions when session starts
+            setIsPreviousSessionsExpanded(false);
+        } else if (currentSessionState === 'idle') {
+            // Expand previous sessions when session ends
+            setIsPreviousSessionsExpanded(true);
+        }
+    }, [currentSessionState]);
 
     // Fetch user data on component mount
     useEffect(() => {
@@ -70,7 +84,7 @@ export default function Dashboard() {
     }, []);
 
     const handleSessionClick = (sessionId: number) => {
-        navigate(`/session/${sessionId}`);
+        window.open(`/session/${sessionId}`, '_blank');
     };
 
     const handleConfigureClick = () => {
@@ -193,58 +207,83 @@ export default function Dashboard() {
                 <CurrentSession 
                     onConfigureClick={handleConfigureClick} 
                     sessionSettings={sessionSettings}
+                    onSessionStateChange={setCurrentSessionState}
                 />
 
+                {/* Current Session Details Section - Only show when session is active or paused */}
+                {(currentSessionState === 'active' || currentSessionState === 'paused') && (
+                    <CurrentSessionDetails 
+                        artifacts={[]}
+                        focusScore={85}
+                    />
+                )}
+
                 {/* Previous Sessions Section */}
-                <div className="sessions-header">
-                    <h2>Previous sessions</h2>
+                <div className="sessions-header" style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => setIsPreviousSessionsExpanded(!isPreviousSessionsExpanded)}>
+                    <h2>
+                        <span className="material-icons-round section-icon">history</span>
+                        Previous sessions
+                    </h2>
+                    <button 
+                        className="icon-button" 
+                        style={{ marginLeft: 'auto' }}
+                        aria-label={isPreviousSessionsExpanded ? 'Collapse' : 'Expand'}
+                    >
+                        <span className="material-icons-round">
+                            {isPreviousSessionsExpanded ? 'expand_less' : 'expand_more'}
+                        </span>
+                    </button>
                 </div>
                 
-                {isLoadingSessions ? (
-                    <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-                        Loading sessions...
-                    </div>
-                ) : sessions.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-                        No sessions found. Start your first study session!
-                    </div>
-                ) : (
-                    <div className="sessions-list">
-                        {sessions.map((session) => (
-                            <div 
-                                key={session.id} 
-                                className="session-card"
-                                onClick={() => handleSessionClick(session.id)}
-                            >
-                                <div className="session-card-header">
-                                    <div className="session-info">
-                                        <h3>{session.title}</h3>
-                                        <div className="session-date">
-                                            {session.start_time ? formatDate(session.start_time) : 'No date'}
+                {isPreviousSessionsExpanded && (
+                    <>
+                        {isLoadingSessions ? (
+                            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                                Loading sessions...
+                            </div>
+                        ) : sessions.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                                No sessions found. Start your first study session!
+                            </div>
+                        ) : (
+                            <div className="sessions-list">
+                                {sessions.map((session) => (
+                                    <div 
+                                        key={session.id} 
+                                        className="session-card"
+                                        onClick={() => handleSessionClick(session.id)}
+                                    >
+                                        <div className="session-card-header">
+                                            <div className="session-info">
+                                                <h3>{session.title}</h3>
+                                                <div className="session-date">
+                                                    {session.start_time ? formatDate(session.start_time) : 'No date'}
+                                                </div>
+                                            </div>
+                                            <div className="session-duration">
+                                                {formatDuration(session.duration)}
+                                            </div>
+                                        </div>
+
+                                        <div className="session-metrics">
+                                            <div className="session-focus-score">
+                                                <span className="focus-score">
+                                                    Focus: {session.focusScore || session.focus_score || 0}%
+                                                </span>
+                                                <span className="emotion-label" style={{fontSize: '18px', fontWeight: '500', color: '#3b82f6', marginLeft: '16px'}}>
+                                                    Status: {session.status}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="session-artifacts">
+                                            {renderArtifactChips(session)}
                                         </div>
                                     </div>
-                                    <div className="session-duration">
-                                        {formatDuration(session.duration)}
-                                    </div>
-                                </div>
-
-                                <div className="session-metrics">
-                                    <div className="session-focus-score">
-                                        <span className="focus-score">
-                                            Focus: {session.focusScore || session.focus_score || 0}%
-                                        </span>
-                                        <span className="emotion-label" style={{fontSize: '18px', fontWeight: '500', color: '#3b82f6', marginLeft: '16px'}}>
-                                            Status: {session.status}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div className="session-artifacts">
-                                    {renderArtifactChips(session)}
-                                </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        )}
+                    </>
                 )}
             </main>
             
