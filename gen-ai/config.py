@@ -31,6 +31,10 @@ class RAGConfig:
     max_chat_tokens: int = 150  # Maximum tokens for chatbot responses
     temperature: float = 0.4  # Creativity level (lower for more focused JSON generation)
     
+    # Chat session settings
+    max_history_size: int = 10  # Maximum number of conversation exchanges to keep in memory
+    summary_interval: int = 5  # Regenerate summary every N messages when at history limit
+    
     @property
     def model_name(self) -> str:
         """Get model name based on hardware and provider configuration"""

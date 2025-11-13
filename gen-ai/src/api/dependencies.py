@@ -139,11 +139,12 @@ async def initialize_app():
         app_state.initialization_errors["generators"] = str(e)
     
     try:
-        # Initialize chat service (using shared vector store to avoid Qdrant lock)
+        # Initialize chat service (using shared RAG system for persistant_docs)
         logger.info("Initializing chat service...")
         app_state.chat_service = ChatService(
             system_prompt=app_state.system_prompt,
-            vector_store=app_state.shared_vector_store
+            vector_store=app_state.shared_vector_store,
+            rag_system=app_state.rag_system  # Pass shared RAG system
         )
         logger.info("Chat service initialized")
     except Exception as e:
@@ -161,10 +162,13 @@ async def shutdown_app():
     try:
         # Clear chat session
         if app_state.chat_service:
-            app_state.chat_service.clear_session()
-            logger.info("Chat session cleared")
+            try:
+                app_state.chat_service.clear_session()
+                logger.info("Chat session cleared")
+            except Exception as e:
+                logger.warning(f"Error clearing chat session during shutdown: {e}")
     except Exception as e:
-        logger.error(f"Error during shutdown: {e}")
+        logger.warning(f"Error during shutdown: {e}")
     
     logger.info("Application shutdown completed")
 

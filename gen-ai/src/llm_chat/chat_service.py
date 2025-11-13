@@ -7,7 +7,7 @@ import os
 import sys
 import time
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
 
 # Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -22,22 +22,23 @@ logger = get_logger(__name__)
 
 class ChatService:
     """
-    Production chat service with single global session
+    Production chat service with stateful conversation
     
     Features:
-    - Context-aware conversation with history
-    - RAG integration for relevant context retrieval
+    - Three-layer context: RAG (persistant_docs) + in-memory summary + recent messages
+    - Messages array format for LLM API (stateful chat)
     - Performance optimization: cached summary with smart regeneration
     - System prompt integration
     """
     
-    def __init__(self, system_prompt: str = None, vector_store=None):
+    def __init__(self, system_prompt: Optional[str] = None, vector_store=None, rag_system=None):
         """
-        Initialize chat service with single global session
+        Initialize chat service with stateful session
         
         Args:
             system_prompt: System prompt for LLM (loaded from file if not provided)
             vector_store: Optional shared VectorStore instance for Qdrant client sharing
+            rag_system: Optional shared BasicRAG instance (uses persistant_docs)
         """
         self.config = get_rag_config()
         self.gateway = AIGateway()
@@ -53,16 +54,19 @@ class ChatService:
         # Load system prompt
         self.system_prompt = system_prompt or self._load_system_prompt()
         
-        # Initialize RAG system for context storage
-        # Use shared vector_store if provided to avoid Qdrant client conflicts
-        self.context_rag = BasicRAG(
-            config=self.config,
-            collection_name="context_docs",
-            use_persistent=True,
-            vector_store=vector_store
-        )
+        # Use shared RAG system (points to persistant_docs) or create new one
+        if rag_system:
+            self.rag_system = rag_system
+        else:
+            # Create new RAG instance pointing to persistant_docs
+            self.rag_system = BasicRAG(
+                config=self.config,
+                collection_name="persistant_docs",
+                use_persistent=True,
+                vector_store=vector_store
+            )
         
-        logger.info("ChatService initialized with single global session")
+        logger.info("ChatService initialized with stateful session")
     
     def _load_system_prompt(self) -> str:
         """Load system prompt from file"""
@@ -93,16 +97,16 @@ class ChatService:
         }
         self.conversation_history.append(exchange)
         
-        # Summarize when we have many exchanges
-        if len(self.conversation_history) > 8:
+        # Summarize when we reach history limit
+        if len(self.conversation_history) >= self.config.max_history_size:
             self._summarize_older_context()
         
-        # Keep only recent history (last 10)
-        if len(self.conversation_history) > 10:
-            self.conversation_history = self.conversation_history[-10:]
+        # Keep only recent history (use config max_history_size)
+        if len(self.conversation_history) > self.config.max_history_size:
+            self.conversation_history = self.conversation_history[-self.config.max_history_size:]
     
     def _summarize_older_context(self):
-        """Summarize older conversation context and ingest into vector store"""
+        """Summarize older conversation context (in-memory only, no vector store)"""
         if len(self.conversation_history) < 6:  # Need at least 6 exchanges to summarize
             return
         
@@ -123,109 +127,111 @@ class ChatService:
 Summary:"""
         
         try:
-            # Get summary from LLM
+            # Get summary from LLM (use string format for summary generation)
             summary = self.gateway.chat(summary_prompt, max_tokens=100)
             self.conversation_summary = summary.strip()
-            
-            # Ingest the older exchanges into vector store for retrieval
-            self._ingest_exchanges_to_vector_store(older_exchanges)
-            
         except Exception as e:
+            # Fail the request, then continue
             logger.warning(f"Failed to summarize older context: {e}")
             # Fallback: keep a simple summary
             self.conversation_summary = f"Previous conversation covered {len(older_exchanges)} exchanges on various topics."
     
-    def _ingest_exchanges_to_vector_store(self, exchanges):
-        """Ingest conversation exchanges into the context vector store"""
+    def _get_rag_context(self, question: str) -> str:
+        """
+        Retrieve RAG context from persistant_docs (session notes/OCR data)
+        
+        Returns formatted context string for inclusion in messages array
+        """
         try:
-            # Convert exchanges to documents for ingestion
-            documents = []
-            for exchange in exchanges:
-                # Create a document that combines question and answer
-                doc = f"Question: {exchange['question']}\nAnswer: {exchange['answer']}"
-                documents.append(doc)
+            results = self.rag_system.search(question, limit=self.config.top_k)
+            if not results:
+                return ""
             
-            # Add to vector store
-            count = self.context_rag.add_documents(documents)
-            logger.info(f"Ingested {count} exchanges into vector store")
-            return count
-        except Exception as e:
-            logger.warning(f"Failed to ingest exchanges: {e}")
-            return 0
-    
-    def get_conversation_context(self, current_question: str = "") -> str:
-        """
-        Get formatted conversation context for the LLM
-        
-        PERFORMANCE OPTIMIZATION: Uses cached summary instead of generating on every request
-        """
-        if not self.conversation_history and not self.conversation_summary:
+            # Format retrieved documents
+            context_parts = []
+            for i, (doc, score) in enumerate(results, 1):
+                if score > self.config.similarity_threshold:
+                    context_parts.append(f"[Note {i}] {doc}")
+            
+            if context_parts:
+                return "Relevant notes and documents from your study session:\n" + "\n\n".join(context_parts)
             return ""
+        except Exception as e:
+            # Fail the request, then continue
+            logger.warning(f"Failed to get RAG context: {e}")
+            return ""
+    
+    def _build_messages_array(self, current_message: str) -> List[Dict[str, str]]:
+        """
+        Build messages array for LLM API call
         
-        context_parts = []
+        Structure:
+        1. System prompt
+        2. RAG context (from persistant_docs)
+        3. Chat summary (long-term conversation memory)
+        4. Recent conversation history (last N exchanges from config)
+        5. Current message
+        """
+        messages = []
         
-        # Add summary of older context if available
-        if self.conversation_summary:
-            context_parts.append(f"Previous conversation summary: {self.conversation_summary}")
-            context_parts.append("")
+        # 1. System prompt
+        if self.system_prompt:
+            messages.append({"role": "system", "content": self.system_prompt})
         
-        # Search vector store for relevant context if we have a current question
-        if current_question and self.conversation_summary:
-            relevant_context = self._retrieve_relevant_context(current_question)
-            if relevant_context:
-                context_parts.append(f"Relevant previous discussion: {relevant_context}")
-                context_parts.append("")
+        # 2. RAG context (session notes)
+        rag_context = self._get_rag_context(current_message)
+        if rag_context:
+            messages.append({"role": "system", "content": rag_context})
         
-        # OPTIMIZATION: Use cached summary with smart regeneration
-        if self.conversation_history:
+        # 3. Chat summary (long-term conversation memory)
+        # Regenerate summary if needed (every N messages when at history limit)
+        if len(self.conversation_history) >= self.config.max_history_size:
             if self._should_regenerate_summary():
-                # Regenerate summary
                 conversation_summary = self._generate_conversation_summary()
                 if conversation_summary:
                     self.conversation_summary_cached = conversation_summary
                     self.last_summary_exchange_count = len(self.conversation_history)
-            
-            # Use cached summary
-            if self.conversation_summary_cached:
-                context_parts.append(f"Conversation summary: {self.conversation_summary_cached}")
-                context_parts.append("")
         
-        # Add recent exchanges (last 2 for immediate context)
-        recent_exchanges = self.conversation_history[-2:]
-        if recent_exchanges:
-            context_parts.append("Recent exchanges:")
-            for exchange in recent_exchanges:
-                context_parts.append(f"User: {exchange['question']}")
-                context_parts.append(f"Assistant: {exchange['answer'][:150]}...")
-                context_parts.append("")
+        if self.conversation_summary_cached:
+            messages.append({
+                "role": "system",
+                "content": f"Conversation summary: {self.conversation_summary_cached}"
+            })
         
-        return "\n".join(context_parts) + "\n\n"
+        # 4. Recent conversation history (last N exchanges from config)
+        recent_exchanges = self.conversation_history[-self.config.max_history_size:]
+        for exchange in recent_exchanges:
+            messages.append({"role": "user", "content": exchange["question"]})
+            messages.append({"role": "assistant", "content": exchange["answer"]})
+        
+        # 5. Current message
+        messages.append({"role": "user", "content": current_message})
+        
+        return messages
     
     def _should_regenerate_summary(self) -> bool:
         """
         Determine if conversation summary should be regenerated
         
-        PERFORMANCE OPTIMIZATION: Only regenerate every 3-5 exchanges
+        Regenerate every N messages (from config) when at conversation history limit
         """
-        if len(self.conversation_history) < 2:
+        if len(self.conversation_history) < self.config.max_history_size:
             return False
         
         # Calculate how many exchanges since last summary
         exchanges_since_last = len(self.conversation_history) - self.last_summary_exchange_count
         
-        # Regenerate if we have 4+ new exchanges since last summary
-        return exchanges_since_last >= 4
+        # Regenerate based on config interval
+        return exchanges_since_last >= self.config.summary_interval
     
     def _generate_conversation_summary(self) -> str:
         """
-        Generate a focused summary of the conversation using LLM
-        
-        CACHED: Result is cached and reused until regeneration needed
+        Generate a focused summary of ALL conversation history using LLM
         """
         if len(self.conversation_history) < 2:
             return ""
         
-        # Build conversation text for summarization
+        # Build conversation text for summarization (ALL history)
         conversation_text = ""
         for exchange in self.conversation_history:
             conversation_text += f"User: {exchange['question']}\n"
@@ -243,49 +249,30 @@ Conversation:
 Summary:"""
         
         try:
-            # Get summary from LLM
+            # Get summary from LLM (use string format for summary generation)
             summary = self.gateway.chat(summary_prompt, max_tokens=150)
-            logger.info("Generated conversation summary")
             return summary.strip()
         except Exception as e:
+            # Fail the request, then continue
             logger.warning(f"Failed to generate summary: {e}")
             # Return cached summary as fallback
             return self.conversation_summary_cached
     
-    def _retrieve_relevant_context(self, question: str) -> str:
-        """Retrieve relevant context from vector store"""
-        try:
-            # Search for relevant exchanges
-            results = self.context_rag.search(question, limit=2)
-            if results:
-                # Combine the most relevant results
-                relevant_texts = [result[0] for result in results if result[1] > 0.7]  # Only high similarity
-                if relevant_texts:
-                    return " ".join(relevant_texts[:2])  # Max 2 relevant exchanges
-            return ""
-        except Exception as e:
-            logger.warning(f"Failed to retrieve relevant context: {e}")
-            return ""
-    
     def clear_vector_store(self):
-        """Clear the context vector store"""
-        try:
-            # Delete the entire collection to clear all context
-            self.context_rag.vector_store.client.delete_collection("context_docs")
-            # Recreate the collection
-            self.context_rag._setup_collection()
-            logger.info("Cleared vector store")
-        except Exception as e:
-            logger.warning(f"Failed to clear vector store: {e}")
+        """
+        No-op for context_docs (not used anymore)
+        persistant_docs is managed separately and not cleared here
+        """
+        pass
     
     def clear_session(self):
-        """Clear the global chat session and all context"""
+        """Clear the in-memory chat session (RAG persists)"""
         self.conversation_history = []
         self.conversation_summary = ""
         self.conversation_summary_cached = ""
         self.last_summary_exchange_count = 0
-        self.clear_vector_store()
-        logger.info("Cleared global chat session")
+        # Note: We don't clear persistant_docs here - that's session-based and handled elsewhere
+        logger.info("Cleared in-memory chat session")
     
     def _clean_response(self, response: str) -> str:
         """Clean up LLM response to remove unwanted formatting"""
@@ -315,7 +302,12 @@ Summary:"""
     
     def chat(self, message: str) -> Dict[str, Any]:
         """
-        Process chat message with conversation context
+        Process chat message with three-layer context
+        
+        Uses:
+        - RAG context from persistant_docs (session notes)
+        - Chat summary (long-term conversation memory)
+        - Recent conversation history (last N exchanges)
         
         Args:
             message: User message
@@ -323,20 +315,12 @@ Summary:"""
         Returns:
             Dictionary with answer, response_time, conversation_length
         """
-        logger.info(f"Processing chat message (history length: {len(self.conversation_history)})")
+        # Build messages array with all context layers
+        messages = self._build_messages_array(message)
         
-        # Build conversation context for the LLM
-        conversation_context = self.get_conversation_context(message)
-        
-        # Create the user message with context
-        if conversation_context:
-            user_message = f"{conversation_context}Current question: {message}"
-        else:
-            user_message = message
-        
-        # Use the gateway to get response with system prompt
+        # Call LLM with messages array (stateful chat)
         start_time = time.time()
-        answer = self.gateway.chat(user_message, system_prompt=self.system_prompt)
+        answer = self.gateway.chat(messages, max_tokens=self.config.max_chat_tokens)
         response_time = time.time() - start_time
         
         # Clean up the response
@@ -344,8 +328,6 @@ Summary:"""
         
         # Add to history
         self.add_to_history(message, answer)
-        
-        logger.info(f"Chat response generated in {response_time:.2f}s")
         
         return {
             "answer": answer,
