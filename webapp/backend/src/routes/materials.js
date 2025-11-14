@@ -5,10 +5,15 @@ const {
   getMaterialById,
   createMaterial,
   updateMaterial,
-  deleteMaterial
+  deleteMaterial,
+  injectArtifact
 } = require('../controllers/materialController');
 
-// All routes require authentication
+// Artifact injection endpoint (no auth - for gen-ai service)
+// This should be called by the gen-ai Python service
+router.post('/inject', injectArtifact);
+
+// All other routes require authentication
 router.use(requireAuth);
 
 // NOTE: getMaterialsBySession is now in sessions.js at /api/sessions/:sessionId/materials

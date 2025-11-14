@@ -2,6 +2,7 @@
 sentence-transformers>=2.2.2
 qdrant-client>=1.7.0
 httpx>=0.25.0
+requests>=2.31.0
 
 # Optional dependencies for enhanced functionality
 torch>=2.0.0
