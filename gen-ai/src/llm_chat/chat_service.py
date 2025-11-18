@@ -186,15 +186,25 @@ class ChatService:
         # Summary generation time will be 0.0 since it's deferred
         
         if self.conversation_summary_cached:
+            # Load conversation summary prompt template
+            summary_content = load_prompt_template(
+                "conversation_summary_with_content.txt",
+                fallback="Conversation summary (key facts, names, topics from earlier exchanges): {summary}",
+                summary=self.conversation_summary_cached
+            )
             messages.append({
                 "role": "system",
-                "content": f"Conversation summary (key facts, names, topics from earlier exchanges): {self.conversation_summary_cached}"
+                "content": summary_content
             })
         elif len(self.conversation_history) > 0:
             # For early exchanges, note that summary will be available after more exchanges
+            building_content = load_prompt(
+                "conversation_summary_building.txt",
+                fallback="Note: Conversation summary is being built. Use recent conversation history for context."
+            )
             messages.append({
                 "role": "system",
-                "content": "Note: Conversation summary is being built. Use recent conversation history for context."
+                "content": building_content.strip()
             })
         
         # 4. Recent conversation history (last N exchanges from config)
