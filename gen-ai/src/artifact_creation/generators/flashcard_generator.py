@@ -46,29 +46,16 @@ class FlashcardGenerator(BaseArtifactGenerator):
         """
         start_time = time.time()
         
-        # Create specific prompt for flashcards
-        prompt = f"""Create {num_items} flashcard about "{topic}".
-
-IMPORTANT: Respond with ONLY valid JSON. No additional text, explanations, or markdown formatting.
-
-Required JSON format:
-{{
-  "artifact_type": "flashcards",
-  "version": "1.0",
-  "cards": [
-    {{
-      "id": "fc_001",
-      "front": "Question here",
-      "back": "Answer here",
-      "tags": ["topic"],
-      "difficulty": 2,
-      "source_refs": ["N1"],
-      "hints": []
-    }}
-  ]
-}}
-
-Generate the JSON now:"""
+        # Load flashcard generation prompt template
+        from src.utils.prompt_loader import load_prompt_template
+        prompt = load_prompt_template(
+            "artifact_flashcard_template.txt",
+            num_items=num_items,
+            topic=topic
+        )
+        if not prompt:
+            # Fallback if template file missing
+            prompt = f'Create {num_items} flashcard about "{topic}". Respond with ONLY valid JSON matching the flashcard schema.'
         
         # Use existing RAG system with artifact token limit
         result = self.rag.query(prompt, max_tokens=self.rag.config.max_tokens)

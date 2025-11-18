@@ -114,13 +114,15 @@ class BasicRAG:
         # Build RAG context from retrieved documents
         rag_context = "\n\n".join([doc for doc, _ in retrieved_docs])
         
-        # Create prompt
-        prompt = f"""Context:
-{rag_context}
-
-Question: {question}
-
-Answer:"""
+        # Load RAG query template from prompts directory
+        from src.utils.prompt_loader import load_prompt_template
+        fallback_template = "Context:\n{context}\n\nQuestion: {question}\n\nAnswer:"
+        prompt = load_prompt_template(
+            "rag_query_template.txt",
+            fallback=fallback_template,
+            context=rag_context,
+            question=question
+        )
         
         # Generate answer with appropriate token limit
         token_limit = max_tokens or self.config.max_chat_tokens

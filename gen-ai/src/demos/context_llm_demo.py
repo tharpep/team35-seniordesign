@@ -38,16 +38,15 @@ class ContextChatSession:
         )
     
     def _load_system_prompt(self) -> str:
-        """Load system prompt from file"""
+        """Load system prompt from prompts directory"""
         try:
-            prompt_path = os.path.join(os.path.dirname(__file__), "system_prompt.md")
-            if os.path.exists(prompt_path):
-                with open(prompt_path, 'r', encoding='utf-8') as f:
-                    return f.read().strip()
+            from src.utils.prompt_loader import load_prompt
+            fallback = "You are a helpful AI assistant. Respond directly and conversationally without formatting headers or markdown."
+            prompt = load_prompt("chat_system_prompt.md", fallback=fallback)
+            return prompt or fallback
         except Exception:
-            pass
-        # Fallback system prompt
-        return "You are a helpful AI assistant. Respond directly and conversationally without formatting headers or markdown."
+            # Fallback system prompt
+            return "You are a helpful AI assistant. Respond directly and conversationally without formatting headers or markdown."
         
     def add_to_history(self, question: str, answer: str):
         """Add exchange to conversation history"""

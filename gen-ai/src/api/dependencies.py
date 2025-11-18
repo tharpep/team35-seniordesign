@@ -105,20 +105,16 @@ async def initialize_app():
         app_state.initialization_errors["rag"] = str(e)
     
     try:
-        # Load system prompt
+        # Load system prompt from prompts directory
         logger.info("Loading system prompt...")
-        prompt_path = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            "demos",
-            "system_prompt.md"
-        )
-        if os.path.exists(prompt_path):
-            with open(prompt_path, 'r', encoding='utf-8') as f:
-                app_state.system_prompt = f.read().strip()
-            logger.info("System prompt loaded")
+        from src.utils.prompt_loader import load_prompt
+        fallback = "You are a helpful AI assistant."
+        app_state.system_prompt = load_prompt("chat_system_prompt.md", fallback=fallback)
+        if app_state.system_prompt:
+            logger.info("System prompt loaded from prompts directory")
         else:
-            logger.warning("System prompt file not found, using fallback")
-            app_state.system_prompt = "You are a helpful AI assistant."
+            logger.warning("Using fallback system prompt")
+            app_state.system_prompt = fallback
     except Exception as e:
         logger.error(f"Failed to load system prompt: {e}")
         app_state.initialization_errors["system_prompt"] = str(e)

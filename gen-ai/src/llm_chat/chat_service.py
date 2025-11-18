@@ -16,6 +16,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from src.ai_providers.gateway import AIGateway
 from src.rag.rag_setup import BasicRAG
+from src.utils.prompt_loader import load_prompt, load_prompt_template
 from config import get_rag_config
 from logging_config import get_logger
 
@@ -70,24 +71,14 @@ class ChatService:
         logger.info("ChatService initialized with stateful session")
     
     def _load_system_prompt(self) -> str:
-        """Load system prompt from file"""
-        try:
-            # Look in src/demos/ directory for system_prompt.md
-            prompt_path = os.path.join(
-                os.path.dirname(os.path.dirname(__file__)),
-                "demos",
-                "system_prompt.md"
-            )
-            if os.path.exists(prompt_path):
-                with open(prompt_path, 'r', encoding='utf-8') as f:
-                    logger.info(f"Loaded system prompt from {prompt_path}")
-                    return f.read().strip()
-        except Exception as e:
-            logger.warning(f"Failed to load system prompt: {e}")
-        
-        # Fallback system prompt
-        logger.info("Using fallback system prompt")
-        return "You are a helpful AI assistant. Respond directly and conversationally without formatting headers or markdown."
+        """Load system prompt from prompts directory"""
+        fallback = "You are a helpful AI assistant. Respond directly and conversationally without formatting headers or markdown."
+        prompt = load_prompt("chat_system_prompt.md", fallback=fallback)
+        if prompt:
+            logger.info("Loaded chat system prompt from prompts directory")
+        else:
+            logger.warning("Using fallback system prompt")
+        return prompt or fallback
     
     def add_to_history(self, question: str, answer: str):
         """Add exchange to conversation history"""
@@ -123,7 +114,9 @@ class ChatService:
                     filtered_results.append((doc, score))
             
             if context_parts:
-                formatted_context = "Relevant notes and documents from your study session:\n" + "\n\n".join(context_parts)
+                # Load RAG context prefix from prompts directory
+                prefix = load_prompt("rag_context_prefix.txt", fallback="Relevant notes and documents from your study session:\n")
+                formatted_context = prefix + "\n\n".join(context_parts)
                 return formatted_context, filtered_results
             return "", filtered_results
         except Exception as e:
@@ -218,36 +211,19 @@ class ChatService:
             conversation_text += f"User: {exchange['question']}\n"
             conversation_text += f"Assistant: {exchange['answer']}\n\n"
         
-        # Create summarization prompt that incorporates old summary
+        # Load summary generation prompt template
         if old_summary:
-            summary_prompt = f"""Create a concise summary that combines:
-1. The previous conversation summary (older context)
-2. The recent conversation exchanges (new context)
-
-Previous summary (older context):
-{old_summary}
-
-Recent conversation:
-{conversation_text}
-
-Create a new summary that:
-- Preserves important facts from the previous summary
-- Incorporates new information from recent exchanges
-- Focuses on KEY FACTS: user's name, main topics, important information
-- Keep it concise (2-3 sentences)
-
-New summary:"""
+            summary_prompt = load_prompt_template(
+                "summary_generation_with_old.md",
+                old_summary=old_summary,
+                recent_conversation=conversation_text
+            )
         else:
             # First summary generation (no old summary)
-            summary_prompt = f"""Create a concise summary focusing on KEY FACTS:
-- User's name: [if mentioned, state clearly]
-- Main topics: [list key topics]
-- Important facts: [any specific information shared]
-
-Conversation:
-{conversation_text}
-
-Summary:"""
+            summary_prompt = load_prompt_template(
+                "summary_generation_first.md",
+                conversation=conversation_text
+            )
         
         try:
             # Get summary from LLM (use string format for summary generation)
