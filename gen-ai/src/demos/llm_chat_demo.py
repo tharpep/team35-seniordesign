@@ -104,24 +104,42 @@ class ChatDemoClient:
         print(response_data['answer'])
         print("-" * 70)
         
-        # Metrics
+        # Timing breakdown
+        timings = response_data.get('timings', {})
+        print("\n[TIMING BREAKDOWN]")
+        print(f"   RAG Search:          {timings.get('rag_search', 0):.3f}s")
+        print(f"   Summary Generation:  {timings.get('summary_generation', 0):.3f}s")
+        print(f"   LLM Call:            {timings.get('llm_call', 0):.3f}s")
+        print(f"   Total (API):         {timings.get('total', response_data.get('response_time', 0)):.3f}s")
+        print(f"   Total (Request):     {response_data.get('total_request_time', 0):.2f}s")
+        
+        # RAG info
+        rag_info = response_data.get('rag_info', {})
+        print("\n[RAG CONTEXT]")
+        if rag_info.get('results_count', 0) > 0:
+            print(f"   Found {rag_info['results_count']} relevant document(s)")
+            for i, result in enumerate(rag_info.get('results', [])[:3], 1):
+                print(f"   [{i}] Score: {result['score']:.3f} - {result['text']}")
+        else:
+            print("   No relevant documents found in RAG database")
+        
+        # General metrics
         print("\n[METRICS]")
-        print(f"   LLM Response Time:   {response_data['response_time']:.2f}s")
-        print(f"   Total Request Time:  {response_data['total_request_time']:.2f}s")
         print(f"   Conversation Length: {response_data['conversation_length']} exchanges")
         print(f"   Session ID:          {response_data['session_id']}")
         
         # Context info
         print("\n[CONTEXT STATUS]")
-        if response_data['conversation_length'] == 0:
+        conv_len = response_data['conversation_length']
+        if conv_len == 0:
             print("   • Fresh conversation (no history)")
-        elif response_data['conversation_length'] < 5:
-            print(f"   • Building context ({response_data['conversation_length']} exchanges)")
-        elif response_data['conversation_length'] < 10:
-            print(f"   • Active conversation ({response_data['conversation_length']} exchanges)")
+        elif conv_len < 5:
+            print(f"   • Building context ({conv_len} exchanges)")
+        elif conv_len < 10:
+            print(f"   • Active conversation ({conv_len} exchanges)")
             print("   • Summary will be generated soon")
         else:
-            print(f"   • Long conversation ({response_data['conversation_length']} exchanges)")
+            print(f"   • Long conversation ({conv_len} exchanges)")
             print("   • Using cached summary + recent history")
         
         print("=" * 70)

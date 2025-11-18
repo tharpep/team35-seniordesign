@@ -42,7 +42,9 @@ async def chat(
             answer=result["answer"],
             session_id=result["session_id"],
             response_time=result["response_time"],
-            conversation_length=result["conversation_length"]
+            conversation_length=result["conversation_length"],
+            timings=result["timings"],
+            rag_info=result["rag_info"]
         )
         
     except Exception as e:

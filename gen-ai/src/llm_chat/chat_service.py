@@ -6,8 +6,10 @@ Extracted from context_llm_demo.py with cached summary for improved latency
 import os
 import sys
 import time
+import threading
 from pathlib import Path
 from typing import Dict, Any, List, Optional
+from copy import deepcopy
 
 # Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -45,7 +47,6 @@ class ChatService:
         
         # Single global session state
         self.conversation_history = []
-        self.conversation_summary = ""
         
         # Performance optimization: cached summary
         self.conversation_summary_cached = ""
@@ -97,71 +98,40 @@ class ChatService:
         }
         self.conversation_history.append(exchange)
         
-        # Summarize when we reach history limit
-        if len(self.conversation_history) >= self.config.max_history_size:
-            self._summarize_older_context()
-        
         # Keep only recent history (use config max_history_size)
         if len(self.conversation_history) > self.config.max_history_size:
             self.conversation_history = self.conversation_history[-self.config.max_history_size:]
     
-    def _summarize_older_context(self):
-        """Summarize older conversation context (in-memory only, no vector store)"""
-        if len(self.conversation_history) < 6:  # Need at least 6 exchanges to summarize
-            return
-        
-        # Get older exchanges (everything except last 3)
-        older_exchanges = self.conversation_history[:-3]
-        
-        # Build context for summarization
-        context_text = ""
-        for i, exchange in enumerate(older_exchanges, 1):
-            context_text += f"Q{i}: {exchange['question']}\n"
-            context_text += f"A{i}: {exchange['answer']}\n\n"
-        
-        # Create summarization prompt
-        summary_prompt = f"""Please summarize the following conversation in 2-3 sentences, focusing on the main topics discussed and key information shared:
-
-{context_text}
-
-Summary:"""
-        
-        try:
-            # Get summary from LLM (use string format for summary generation)
-            summary = self.gateway.chat(summary_prompt, max_tokens=100)
-            self.conversation_summary = summary.strip()
-        except Exception as e:
-            # Fail the request, then continue
-            logger.warning(f"Failed to summarize older context: {e}")
-            # Fallback: keep a simple summary
-            self.conversation_summary = f"Previous conversation covered {len(older_exchanges)} exchanges on various topics."
-    
-    def _get_rag_context(self, question: str) -> str:
+    def _get_rag_context(self, question: str) -> tuple[str, List[tuple[str, float]]]:
         """
         Retrieve RAG context from persistant_docs (session notes/OCR data)
         
-        Returns formatted context string for inclusion in messages array
+        Returns:
+            Tuple of (formatted context string, raw results list)
         """
         try:
             results = self.rag_system.search(question, limit=self.config.top_k)
             if not results:
-                return ""
+                return "", []
             
             # Format retrieved documents
             context_parts = []
+            filtered_results = []
             for i, (doc, score) in enumerate(results, 1):
                 if score > self.config.similarity_threshold:
                     context_parts.append(f"[Note {i}] {doc}")
+                    filtered_results.append((doc, score))
             
             if context_parts:
-                return "Relevant notes and documents from your study session:\n" + "\n\n".join(context_parts)
-            return ""
+                formatted_context = "Relevant notes and documents from your study session:\n" + "\n\n".join(context_parts)
+                return formatted_context, filtered_results
+            return "", filtered_results
         except Exception as e:
             # Fail the request, then continue
             logger.warning(f"Failed to get RAG context: {e}")
-            return ""
+            return "", []
     
-    def _build_messages_array(self, current_message: str) -> List[Dict[str, str]]:
+    def _build_messages_array(self, current_message: str) -> tuple[List[Dict[str, str]], List[tuple[str, float]], float]:
         """
         Build messages array for LLM API call
         
@@ -171,26 +141,26 @@ Summary:"""
         3. Chat summary (long-term conversation memory)
         4. Recent conversation history (last N exchanges from config)
         5. Current message
+        
+        Returns:
+            Tuple of (messages array, RAG results for debugging, summary generation time)
         """
         messages = []
+        rag_results = []
+        summary_gen_time = 0.0
         
         # 1. System prompt
         if self.system_prompt:
             messages.append({"role": "system", "content": self.system_prompt})
         
         # 2. RAG context (session notes)
-        rag_context = self._get_rag_context(current_message)
+        rag_context, rag_results = self._get_rag_context(current_message)
         if rag_context:
             messages.append({"role": "system", "content": rag_context})
         
         # 3. Chat summary (long-term conversation memory)
-        # Regenerate summary if needed (every N messages when at history limit)
-        if len(self.conversation_history) >= self.config.max_history_size:
-            if self._should_regenerate_summary():
-                conversation_summary = self._generate_conversation_summary()
-                if conversation_summary:
-                    self.conversation_summary_cached = conversation_summary
-                    self.last_summary_exchange_count = len(self.conversation_history)
+        # Use cached summary (generation is deferred to after response)
+        # Summary generation time will be 0.0 since it's deferred
         
         if self.conversation_summary_cached:
             messages.append({
@@ -207,7 +177,7 @@ Summary:"""
         # 5. Current message
         messages.append({"role": "user", "content": current_message})
         
-        return messages
+        return messages, rag_results, summary_gen_time
     
     def _should_regenerate_summary(self) -> bool:
         """
@@ -224,21 +194,52 @@ Summary:"""
         # Regenerate based on config interval
         return exchanges_since_last >= self.config.summary_interval
     
-    def _generate_conversation_summary(self) -> str:
+    def _generate_conversation_summary_from_recent(self, recent_exchanges: List[Dict[str, Any]], old_summary: str = "") -> str:
         """
-        Generate a focused summary of ALL conversation history using LLM
-        """
-        if len(self.conversation_history) < 2:
-            return ""
+        Generate summary from recent exchanges + old summary (sliding window approach)
         
-        # Build conversation text for summarization (ALL history)
+        This creates a rolling summary that compresses older context while keeping
+        recent exchanges fresh. The summary is always "behind" but recent history
+        makes up for it.
+        
+        Args:
+            recent_exchanges: Last N exchanges to summarize (typically last 9)
+            old_summary: Previous summary to incorporate (compressed older context)
+            
+        Returns:
+            Generated summary string
+        """
+        if len(recent_exchanges) < 2:
+            return old_summary if old_summary else ""
+        
+        # Build conversation text for summarization (recent exchanges only)
         conversation_text = ""
-        for exchange in self.conversation_history:
+        for exchange in recent_exchanges:
             conversation_text += f"User: {exchange['question']}\n"
             conversation_text += f"Assistant: {exchange['answer']}\n\n"
         
-        # Create summarization prompt
-        summary_prompt = f"""Create a concise summary focusing on KEY FACTS:
+        # Create summarization prompt that incorporates old summary
+        if old_summary:
+            summary_prompt = f"""Create a concise summary that combines:
+1. The previous conversation summary (older context)
+2. The recent conversation exchanges (new context)
+
+Previous summary (older context):
+{old_summary}
+
+Recent conversation:
+{conversation_text}
+
+Create a new summary that:
+- Preserves important facts from the previous summary
+- Incorporates new information from recent exchanges
+- Focuses on KEY FACTS: user's name, main topics, important information
+- Keep it concise (2-3 sentences)
+
+New summary:"""
+        else:
+            # First summary generation (no old summary)
+            summary_prompt = f"""Create a concise summary focusing on KEY FACTS:
 - User's name: [if mentioned, state clearly]
 - Main topics: [list key topics]
 - Important facts: [any specific information shared]
@@ -250,13 +251,36 @@ Summary:"""
         
         try:
             # Get summary from LLM (use string format for summary generation)
-            summary = self.gateway.chat(summary_prompt, max_tokens=150)
+            summary = self.gateway.chat(summary_prompt, max_tokens=200)
             return summary.strip()
         except Exception as e:
             # Fail the request, then continue
             logger.warning(f"Failed to generate summary: {e}")
-            # Return cached summary as fallback
-            return self.conversation_summary_cached
+            # Return old summary as fallback
+            return old_summary if old_summary else ""
+    
+    def _generate_summary_sync(self, recent_exchanges: List[Dict[str, Any]]):
+        """
+        Generate summary in background thread (non-blocking)
+        
+        Uses sliding window approach: generates summary from recent exchanges + old summary.
+        This creates a rolling compression where summary is always "behind" but recent
+        history makes up for it.
+        
+        Args:
+            recent_exchanges: Last N exchanges to summarize (typically last 9)
+        """
+        try:
+            old_summary = self.conversation_summary_cached
+            logger.info(f"Generating summary in background from {len(recent_exchanges)} recent exchanges + old summary")
+            summary = self._generate_conversation_summary_from_recent(recent_exchanges, old_summary)
+            if summary:
+                self.conversation_summary_cached = summary
+                # Update count to reflect that summary now covers these exchanges
+                self.last_summary_exchange_count = len(self.conversation_history)
+                logger.info("Summary generated and cached successfully (sliding window)")
+        except Exception as e:
+            logger.error(f"Error in sync summary generation: {e}")
     
     def clear_vector_store(self):
         """
@@ -268,7 +292,6 @@ Summary:"""
     def clear_session(self):
         """Clear the in-memory chat session (RAG persists)"""
         self.conversation_history = []
-        self.conversation_summary = ""
         self.conversation_summary_cached = ""
         self.last_summary_exchange_count = 0
         # Note: We don't clear persistant_docs here - that's session-based and handled elsewhere
@@ -313,25 +336,84 @@ Summary:"""
             message: User message
             
         Returns:
-            Dictionary with answer, response_time, conversation_length
+            Dictionary with answer, response_time, conversation_length, timing breakdown, and RAG results
         """
+        # Timing breakdown
+        timings = {
+            "rag_search": 0.0,
+            "summary_generation": 0.0,
+            "llm_call": 0.0,
+            "total": 0.0
+        }
+        
+        total_start = time.time()
+        
         # Build messages array with all context layers
-        messages = self._build_messages_array(message)
+        # Track RAG search and summary generation separately
+        rag_start = time.time()
+        messages, rag_results, summary_gen_time = self._build_messages_array(message)
+        rag_time = time.time() - rag_start
+        
+        # Separate RAG search time from summary generation time
+        timings["rag_search"] = rag_time - summary_gen_time
+        timings["summary_generation"] = summary_gen_time
         
         # Call LLM with messages array (stateful chat)
-        start_time = time.time()
+        llm_start = time.time()
         answer = self.gateway.chat(messages, max_tokens=self.config.max_chat_tokens)
-        response_time = time.time() - start_time
+        timings["llm_call"] = time.time() - llm_start
+        
+        timings["total"] = time.time() - total_start
         
         # Clean up the response
         answer = self._clean_response(answer)
         
-        # Add to history
+        # Add to history first (this may trim old entries if over limit)
         self.add_to_history(message, answer)
+        
+        # Check if summary should be regenerated (sliding window approach)
+        # Generate from last 9 exchanges + old summary, then history resets
+        should_regenerate = False
+        recent_exchanges_for_summary = None
+        
+        if len(self.conversation_history) >= self.config.max_history_size:
+            # Check if we should regenerate based on interval
+            exchanges_since_last = len(self.conversation_history) - self.last_summary_exchange_count
+            if exchanges_since_last >= self.config.summary_interval:
+                should_regenerate = True
+                # Take last (max_history_size - 1) exchanges for summary
+                # This keeps summary "behind" by 1, but recent history makes up for it
+                num_exchanges_for_summary = self.config.max_history_size - 1
+                recent_exchanges_for_summary = deepcopy(
+                    self.conversation_history[-num_exchanges_for_summary:]
+                )
+        
+        # Fire async summary generation if needed (sliding window: last 9 + old summary)
+        # Uses threading to run in background without blocking the response
+        if should_regenerate and recent_exchanges_for_summary:
+            thread = threading.Thread(
+                target=self._generate_summary_sync,
+                args=(recent_exchanges_for_summary,),
+                daemon=True,
+                name="SummaryGenerator"
+            )
+            thread.start()
+            logger.info(f"Started background summary generation from last {len(recent_exchanges_for_summary)} exchanges + old summary")
+        
+        # Format RAG results for response
+        rag_info = {
+            "results_count": len(rag_results),
+            "results": [
+                {"text": doc[:100] + "..." if len(doc) > 100 else doc, "score": float(score)}
+                for doc, score in rag_results[:3]  # Return top 3 for debugging
+            ]
+        }
         
         return {
             "answer": answer,
-            "response_time": response_time,
+            "response_time": timings["total"],
+            "timings": timings,
+            "rag_info": rag_info,
             "conversation_length": len(self.conversation_history),
             "session_id": "global"  # Single global session
         }
@@ -341,7 +423,7 @@ Summary:"""
         return {
             "session_id": "global",
             "conversation_length": len(self.conversation_history),
-            "has_summary": bool(self.conversation_summary or self.conversation_summary_cached),
+            "has_summary": bool(self.conversation_summary_cached),
             "last_summary_count": self.last_summary_exchange_count
         }
 
