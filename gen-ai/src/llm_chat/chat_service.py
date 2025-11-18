@@ -101,27 +101,57 @@ class ChatService:
             Tuple of (formatted context string, raw results list)
         """
         try:
-            results = self.rag_system.search(question, limit=self.config.top_k)
-            if not results:
+            # Check if collection has documents
+            stats = self.rag_system.get_stats()
+            doc_count = stats.get("document_count", 0)
+            if doc_count == 0:
+                logger.warning(f"RAG collection '{self.rag_system.collection_name}' has no documents. Documents need to be ingested first.")
                 return "", []
             
+            results = self.rag_system.search(question, limit=self.config.top_k)
+            if not results:
+                logger.debug(f"RAG search returned no results for query: {question[:50]}... (collection has {doc_count} documents)")
+                return "", []
+            
+            # Log all results for debugging
+            logger.debug(f"RAG search returned {len(results)} results:")
+            for i, (doc, score) in enumerate(results, 1):
+                logger.debug(f"  [{i}] Score: {score:.4f}, Text preview: {doc[:100]}...")
+            
             # Format retrieved documents
+            # Use a more lenient threshold - Qdrant cosine similarity scores can vary
+            # For all-MiniLM-L6-v2, relevant documents typically score 0.3-0.8
+            # Lower threshold to 0.3 to capture more relevant results
+            effective_threshold = max(0.3, self.config.similarity_threshold * 0.5)  # Use 50% of configured threshold or 0.3, whichever is higher
+            
             context_parts = []
             filtered_results = []
             for i, (doc, score) in enumerate(results, 1):
-                if score > self.config.similarity_threshold:
+                if score >= effective_threshold:
                     context_parts.append(f"[Note {i}] {doc}")
                     filtered_results.append((doc, score))
+                else:
+                    logger.debug(f"  Filtered out result {i} with score {score:.4f} (threshold: {effective_threshold:.4f})")
             
             if context_parts:
                 # Load RAG context prefix from prompts directory
                 prefix = load_prompt("rag_context_prefix.txt", fallback="Relevant notes and documents from your study session:\n")
                 formatted_context = prefix + "\n\n".join(context_parts)
+                logger.info(f"RAG context retrieved: {len(filtered_results)} documents with scores >= {effective_threshold:.4f}")
                 return formatted_context, filtered_results
+            else:
+                logger.warning(f"RAG search found {len(results)} results but all were below threshold {effective_threshold:.4f}. Top score: {results[0][1]:.4f if results else 'N/A'}")
+                # Return top result even if below threshold as fallback
+                if results:
+                    top_doc, top_score = results[0]
+                    logger.info(f"Using top result as fallback (score: {top_score:.4f})")
+                    prefix = load_prompt("rag_context_prefix.txt", fallback="Relevant notes and documents from your study session:\n")
+                    formatted_context = prefix + f"\n[Note 1] {top_doc}"
+                    return formatted_context, [(top_doc, top_score)]
             return "", filtered_results
         except Exception as e:
             # Fail the request, then continue
-            logger.warning(f"Failed to get RAG context: {e}")
+            logger.warning(f"Failed to get RAG context: {e}", exc_info=True)
             return "", []
     
     def _build_messages_array(self, current_message: str) -> tuple[List[Dict[str, str]], List[tuple[str, float]], float]:
@@ -158,7 +188,13 @@ class ChatService:
         if self.conversation_summary_cached:
             messages.append({
                 "role": "system",
-                "content": f"Conversation summary: {self.conversation_summary_cached}"
+                "content": f"Conversation summary (key facts, names, topics from earlier exchanges): {self.conversation_summary_cached}"
+            })
+        elif len(self.conversation_history) > 0:
+            # For early exchanges, note that summary will be available after more exchanges
+            messages.append({
+                "role": "system",
+                "content": "Note: Conversation summary is being built. Use recent conversation history for context."
             })
         
         # 4. Recent conversation history (last N exchanges from config)
