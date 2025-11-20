@@ -39,6 +39,13 @@ This directory contains all prompts used by the gen-ai subsystem for better long
   - Format: `Context: {context}\n\nQuestion: {question}\n\nAnswer:`
   - Used by BasicRAG.query() method for artifact generation (not chat)
 
+- **`rag_query_generation.txt`** - Template for generating optimized search queries
+  - Used by ChatService to improve RAG retrieval for vague or low-confidence queries
+  - Takes user question and recent conversation context
+  - Generates concise search query (3-5 keywords) optimized for vector search
+  - Placeholders: `{user_question}`, `{recent_context}`
+  - Used in hybrid RAG approach: tries original query first, then generates optimized query if needed
+
 ### Summary Generation Prompts
 - **`summary_generation_with_old.md`** - Template for generating summary with previous summary
   - Used when regenerating summary (sliding window approach)

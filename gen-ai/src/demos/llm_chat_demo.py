@@ -108,6 +108,7 @@ class ChatDemoClient:
         timings = response_data.get('timings', {})
         print("\n[TIMING BREAKDOWN]")
         print(f"   RAG Search:          {timings.get('rag_search', 0):.3f}s")
+        print(f"   Query Optimization: {timings.get('query_optimization', 0):.3f}s")
         print(f"   Summary Generation:  {timings.get('summary_generation', 0):.3f}s")
         print(f"   LLM Call:            {timings.get('llm_call', 0):.3f}s")
         print(f"   Total (API):         {timings.get('total', response_data.get('response_time', 0)):.3f}s")
