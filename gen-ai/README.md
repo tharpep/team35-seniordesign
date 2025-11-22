@@ -4,98 +4,118 @@ GenAI subsystem for artifact generation, RAG queries, and interactive chat.
 
 ## Quick Start
 
-### Prerequisites
+### Step 1: Install Poetry
 
-- Python 3.8 or higher
-- Poetry (dependency management)
+If you don't have Poetry installed:
 
-### Install Poetry
-
-If you don't have Poetry installed, install it using one of these methods:
-
-**Windows (PowerShell):**
-```powershell
-(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
-```
-
-**macOS/Linux:**
-```bash
-curl -sSL https://install.python-poetry.org | python3 -
-```
-
-**Alternative (pip):**
+**Using pip (recommended):**
 ```bash
 pip install poetry
 ```
 
-After installation, verify Poetry is installed:
+**Or using the official installer:**
+- **Windows (PowerShell):**
+  ```powershell
+  (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
+  ```
+- **macOS/Linux:**
+  ```bash
+  curl -sSL https://install.python-poetry.org | python3 -
+  ```
+
+Verify installation:
 ```bash
 poetry --version
 ```
 
-**Note:** If you're using Poetry 2.0.0 or later, you need to install the shell plugin:
-```bash
-poetry self add poetry-plugin-shell
-```
-
-### Setup
+### Step 2: Setup Project
 
 1. **Install dependencies:**
    ```bash
    poetry install
    ```
-   This creates a virtual environment and installs all required dependencies.
 
-2. **Activate the virtual environment:**
-   
-   **Option A - Using shell plugin (recommended):**
+2. **Add shell plugin (required for Poetry 2.0+):**
+   ```bash
+   poetry self add poetry-plugin-shell
+   ```
+
+3. **Activate the virtual environment:**
    ```bash
    poetry shell
    ```
-   This spawns a new shell within the virtual environment. To exit, type `exit`.
-   
-   **Option B - Using env activate (Poetry 2.0+ alternative):**
-   ```bash
-   poetry env activate
-   ```
-   Or on Windows PowerShell:
-   ```powershell
-   .venv\Scripts\Activate.ps1
-   ```
-   Or on Windows CMD:
-   ```cmd
-   .venv\Scripts\activate.bat
-   ```
+   You should see your prompt change to indicate you're in the virtual environment.
 
-3. **Verify installation:**
+4. **Verify installation:**
    ```bash
    genai --help
    ```
 
-## CLI Commands
+### Step 3: Start the Server
 
-After running `poetry shell`, you can use the following commands:
+**IMPORTANT:** Start the API server first in a terminal before using other commands.
 
-### `genai chat`
-Interactive chat with conversation context (requires API server).
+In your terminal (after `poetry shell`):
+```bash
+genai server
+```
 
+The server will start at `http://127.0.0.1:8000`. Keep this terminal running.
+
+### Step 4: Test the System
+
+Open a **new terminal** and run:
+
+```bash
+cd gen-ai
+poetry shell
+```
+
+Then test the commands:
+
+**Ingest documents:**
+```bash
+genai ingest
+```
+
+**Generate artifacts:**
+```bash
+genai artifact --topic "Newton's laws of motion"
+```
+
+**Interactive chat:**
 ```bash
 genai chat
 ```
 
-**Features:**
-- Three-layer context: RAG + Summary + Recent messages
-- Stateful conversation maintained through API
-- Real-time metrics and performance tracking
+**Run comprehensive demo:**
+```bash
+genai demo
+```
 
-**Commands in chat:**
-- `clear` - Clear the chat session (reset context)
-- `stats` - Show session statistics
-- `help` - Show help
-- `quit` - Exit the chat
+## CLI Commands
+
+All commands require `poetry shell` to be active and the API server running (except `genai server` and `genai query`).
+
+### `genai server`
+Start the FastAPI server (run this first in a separate terminal).
+
+```bash
+genai server
+```
+
+**Options:**
+- `--host HOST` - Host to bind to (default: `127.0.0.1`)
+- `--port PORT` - Port to bind to (default: `8000`)
+- `--reload/--no-reload` - Enable/disable auto-reload (default: enabled)
+
+**Endpoints:**
+- API: `http://127.0.0.1:8000`
+- Swagger docs: `http://127.0.0.1:8000/docs`
+- Health check: `http://127.0.0.1:8000/health`
 
 ### `genai ingest`
-Ingest documents from the default folder into the RAG system.
+Ingest documents into the RAG system.
 
 ```bash
 genai ingest
@@ -108,22 +128,6 @@ genai ingest
 - Processes all `.txt` and `.md` files in the folder
 - Creates embeddings and indexes them in Qdrant
 - Uses the `persistant_docs` collection
-
-### `genai query`
-Interactive RAG query REPL (no API server required).
-
-```bash
-genai query
-```
-
-**Features:**
-- Direct RAG queries using `persistant_docs` collection
-- Shows retrieved context documents with similarity scores
-- LLM-generated answers based on retrieved context
-
-**Commands in query:**
-- `help` - Show help
-- `quit` - Exit the query REPL
 
 ### `genai artifact`
 Generate educational artifacts (flashcards, MCQ, insights) via API.
@@ -144,22 +148,63 @@ genai artifact
 **Output:**
 Artifacts are saved to `src/artifact_creation/artifact_output/` with timestamps.
 
-### `genai server`
-Start the FastAPI server.
+### `genai chat`
+Interactive chat with conversation context (requires API server).
 
 ```bash
-genai server
+genai chat
 ```
 
 **Options:**
-- `--host HOST` - Host to bind to (default: `127.0.0.1`)
-- `--port PORT` - Port to bind to (default: `8000`)
-- `--reload/--no-reload` - Enable/disable auto-reload (default: enabled)
+- `--base-url URL` - API server base URL (default: `http://127.0.0.1:8000`)
 
-**Endpoints:**
-- API: `http://127.0.0.1:8000`
-- Swagger docs: `http://127.0.0.1:8000/docs`
-- ReDoc: `http://127.0.0.1:8000/redoc`
+**Features:**
+- Three-layer context: RAG + Summary + Recent messages
+- Stateful conversation maintained through API
+- Real-time metrics and performance tracking
+
+**Commands in chat:**
+- `clear` - Clear the chat session (reset context)
+- `stats` - Show session statistics
+- `help` - Show help
+- `quit` - Exit the chat
+
+### `genai query`
+Interactive RAG query REPL (no API server required).
+
+```bash
+genai query
+```
+
+**Features:**
+- Direct RAG queries using `persistant_docs` collection
+- Shows retrieved context documents with similarity scores
+- LLM-generated answers based on retrieved context
+
+**Commands in query:**
+- `help` - Show help
+- `quit` - Exit the query REPL
+
+### `genai demo`
+Run comprehensive subsystem demo via API (tests all specifications).
+
+```bash
+genai demo
+```
+
+**Options:**
+- `--mode MODE` - Demo mode: 'automated' or 'interactive' (default: 'interactive')
+- `--base-url URL` - API server base URL (default: `http://127.0.0.1:8000`)
+
+**What it tests:**
+- Artifact Generation
+- Schema Compliance
+- Token Management
+- Processing Latency
+- Factual Accuracy
+- System Reliability
+
+**Note:** Requires API server to be running.
 
 ### `genai test`
 Run pytest tests.
@@ -188,28 +233,30 @@ Shows:
 
 ## Typical Workflow
 
-1. **Start the API server** (in one terminal):
+1. **Terminal 1 - Start the server:**
    ```bash
+   cd gen-ai
    poetry shell
    genai server
    ```
+   Keep this terminal running.
 
-2. **Ingest documents** (in another terminal):
+2. **Terminal 2 - Use the system:**
    ```bash
+   cd gen-ai
    poetry shell
+   
+   # Ingest documents
    genai ingest
-   ```
-
-3. **Use the features**:
-   ```bash
-   # Interactive chat
-   genai chat
    
    # Generate artifacts
    genai artifact --topic "Your topic here"
    
-   # Query RAG system
-   genai query
+   # Interactive chat
+   genai chat
+   
+   # Run comprehensive demo
+   genai demo
    ```
 
 ## Configuration
@@ -249,40 +296,24 @@ gen-ai/
 └── requirements.txt       # Legacy requirements (for reference)
 ```
 
-## Legacy Support
-
-The old `run` script is still available for backward compatibility:
-
-```bash
-python run setup
-python run start
-python run demo
-python run test
-python run config
-```
-
-However, the new Poetry-based CLI is recommended for all new development.
-
 ## Troubleshooting
 
 **Poetry not found:**
-- Make sure Poetry is installed and in your PATH
+- Make sure Poetry is installed: `pip install poetry`
+- Verify: `poetry --version`
 - On Windows, you may need to restart your terminal after installation
-- Try `python -m poetry` instead of `poetry`
 
-**`poetry shell` command not available (Poetry 2.0+):**
+**`poetry shell` command not available:**
 - Install the shell plugin: `poetry self add poetry-plugin-shell`
-- Or use the alternative: `poetry env activate` or activate the venv directly
-- On Windows PowerShell: `.venv\Scripts\Activate.ps1`
-- On Windows CMD: `.venv\Scripts\activate.bat`
+- Then run `poetry shell` again
 
 **Command not found after `poetry shell`:**
 - Make sure you ran `poetry install` first
-- Verify the virtual environment was created: `poetry env info`
+- Verify the virtual environment: `poetry env info`
 - Try `poetry run genai --help` instead
 
 **API server connection errors:**
-- Make sure the server is running: `genai server`
+- **Make sure the server is running first:** `genai server` (in a separate terminal)
 - Check the server is accessible: `curl http://127.0.0.1:8000/health`
 - Verify the `--base-url` matches the server address
 
@@ -310,4 +341,3 @@ Start the server and visit `http://127.0.0.1:8000/docs`
 ## License
 
 Team 35 Senior Design Project
-
