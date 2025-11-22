@@ -282,7 +282,8 @@ class ChatService:
                 logger.info(f"RAG context retrieved: {len(filtered_results)} documents with scores >= {effective_threshold:.4f}")
                 return formatted_context, filtered_results, query_optimization_time
             else:
-                logger.warning(f"RAG search found {len(results)} results but all were below threshold {effective_threshold:.4f}. Top score: {results[0][1]:.4f if results else 'N/A'}")
+                top_score_str = f"{results[0][1]:.4f}" if results else "N/A"
+                logger.warning(f"RAG search found {len(results)} results but all were below threshold {effective_threshold:.4f}. Top score: {top_score_str}")
                 # Return top result even if below threshold as fallback
                 if results:
                     top_doc, top_score = results[0]

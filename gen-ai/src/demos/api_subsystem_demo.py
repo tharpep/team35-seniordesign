@@ -1,6 +1,6 @@
 """
-GenAI Subsystem Comprehensive Demo
-Demonstrates all design document specifications with technical measurements
+API-based Subsystem Demo
+Runs comprehensive demo through the API endpoints (true integration test)
 """
 
 import json
@@ -10,37 +10,101 @@ import sys
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Any, Tuple
-import asyncio
+from typing import Dict, List, Any, Tuple, Optional
+import requests
 
 # Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
-from src.rag.rag_setup import BasicRAG
-from src.artifact_creation.generators import FlashcardGenerator, MCQGenerator, InsightsGenerator
-from src.ai_providers.gateway import AIGateway
-from config import get_rag_config
+
+class APIDemoClient:
+    """API client for running subsystem demo through API endpoints"""
+    
+    def __init__(self, base_url: str = "http://127.0.0.1:8000"):
+        self.base_url = base_url.rstrip('/')
+        self.session = requests.Session()
+        self.session.timeout = 120
+    
+    def check_health(self) -> Tuple[bool, Optional[str]]:
+        """Check if API server is running"""
+        try:
+            response = self.session.get(f"{self.base_url}/health", timeout=5)
+            if response.status_code == 200:
+                return True, None
+            else:
+                return False, f"API returned status {response.status_code}"
+        except requests.ConnectionError:
+            return False, "Cannot connect to API - is the server running?"
+        except requests.Timeout:
+            return False, "API health check timed out"
+        except Exception as e:
+            return False, f"Health check failed: {e}"
+    
+    def generate_flashcard(self, topic: str, num_items: int = 1) -> Dict[str, Any]:
+        """Generate flashcard via API"""
+        response = self.session.post(
+            f"{self.base_url}/api/flashcards",
+            json={"topic": topic, "num_items": num_items}
+        )
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f"API returned status {response.status_code}: {response.text}")
+    
+    def generate_mcq(self, topic: str, num_items: int = 1) -> Dict[str, Any]:
+        """Generate MCQ via API"""
+        response = self.session.post(
+            f"{self.base_url}/api/mcq",
+            json={"topic": topic, "num_items": num_items}
+        )
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f"API returned status {response.status_code}: {response.text}")
+    
+    def generate_insight(self, topic: str, num_items: int = 1) -> Dict[str, Any]:
+        """Generate insight via API"""
+        response = self.session.post(
+            f"{self.base_url}/api/insights",
+            json={"topic": topic, "num_items": num_items}
+        )
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f"API returned status {response.status_code}: {response.text}")
+    
+    def chat(self, message: str, session_id: str = "global") -> Dict[str, Any]:
+        """Send chat message via API"""
+        response = self.session.post(
+            f"{self.base_url}/api/chat",
+            json={"message": message, "session_id": session_id}
+        )
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f"API returned status {response.status_code}: {response.text}")
+    
+    def clear_session(self, session_id: str = "global") -> bool:
+        """Clear chat session via API"""
+        response = self.session.delete(
+            f"{self.base_url}/api/chat/session/{session_id}"
+        )
+        return response.status_code == 200
 
 
 class AccuracyEvaluator:
-    """Evaluates factual accuracy using multiple approaches"""
+    """Evaluates factual accuracy using API-based approach"""
     
-    def __init__(self, rag_system: BasicRAG):
-        self.rag = rag_system
-        self.gateway = AIGateway()
+    def __init__(self, api_client: APIDemoClient):
+        self.api = api_client
     
-    def llm_based_accuracy(self, artifact: Dict[str, Any], topic: str, context_docs: List[str]) -> float:
-        """LLM-based accuracy evaluation with improved prompt"""
+    def llm_based_accuracy(self, artifact: Dict[str, Any], topic: str) -> float:
+        """LLM-based accuracy evaluation via API"""
         try:
-            # Extract content to evaluate
             content_to_evaluate = self._extract_artifact_content(artifact)
             
-            # Create evaluation prompt with more context and lenient criteria
-            context = "\n".join(context_docs[:5])  # Use top 5 context docs
+            # Use chat API for evaluation
             prompt = f"""Evaluate if this educational content about "{topic}" is factually correct and helpful for learning.
-
-SOURCE CONTEXT:
-{context}
 
 GENERATED CONTENT:
 {content_to_evaluate}
@@ -48,7 +112,6 @@ GENERATED CONTENT:
 Consider:
 - Is the information factually correct?
 - Is it helpful for learning the topic?
-- Does it align with the source material (even if not exact wording)?
 
 Rate from 0.0 to 1.0 where:
 - 1.0 = Factually correct and very helpful
@@ -60,20 +123,20 @@ Rate from 0.0 to 1.0 where:
 
 Respond with only a number between 0.0 and 1.0:"""
 
-            response = self.gateway.chat(prompt, max_tokens=300, model="mistral:latest")
+            response = self.api.chat(prompt)
+            answer = response.get('answer', '')
             
-            # Simple numeric parsing with higher default
+            # Parse numeric score
             try:
                 import re
-                # Extract number from response
-                numbers = re.findall(r'0\.\d+|1\.0|\d+\.\d+', response)
+                numbers = re.findall(r'0\.\d+|1\.0|\d+\.\d+', answer)
                 if numbers:
                     score = float(numbers[0])
                     return max(0.0, min(1.0, score))
                 else:
-                    return 0.7  # Default to "mostly correct" instead of 0.5
+                    return 0.7  # Default to "mostly correct"
             except:
-                return 0.7  # Default to "mostly correct"
+                return 0.7
                 
         except Exception as e:
             print(f"   [WARNING] LLM accuracy evaluation failed: {e}")
@@ -82,21 +145,15 @@ Respond with only a number between 0.0 and 1.0:"""
     def hitl_simulation(self, artifact: Dict[str, Any], topic: str) -> float:
         """Simulated Human-in-the-Loop validation"""
         try:
-            # Simulate human validation based on known educational standards
             content = self._extract_artifact_content(artifact)
-            
-            # Simple heuristics for educational content quality
             score = 0.8  # Base score
             
-            # Check for common educational content indicators
             if any(indicator in content.lower() for indicator in ['definition', 'example', 'explanation']):
                 score += 0.1
             
-            # Check for proper structure
-            if len(content.split()) > 10:  # Substantial content
+            if len(content.split()) > 10:
                 score += 0.05
             
-            # Check for topic relevance
             if topic.lower() in content.lower():
                 score += 0.05
             
@@ -105,7 +162,6 @@ Respond with only a number between 0.0 and 1.0:"""
         except Exception as e:
             print(f"   [WARNING] HITL simulation failed: {e}")
             return 0.5
-    
     
     def _extract_artifact_content(self, artifact: Dict[str, Any]) -> str:
         """Extract text content from artifact for evaluation"""
@@ -133,15 +189,14 @@ Respond with only a number between 0.0 and 1.0:"""
 
 
 class ReliabilityTester:
-    """Tests system reliability and graceful degradation"""
+    """Tests system reliability via API"""
     
-    def __init__(self, rag_system: BasicRAG):
-        self.rag = rag_system
-        self.gateway = AIGateway()
+    def __init__(self, api_client: APIDemoClient):
+        self.api = api_client
     
     def test_success_rates(self, num_requests: int = 10) -> Dict[str, Any]:
-        """Test success/failure rates with multiple requests"""
-        print(f"   Testing {num_requests} requests for reliability...")
+        """Test success/failure rates with multiple API requests"""
+        print(f"   Testing {num_requests} API requests for reliability...")
         
         success_count = 0
         failure_count = 0
@@ -165,22 +220,15 @@ class ReliabilityTester:
             start_time = time.time()
             
             try:
-                result = self.rag.query(query)
+                response = self.api.chat(query)
                 response_time = time.time() - start_time
                 response_times.append(response_time)
                 
-                # Check if we got a valid response
-                if isinstance(result, tuple):
-                    answer, context_docs, context_scores = result
-                    if answer and len(answer.strip()) > 10:  # Substantial response
-                        success_count += 1
-                    else:
-                        failure_count += 1
+                answer = response.get('answer', '')
+                if answer and len(answer.strip()) > 10:
+                    success_count += 1
                 else:
-                    if result and len(result.strip()) > 10:
-                        success_count += 1
-                    else:
-                        failure_count += 1
+                    failure_count += 1
                         
             except Exception as e:
                 failure_count += 1
@@ -201,25 +249,19 @@ class ReliabilityTester:
         }
     
     def test_graceful_degradation(self) -> Dict[str, Any]:
-        """Test graceful degradation when no relevant documents found"""
-        print("   Testing graceful degradation...")
+        """Test graceful degradation via API"""
+        print("   Testing graceful degradation via API...")
         
-        # Test with query that should have no relevant documents
         obscure_query = "What is the quantum mechanics of unicorn particles in parallel universes?"
         
         start_time = time.time()
         try:
-            result = self.rag.query(obscure_query)
+            response = self.api.chat(obscure_query)
             response_time = time.time() - start_time
             
-            if isinstance(result, tuple):
-                answer, context_docs, context_scores = result
-            else:
-                answer = result
-                context_docs = []
-                context_scores = []
+            answer = response.get('answer', '')
+            rag_info = response.get('rag_info', {})
             
-            # Check if system gracefully handled the query
             graceful_handling = (
                 answer is not None and 
                 len(answer.strip()) > 0 and
@@ -231,8 +273,8 @@ class ReliabilityTester:
                 "response_time": response_time,
                 "has_response": bool(answer),
                 "response_length": len(answer) if answer else 0,
-                "context_docs_retrieved": len(context_docs),
-                "avg_context_score": statistics.mean(context_scores) if context_scores else 0
+                "context_docs_retrieved": rag_info.get('results_count', 0),
+                "avg_context_score": statistics.mean([r.get('score', 0) for r in rag_info.get('results', [])]) if rag_info.get('results') else 0
             }
             
         except Exception as e:
@@ -243,46 +285,38 @@ class ReliabilityTester:
             }
 
 
-class SubsystemDemo:
-    """Comprehensive demo of all GenAI subsystem specifications"""
+class APISubsystemDemo:
+    """Comprehensive API-based demo of all GenAI subsystem specifications"""
     
-    def __init__(self):
-        self.config = get_rag_config()
+    def __init__(self, base_url: str = "http://127.0.0.1:8000"):
+        self.base_url = base_url
         self.results = {}
-        
-        # Force Purdue API for demo
-        self.config.use_ollama = False
-        print(f"[CONFIG] Using {self.config.model_name} via Purdue API")
-        
-        # Initialize components
-        self.rag = BasicRAG(collection_name="persistant_docs")
-        self.accuracy_evaluator = AccuracyEvaluator(self.rag)
-        self.reliability_tester = ReliabilityTester(self.rag)
-        
-        # Initialize artifact generators
-        self.flashcard_gen = FlashcardGenerator(self.rag)
-        self.mcq_gen = MCQGenerator(self.rag)
-        self.insights_gen = InsightsGenerator(self.rag)
+        self.api = APIDemoClient(base_url)
+        self.accuracy_evaluator = AccuracyEvaluator(self.api)
+        self.reliability_tester = ReliabilityTester(self.api)
     
-    def check_data_availability(self) -> bool:
-        """Check if RAG data is available"""
-        stats = self.rag.get_stats()
-        doc_count = stats.get('document_count', 0)
+    def check_api_availability(self) -> bool:
+        """Check if API server is available"""
+        print("[CHECK] Verifying API server connection...")
+        is_healthy, error_msg = self.api.check_health()
         
-        if doc_count == 0:
-            print("[ERROR] No documents found in persistent storage!")
-            print("   Please run RAG demo first to ingest documents.")
+        if not is_healthy:
+            print(f"[ERROR] API server is not available!")
+            if error_msg:
+                print(f"   Reason: {error_msg}")
+            print("\nPlease start the API server first:")
+            print("   genai server")
             return False
         
-        print(f"[OK] Found {doc_count} documents in persistent storage")
+        print("[OK] API server is available and healthy")
         return True
     
     def demo_artifact_generation(self) -> Dict[str, Any]:
-        """Demo: Artifact Generation (3 types)"""
+        """Demo: Artifact Generation via API"""
         print("\n" + "="*60)
-        print("SPECIFICATION 1: ARTIFACT GENERATION")
+        print("SPECIFICATION 1: ARTIFACT GENERATION (API)")
         print("="*60)
-        print("Target: Generate at least 3 types of artifacts (flashcards, MCQs, insights)")
+        print("Target: Generate at least 3 types of artifacts via API")
         
         test_topic = "Newton's laws of motion"
         print(f"\nGenerating artifacts for topic: '{test_topic}'")
@@ -290,24 +324,24 @@ class SubsystemDemo:
         artifacts = {}
         generation_times = {}
         
-        # Generate flashcard
-        print("   [FLASHCARD] Generating...")
+        # Generate flashcard via API
+        print("   [FLASHCARD] Generating via API...")
         start_time = time.time()
-        artifacts['flashcard'] = self.flashcard_gen.generate(test_topic, num_items=1)
+        artifacts['flashcard'] = self.api.generate_flashcard(test_topic, num_items=1)
         generation_times['flashcard'] = time.time() - start_time
         print(f"   [OK] Generated in {generation_times['flashcard']:.2f}s")
         
-        # Generate MCQ
-        print("   [MCQ] Generating...")
+        # Generate MCQ via API
+        print("   [MCQ] Generating via API...")
         start_time = time.time()
-        artifacts['mcq'] = self.mcq_gen.generate(test_topic, num_items=1)
+        artifacts['mcq'] = self.api.generate_mcq(test_topic, num_items=1)
         generation_times['mcq'] = time.time() - start_time
         print(f"   [OK] Generated in {generation_times['mcq']:.2f}s")
         
-        # Generate insight
-        print("   [INSIGHT] Generating...")
+        # Generate insight via API
+        print("   [INSIGHT] Generating via API...")
         start_time = time.time()
-        artifacts['insight'] = self.insights_gen.generate(test_topic, num_items=1)
+        artifacts['insight'] = self.api.generate_insight(test_topic, num_items=1)
         generation_times['insight'] = time.time() - start_time
         print(f"   [OK] Generated in {generation_times['insight']:.2f}s")
         
@@ -319,11 +353,11 @@ class SubsystemDemo:
         
         success = len(artifact_types) >= 3
         print(f"\n[RESULT] {'PASS' if success else 'FAIL'}")
-        print(f"   Generated {len(artifact_types)} artifact types: {', '.join(artifact_types)}")
+        print(f"   Generated {len(artifact_types)} artifact types via API: {', '.join(artifact_types)}")
         
         return {
-            "specification": "Artifact Generation",
-            "target": "3+ artifact types",
+            "specification": "Artifact Generation (API)",
+            "target": "3+ artifact types via API",
             "achieved": len(artifact_types),
             "success": success,
             "artifact_types": list(artifact_types),
@@ -332,30 +366,27 @@ class SubsystemDemo:
         }
     
     def demo_schema_compliance(self) -> Dict[str, Any]:
-        """Demo: Schema Compliance"""
+        """Demo: Schema Compliance via API"""
         print("\n" + "="*60)
-        print("SPECIFICATION 2: SCHEMA COMPLIANCE")
+        print("SPECIFICATION 2: SCHEMA COMPLIANCE (API)")
         print("="*60)
-        print("Target: All artifacts conform to fixed JSON schema per type")
+        print("Target: All artifacts from API conform to fixed JSON schema")
         
-        # Generate one of each type for validation
         test_topic = "Machine learning basics"
         artifacts = {
-            'flashcard': self.flashcard_gen.generate(test_topic, num_items=1),
-            'mcq': self.mcq_gen.generate(test_topic, num_items=1),
-            'insight': self.insights_gen.generate(test_topic, num_items=1)
+            'flashcard': self.api.generate_flashcard(test_topic, num_items=1),
+            'mcq': self.api.generate_mcq(test_topic, num_items=1),
+            'insight': self.api.generate_insight(test_topic, num_items=1)
         }
         
         schema_validation_results = {}
         
         for artifact_type, artifact in artifacts.items():
-            print(f"   Validating {artifact_type} schema...")
+            print(f"   Validating {artifact_type} schema from API...")
             
-            # Check required fields
             required_fields = ['artifact_type', 'version']
             has_required = all(field in artifact for field in required_fields)
             
-            # Check type-specific fields
             type_specific_valid = False
             actual_artifact_type = artifact.get('artifact_type', '')
             
@@ -376,34 +407,32 @@ class SubsystemDemo:
         print(f"   Schema compliance: {sum(schema_validation_results.values())}/{len(schema_validation_results)} types")
         
         return {
-            "specification": "Schema Compliance",
-            "target": "Fixed JSON schema per artifact type",
+            "specification": "Schema Compliance (API)",
+            "target": "Fixed JSON schema per artifact type from API",
             "success": overall_success,
             "validation_results": schema_validation_results,
             "artifacts": artifacts
         }
     
     def demo_token_management(self) -> Dict[str, Any]:
-        """Demo: Token Management"""
+        """Demo: Token Management via API"""
         print("\n" + "="*60)
-        print("SPECIFICATION 3: TOKEN MANAGEMENT")
+        print("SPECIFICATION 3: TOKEN MANAGEMENT (API)")
         print("="*60)
         print("Target: <500 tokens per artifact, <300 tokens per chatbot response")
         
-        # Test artifact token usage
         test_topic = "Object-oriented programming"
         artifacts = {
-            'flashcard': self.flashcard_gen.generate(test_topic, num_items=1),
-            'mcq': self.mcq_gen.generate(test_topic, num_items=1),
-            'insight': self.insights_gen.generate(test_topic, num_items=1)
+            'flashcard': self.api.generate_flashcard(test_topic, num_items=1),
+            'mcq': self.api.generate_mcq(test_topic, num_items=1),
+            'insight': self.api.generate_insight(test_topic, num_items=1)
         }
         
         artifact_token_results = {}
         for artifact_type, artifact in artifacts.items():
             tokens_out = artifact.get('metrics', {}).get('tokens_out', 0)
-            # Use tolerance zone: within 50 tokens of limit is acceptable
             within_limit = tokens_out <= 500
-            within_tolerance = tokens_out <= 550  # 500 + 50 tolerance
+            within_tolerance = tokens_out <= 550
             artifact_token_results[artifact_type] = {
                 'tokens': tokens_out,
                 'limit': 500,
@@ -414,8 +443,8 @@ class SubsystemDemo:
             status = '[OK]' if within_limit else ('[TOLERANCE]' if within_tolerance else '[FAIL]')
             print(f"   {artifact_type}: {tokens_out} tokens {status}")
         
-        # Test chatbot token usage
-        print("   Testing chatbot response tokens...")
+        # Test chatbot token usage via API
+        print("   Testing chatbot response tokens via API...")
         chat_queries = [
             "What is inheritance?",
             "Explain polymorphism",
@@ -424,15 +453,9 @@ class SubsystemDemo:
         
         chat_token_results = []
         for query in chat_queries:
-            result = self.rag.query(query)
-            if isinstance(result, tuple):
-                answer, _, _ = result
-            else:
-                answer = result
-            
-            # Rough token estimation (4 chars per token)
+            response = self.api.chat(query)
+            answer = response.get('answer', '')
             estimated_tokens = len(answer) // 4 if answer else 0
-            # Use tolerance zone: within 50 tokens of limit is acceptable
             within_limit = estimated_tokens <= 300
             within_tolerance = estimated_tokens <= 350  # 300 + 50 tolerance
             chat_token_results.append({
@@ -446,17 +469,14 @@ class SubsystemDemo:
             status = '[OK]' if within_limit else ('[TOLERANCE]' if within_tolerance else '[FAIL]')
             print(f"   Chat: {estimated_tokens} tokens {status}")
         
-        # Success if within tolerance zone (limit + 50 tokens)
         artifact_success = all(result['within_tolerance'] for result in artifact_token_results.values())
         chat_success = all(result['within_tolerance'] for result in chat_token_results)
         overall_success = artifact_success and chat_success
         
         print(f"\n[RESULT] {'PASS' if overall_success else 'FAIL'}")
-        print(f"   Artifacts: {sum(result['within_limit'] for result in artifact_token_results.values())}/{len(artifact_token_results)} within limit, {sum(result['within_tolerance'] for result in artifact_token_results.values())}/{len(artifact_token_results)} within tolerance")
-        print(f"   Chat responses: {sum(result['within_limit'] for result in chat_token_results)}/{len(chat_token_results)} within limit, {sum(result['within_tolerance'] for result in chat_token_results)}/{len(chat_token_results)} within tolerance")
         
         return {
-            "specification": "Token Management",
+            "specification": "Token Management (API)",
             "target": "<500 tokens per artifact, <300 per chat (tolerance: +50 tokens)",
             "success": overall_success,
             "artifact_tokens": artifact_token_results,
@@ -464,13 +484,12 @@ class SubsystemDemo:
         }
     
     def demo_processing_latency(self) -> Dict[str, Any]:
-        """Demo: Processing Latency"""
+        """Demo: Processing Latency via API"""
         print("\n" + "="*60)
-        print("SPECIFICATION 4: PROCESSING LATENCY")
+        print("SPECIFICATION 4: PROCESSING LATENCY (API)")
         print("="*60)
-        print("Target: <5.0 seconds at 95th percentile")
+        print("Target: <5.0 seconds at 95th percentile via API")
         
-        # Test multiple requests to get latency distribution
         test_queries = [
             "What is machine learning?",
             "Explain neural networks",
@@ -484,20 +503,30 @@ class SubsystemDemo:
             "Describe artificial intelligence"
         ]
         
-        print(f"   Testing {len(test_queries)} requests for latency distribution...")
+        print(f"   Testing {len(test_queries)} API requests for latency distribution...")
         
         response_times = []
         for i, query in enumerate(test_queries):
             print(f"   Request {i+1}/{len(test_queries)}: {query[:30]}...")
             start_time = time.time()
             
-            result = self.rag.query(query)
-            response_time = time.time() - start_time
-            response_times.append(response_time)
-            
-            print(f"     Response time: {response_time:.2f}s")
+            try:
+                self.api.chat(query)
+                response_time = time.time() - start_time
+                response_times.append(response_time)
+                print(f"     Response time: {response_time:.2f}s")
+            except Exception as e:
+                print(f"     [ERROR] {e}")
         
-        # Calculate statistics
+        if not response_times:
+            print("\n[RESULT] FAIL - No successful requests")
+            return {
+                "specification": "Processing Latency (API)",
+                "target": "<5.0s at 95th percentile",
+                "success": False,
+                "error": "No successful requests"
+            }
+        
         avg_latency = statistics.mean(response_times)
         p95_latency = statistics.quantiles(response_times, n=20)[18] if len(response_times) >= 20 else max(response_times)
         max_latency = max(response_times)
@@ -511,10 +540,9 @@ class SubsystemDemo:
         print(f"   Maximum: {max_latency:.2f}s")
         print(f"   Minimum: {min_latency:.2f}s")
         print(f"\n[RESULT] {'PASS' if success else 'FAIL'}")
-        print(f"   95th percentile: {p95_latency:.2f}s (target: <5.0s)")
         
         return {
-            "specification": "Processing Latency",
+            "specification": "Processing Latency (API)",
             "target": "<5.0s at 95th percentile",
             "achieved": p95_latency,
             "success": success,
@@ -526,13 +554,12 @@ class SubsystemDemo:
         }
     
     def demo_factual_accuracy(self) -> Dict[str, Any]:
-        """Demo: Factual Accuracy"""
+        """Demo: Factual Accuracy via API"""
         print("\n" + "="*60)
-        print("SPECIFICATION 5: FACTUAL ACCURACY")
+        print("SPECIFICATION 5: FACTUAL ACCURACY (API)")
         print("="*60)
         print("Target: 90% factual accuracy with <5% hallucination rate")
         
-        # Test with known educational topics
         test_topics = [
             "Newton's laws of motion",
             "Object-oriented programming",
@@ -545,41 +572,28 @@ class SubsystemDemo:
         for topic in test_topics:
             print(f"\n   Testing accuracy for: '{topic}'")
             
-            # Generate artifacts
+            # Generate artifacts via API
             artifacts = {
-                'flashcard': self.flashcard_gen.generate(topic, num_items=1),
-                'mcq': self.mcq_gen.generate(topic, num_items=1),
-                'insight': self.insights_gen.generate(topic, num_items=1)
+                'flashcard': self.api.generate_flashcard(topic, num_items=1),
+                'mcq': self.api.generate_mcq(topic, num_items=1),
+                'insight': self.api.generate_insight(topic, num_items=1)
             }
             
             # Evaluate each artifact
             for artifact_type, artifact in artifacts.items():
                 print(f"     Evaluating {artifact_type}...")
                 
-                # Get context for evaluation
-                context_docs = []
-                if 'provenance' in artifact:
-                    # Extract context from provenance
-                    for ref, info in artifact['provenance'].items():
-                        if 'preview' in info:
-                            context_docs.append(info['preview'])
-                
-                # Method 1: LLM-based evaluation
-                llm_score = self.accuracy_evaluator.llm_based_accuracy(artifact, topic, context_docs)
+                llm_score = self.accuracy_evaluator.llm_based_accuracy(artifact, topic)
                 all_llm_scores.append(llm_score)
                 
-                # Method 2: HITL simulation
                 hitl_score = self.accuracy_evaluator.hitl_simulation(artifact, topic)
                 all_hitl_scores.append(hitl_score)
                 
                 print(f"       LLM accuracy: {llm_score:.2f}")
                 print(f"       HITL accuracy: {hitl_score:.2f}")
         
-        # Calculate overall accuracy using LLM and HITL methods
         avg_llm_accuracy = statistics.mean(all_llm_scores)
         avg_hitl_accuracy = statistics.mean(all_hitl_scores)
-        
-        # Combined accuracy from LLM and HITL methods
         combined_accuracy = (avg_llm_accuracy + avg_hitl_accuracy) / 2
         
         accuracy_success = combined_accuracy >= 0.90
@@ -590,10 +604,9 @@ class SubsystemDemo:
         print(f"   HITL simulation accuracy: {avg_hitl_accuracy:.1%}")
         print(f"   Combined accuracy: {combined_accuracy:.1%}")
         print(f"\n[RESULT] {'PASS' if overall_success else 'FAIL'}")
-        print(f"   Accuracy: {combined_accuracy:.1%} (target: >=90%)")
         
         return {
-            "specification": "Factual Accuracy",
+            "specification": "Factual Accuracy (API)",
             "target": "90% accuracy",
             "achieved_accuracy": combined_accuracy,
             "success": overall_success,
@@ -606,13 +619,12 @@ class SubsystemDemo:
         }
     
     def demo_system_reliability(self) -> Dict[str, Any]:
-        """Demo: System Reliability"""
+        """Demo: System Reliability via API"""
         print("\n" + "="*60)
-        print("SPECIFICATION 6: SYSTEM RELIABILITY")
+        print("SPECIFICATION 6: SYSTEM RELIABILITY (API)")
         print("="*60)
         print("Target: 98% uptime with <2% drop rate")
         
-        # Test 1: Success/failure rates
         print("\n   Test 1: Success/Failure Rate Analysis")
         reliability_results = self.reliability_tester.test_success_rates(num_requests=15)
         
@@ -623,16 +635,13 @@ class SubsystemDemo:
         print(f"   Failure rate: {failure_rate:.1%}")
         print(f"   Average response time: {reliability_results['avg_response_time']:.2f}s")
         
-        # Test 2: Graceful degradation
         print("\n   Test 2: Graceful Degradation")
         degradation_results = self.reliability_tester.test_graceful_degradation()
         
         graceful_handling = degradation_results['graceful_handling']
         print(f"   Graceful handling: {'[OK]' if graceful_handling else '[FAIL]'}")
         print(f"   Response time: {degradation_results['response_time']:.2f}s")
-        print(f"   Context docs retrieved: {degradation_results['context_docs_retrieved']}")
         
-        # Calculate overall reliability
         uptime_success = success_rate >= 0.98
         drop_rate_success = failure_rate <= 0.02
         degradation_success = graceful_handling
@@ -645,7 +654,7 @@ class SubsystemDemo:
         print(f"\n[RESULT] {'PASS' if overall_success else 'FAIL'}")
         
         return {
-            "specification": "System Reliability",
+            "specification": "System Reliability (API)",
             "target": "98% uptime, <2% drop rate",
             "achieved_uptime": success_rate,
             "achieved_drop_rate": failure_rate,
@@ -654,101 +663,13 @@ class SubsystemDemo:
             "degradation_results": degradation_results
         }
     
-    def demo_data_encryption(self) -> Dict[str, Any]:
-        """Demo: Data Encryption (Mock Implementation)"""
-        print("\n" + "="*60)
-        print("SPECIFICATION 7: DATA ENCRYPTION")
-        print("="*60)
-        print("Target: Demonstrate encryption/decryption capability")
-        
-        import base64
-        import json
-        
-        # Simple mock encryption functions (base64 for demo purposes)
-        def mock_encrypt(text: str) -> str:
-            """Mock encryption using base64 encoding"""
-            return base64.b64encode(text.encode('utf-8')).decode('utf-8')
-        
-        def mock_decrypt(encrypted_text: str) -> str:
-            """Mock decryption using base64 decoding"""
-            return base64.b64decode(encrypted_text.encode('utf-8')).decode('utf-8')
-        
-        # Test 1: Document encryption
-        print("\n[TEST 1: Document Encryption]")
-        sample_doc = "Newton's first law states that an object at rest stays at rest unless acted upon by an external force."
-        encrypted_doc = mock_encrypt(sample_doc)
-        decrypted_doc = mock_decrypt(encrypted_doc)
-        
-        print(f"   Original: {sample_doc[:50]}...")
-        print(f"   Encrypted: {encrypted_doc[:50]}...")
-        print(f"   Decrypted: {decrypted_doc[:50]}...")
-        doc_success = sample_doc == decrypted_doc
-        print(f"   Result: {'[PASS]' if doc_success else '[FAIL]'}")
-        
-        # Test 2: Artifact encryption
-        print("\n[TEST 2: Artifact Encryption]")
-        sample_artifact = {
-            "artifact_type": "flashcards",
-            "version": "1.0",
-            "cards": [{
-                "id": "fc_001",
-                "front": "What is Newton's first law?",
-                "back": "An object at rest stays at rest unless acted upon by an external force."
-            }]
-        }
-        
-        artifact_json = json.dumps(sample_artifact, indent=2)
-        encrypted_artifact = mock_encrypt(artifact_json)
-        decrypted_artifact = mock_decrypt(encrypted_artifact)
-        restored_artifact = json.loads(decrypted_artifact)
-        
-        print(f"   Original artifact: {len(artifact_json)} characters")
-        print(f"   Encrypted artifact: {len(encrypted_artifact)} characters")
-        print(f"   Decrypted artifact: {len(decrypted_artifact)} characters")
-        artifact_success = sample_artifact == restored_artifact
-        print(f"   Result: {'[PASS]' if artifact_success else '[FAIL]'}")
-        
-        # Test 3: API communication encryption
-        print("\n[TEST 3: API Communication Encryption]")
-        api_request = "Generate a flashcard about machine learning"
-        encrypted_request = mock_encrypt(api_request)
-        decrypted_request = mock_decrypt(encrypted_request)
-        
-        print(f"   Original request: {api_request}")
-        print(f"   Encrypted request: {encrypted_request[:30]}...")
-        print(f"   Decrypted request: {decrypted_request}")
-        api_success = api_request == decrypted_request
-        print(f"   Result: {'[PASS]' if api_success else '[FAIL]'}")
-        
-        # Overall results
-        overall_success = doc_success and artifact_success and api_success
-        
-        print(f"\n[ENCRYPTION RESULTS]")
-        print(f"   Document encryption: {'[PASS]' if doc_success else '[FAIL]'}")
-        print(f"   Artifact encryption: {'[PASS]' if artifact_success else '[FAIL]'}")
-        print(f"   API encryption: {'[PASS]' if api_success else '[FAIL]'}")
-        print(f"\n[RESULT] {'PASS' if overall_success else 'FAIL'}")
-        print(f"   Encryption/Decryption: {3 if overall_success else sum([doc_success, artifact_success, api_success])}/3 tests passed")
-        
-        return {
-            "specification": "Data Encryption",
-            "target": "Demonstrate encryption/decryption capability",
-            "success": overall_success,
-            "tests": {
-                "document_encryption": doc_success,
-                "artifact_encryption": artifact_success,
-                "api_encryption": api_success
-            },
-            "implementation_note": "Mock encryption using base64 for demonstration. Production would use AES-256 or similar."
-        }
-    
     def run_interactive_demo(self):
         """Run interactive demo allowing user to choose specifications"""
         print("\n" + "="*60)
-        print("INTERACTIVE SUBSYSTEM DEMO")
+        print("INTERACTIVE SUBSYSTEM DEMO (API-BASED)")
         print("="*60)
         
-        if not self.check_data_availability():
+        if not self.check_api_availability():
             return
         
         specifications = [
@@ -757,8 +678,7 @@ class SubsystemDemo:
             ("Token Management", self.demo_token_management),
             ("Processing Latency", self.demo_processing_latency),
             ("Factual Accuracy", self.demo_factual_accuracy),
-            ("System Reliability", self.demo_system_reliability),
-            ("Data Encryption", self.demo_data_encryption)
+            ("System Reliability", self.demo_system_reliability)
         ]
         
         print("\nAvailable specifications to demo:")
@@ -769,13 +689,12 @@ class SubsystemDemo:
         
         while True:
             try:
-                choice = input("\nSelect specification (0-7, q): ").strip().lower()
+                choice = input("\nSelect specification (0-6, q): ").strip().lower()
                 
                 if choice == 'q':
                     print("Exiting demo...")
                     break
                 elif choice == '0':
-                    # Run all specifications
                     for name, demo_func in specifications:
                         result = demo_func()
                         self.results[name] = result
@@ -787,7 +706,6 @@ class SubsystemDemo:
                         result = demo_func()
                         self.results[name] = result
                         
-                        # Ask if user wants to continue
                         continue_choice = input("\nContinue with another specification? (y/n): ").strip().lower()
                         if continue_choice != 'y':
                             break
@@ -803,24 +721,22 @@ class SubsystemDemo:
     def run_automated_demo(self):
         """Run automated demo of all specifications"""
         print("\n" + "="*60)
-        print("AUTOMATED SUBSYSTEM DEMO")
+        print("AUTOMATED SUBSYSTEM DEMO (API-BASED)")
         print("="*60)
         
-        if not self.check_data_availability():
+        if not self.check_api_availability():
             return
         
-        # Run all specifications
         specifications = [
             ("Artifact Generation", self.demo_artifact_generation),
             ("Schema Compliance", self.demo_schema_compliance),
             ("Token Management", self.demo_token_management),
             ("Processing Latency", self.demo_processing_latency),
             ("Factual Accuracy", self.demo_factual_accuracy),
-            ("System Reliability", self.demo_system_reliability),
-            ("Data Encryption", self.demo_data_encryption)
+            ("System Reliability", self.demo_system_reliability)
         ]
         
-        print("Running all specifications automatically...\n")
+        print("Running all specifications automatically via API...\n")
         
         for name, demo_func in specifications:
             try:
@@ -840,7 +756,7 @@ class SubsystemDemo:
     def generate_summary(self):
         """Generate JSON summary of demo results"""
         print("\n" + "="*60)
-        print("DEMO SUMMARY")
+        print("DEMO SUMMARY (API-BASED)")
         print("="*60)
         
         total_specs = len(self.results)
@@ -857,10 +773,12 @@ class SubsystemDemo:
         
         # Save JSON summary
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        summary_file = Path(__file__).parent / f"demo_summary_{timestamp}.json"
+        summary_file = Path(__file__).parent / f"demo_summary_api_{timestamp}.json"
         
         summary_data = {
             "demo_timestamp": timestamp,
+            "demo_type": "API-based",
+            "api_base_url": self.base_url,
             "total_specifications": total_specs,
             "successful_specifications": successful_specs,
             "success_rate": successful_specs/total_specs,
@@ -873,12 +791,12 @@ class SubsystemDemo:
         print(f"\n[JSON] Summary saved to: {summary_file}")
 
 
-def run_subsystem_demo(mode: str = "automated"):
-    """Entry point function for CLI integration"""
-    print("GenAI Subsystem Comprehensive Demo")
-    print("Demonstrating all design document specifications")
+def run_api_subsystem_demo(mode: str = "automated", base_url: str = "http://127.0.0.1:8000"):
+    """Entry point function for API-based demo"""
+    print("GenAI Subsystem Comprehensive Demo (API-Based)")
+    print("Testing all specifications through API endpoints")
     
-    demo = SubsystemDemo()
+    demo = APISubsystemDemo(base_url=base_url)
     
     if mode.lower() == 'automated':
         demo.run_automated_demo()
@@ -890,14 +808,3 @@ def run_subsystem_demo(mode: str = "automated"):
     
     return True
 
-
-def main():
-    """Main demo function"""
-    if len(sys.argv) > 1 and sys.argv[1].lower() == 'automated':
-        run_subsystem_demo('automated')
-    else:
-        run_subsystem_demo('interactive')
-
-
-if __name__ == "__main__":
-    main()

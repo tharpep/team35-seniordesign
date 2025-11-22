@@ -7,7 +7,7 @@ import typer
 from typing import Optional
 
 # Import all command modules
-from cli.commands import chat, ingest, query, artifact, server, test, config
+from cli.commands import chat, ingest, query, artifact, server, test, config, demo
 
 # Create main Typer app
 app = typer.Typer(
@@ -24,6 +24,7 @@ app.add_typer(artifact.app, name="artifact", help="Generate educational artifact
 app.add_typer(server.app, name="server", help="Start FastAPI server")
 app.add_typer(test.app, name="test", help="Run tests")
 app.add_typer(config.app, name="config", help="Show current configuration")
+app.add_typer(demo.app, name="demo", help="Run comprehensive subsystem demo")
 
 
 @app.callback()
