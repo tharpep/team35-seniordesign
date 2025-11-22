@@ -7,9 +7,9 @@ readme = "README.md"
 packages = [{include = "cli"}]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 sentence-transformers = ">=2.2.2"
-qdrant-client = ">=1.7.0"
+qdrant-client = "1.15.1"
 httpx = ">=0.25.0"
 torch = ">=2.0.0"
 transformers = ">=4.30.0"

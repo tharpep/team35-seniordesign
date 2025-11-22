@@ -5,6 +5,7 @@ FastAPI server startup command
 import typer
 import subprocess
 import sys
+import os
 from pathlib import Path
 
 app = typer.Typer(name="server", help="Start FastAPI server")
@@ -31,16 +32,30 @@ def start(
     print("\n[INFO] Press Ctrl+C to stop the server")
     print("=" * 70 + "\n")
     
-    # Get project root
+    # Get project root (same as python run start does)
     project_root = Path(__file__).parent.parent.parent
     
-    # Build uvicorn command
-    cmd = [
-        sys.executable, "-m", "uvicorn",
-        "src.api.main:app",
-        "--host", host,
-        "--port", str(port)
-    ]
+    # Use poetry run to ensure we're in Poetry's environment with correct dependencies
+    # This matches how other Poetry commands work
+    import shutil
+    poetry_cmd = shutil.which("poetry")
+    
+    if poetry_cmd:
+        # Use poetry run to execute in Poetry's environment
+        cmd = [
+            poetry_cmd, "run", "uvicorn",
+            "src.api.main:app",
+            "--host", host,
+            "--port", str(port)
+        ]
+    else:
+        # Fallback to sys.executable if poetry not found
+        cmd = [
+            sys.executable, "-m", "uvicorn",
+            "src.api.main:app",
+            "--host", host,
+            "--port", str(port)
+        ]
     
     if reload:
         cmd.append("--reload")
@@ -60,6 +75,6 @@ def start(
 def main(ctx: typer.Context):
     """Start FastAPI server - default command"""
     if ctx.invoked_subcommand is None:
-        ctx.invoke(start)
+        ctx.invoke(start, host="127.0.0.1", port=8000, reload=True)
 
 

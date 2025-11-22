@@ -117,6 +117,6 @@ def documents(
 def main(ctx: typer.Context):
     """Document ingestion - default command"""
     if ctx.invoked_subcommand is None:
-        ctx.invoke(documents)
+        ctx.invoke(documents, path=None)
 
 

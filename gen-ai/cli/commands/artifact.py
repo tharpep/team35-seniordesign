@@ -170,6 +170,6 @@ def generate(
 def main(ctx: typer.Context):
     """Artifact generation - default command"""
     if ctx.invoked_subcommand is None:
-        ctx.invoke(generate)
+        ctx.invoke(generate, topic="Newton's laws of motion", base_url="http://127.0.0.1:8000")
 
 

@@ -63,6 +63,6 @@ def run(
 def main(ctx: typer.Context):
     """Run tests - default command"""
     if ctx.invoked_subcommand is None:
-        ctx.invoke(run)
+        ctx.invoke(run, all=False, verbose=True)
 
 

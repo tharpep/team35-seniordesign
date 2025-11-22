@@ -202,6 +202,18 @@ def get_insights_generator() -> InsightsGenerator:
 def get_chat_service() -> ChatService:
     """Get shared chat service instance"""
     if not app_state.chat_service:
-        raise RuntimeError("Chat service not initialized")
+        error_msg = "Chat service not initialized"
+        if "chat_service" in app_state.initialization_errors:
+            error_msg += f": {app_state.initialization_errors['chat_service']}"
+        logger.error(error_msg)
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "error": error_msg,
+                "code": "SERVICE_NOT_INITIALIZED",
+                "details": {"service": "chat_service"}
+            }
+        )
     return app_state.chat_service
 

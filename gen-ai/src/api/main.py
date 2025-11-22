@@ -79,13 +79,24 @@ async def root():
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
     """Handle unexpected exceptions"""
+    # Let FastAPI handle HTTPException (it has its own handler)
+    from fastapi import HTTPException
+    if isinstance(exc, HTTPException):
+        raise exc
+    
+    # Log the actual error with full traceback
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    
+    # Return error with actual message for debugging
     return JSONResponse(
         status_code=500,
         content={
-            "error": "Internal server error",
+            "error": str(exc) or "Internal server error",
             "code": "INTERNAL_ERROR",
-            "details": {}
+            "details": {
+                "exception_type": type(exc).__name__,
+                "path": str(request.url.path) if hasattr(request, 'url') else "unknown"
+            }
         }
     )
 

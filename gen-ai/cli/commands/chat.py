@@ -173,6 +173,6 @@ def interactive(
 def main(ctx: typer.Context):
     """Interactive chat - default command"""
     if ctx.invoked_subcommand is None:
-        ctx.invoke(interactive)
+        ctx.invoke(interactive, base_url="http://127.0.0.1:8000")
 
 

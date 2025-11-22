@@ -48,13 +48,20 @@ async def chat(
         )
         
     except Exception as e:
-        logger.error(f"Chat error: {e}")
+        # Log full error with traceback for debugging
+        import traceback
+        logger.error(f"Chat error: {e}", exc_info=True)
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        
         raise HTTPException(
             status_code=500,
             detail={
                 "error": str(e),
                 "code": "CHAT_ERROR",
-                "details": {"session_id": session_id}
+                "details": {
+                    "session_id": session_id,
+                    "exception_type": type(e).__name__
+                }
             }
         )
 
