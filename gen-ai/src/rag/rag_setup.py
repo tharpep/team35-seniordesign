@@ -17,7 +17,7 @@ from config import get_rag_config
 class BasicRAG:
     """RAG system that orchestrates vector storage, retrieval, and generation"""
     
-    def __init__(self, config=None, collection_name=None, use_persistent=None):
+    def __init__(self, config=None, collection_name=None, use_persistent=None, vector_store=None):
         """
         Initialize RAG system
         
@@ -25,13 +25,18 @@ class BasicRAG:
             config: RAGConfig object (uses default if None)
             collection_name: Name for Qdrant collection (uses config default if None)
             use_persistent: If True, use persistent Qdrant storage (uses config default if None)
+            vector_store: Optional shared VectorStore instance (creates new one if None)
         """
         self.config = config or get_rag_config()
         self.collection_name = collection_name or self.config.collection_name
         
         # Initialize components
         self.gateway = AIGateway()
-        self.vector_store = VectorStore(use_persistent=use_persistent if use_persistent is not None else self.config.use_persistent)
+        # Use shared vector store if provided, otherwise create new one
+        if vector_store is not None:
+            self.vector_store = vector_store
+        else:
+            self.vector_store = VectorStore(use_persistent=use_persistent if use_persistent is not None else self.config.use_persistent)
         self.retriever = DocumentRetriever()
         
         # Setup collection
@@ -109,13 +114,15 @@ class BasicRAG:
         # Build RAG context from retrieved documents
         rag_context = "\n\n".join([doc for doc, _ in retrieved_docs])
         
-        # Create prompt
-        prompt = f"""Context:
-{rag_context}
-
-Question: {question}
-
-Answer:"""
+        # Load RAG query template from prompts directory
+        from src.utils.prompt_loader import load_prompt_template
+        fallback_template = "Context:\n{context}\n\nQuestion: {question}\n\nAnswer:"
+        prompt = load_prompt_template(
+            "rag_query_template.txt",
+            fallback=fallback_template,
+            context=rag_context,
+            question=question
+        )
         
         # Generate answer with appropriate token limit
         token_limit = max_tokens or self.config.max_chat_tokens

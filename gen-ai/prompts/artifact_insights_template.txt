@@ -1,0 +1,19 @@
+Create {num_items} key insight about "{topic}".
+
+IMPORTANT: Respond with ONLY valid JSON. No additional text, explanations, or markdown formatting.
+
+Required JSON format:
+{{
+  "artifact_type": "insights",
+  "version": "1.0",
+  "insights": [
+    {{
+      "id": "ins_001",
+      "title": "Insight title",
+      "takeaway": "Main insight here"
+    }}
+  ]
+}}
+
+Generate the JSON now:
+

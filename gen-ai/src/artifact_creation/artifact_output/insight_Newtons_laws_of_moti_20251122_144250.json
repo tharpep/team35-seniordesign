@@ -1,0 +1,50 @@
+{
+  "artifact_type": "insights",
+  "version": "1.0",
+  "insights": [
+    {
+      "id": "ins_001",
+      "title": "Key Insight about Newton's Laws of Motion",
+      "takeaway": "Newton's first law (law of inertia) states that an object at rest stays at rest, and an object in motion stays in motion with the same speed and direction unless acted upon by an unbalanced force."
+    }
+  ],
+  "provenance": {
+    "N1": {
+      "note_id": "note_001",
+      "similarity": 0.329,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N2": {
+      "note_id": "note_002",
+      "similarity": 0.329,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N3": {
+      "note_id": "note_003",
+      "similarity": 0.279,
+      "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+    },
+    "N4": {
+      "note_id": "note_004",
+      "similarity": 0.279,
+      "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+    },
+    "N5": {
+      "note_id": "note_005",
+      "similarity": 0.266,
+      "preview": "essions over time rather than massing - **Forgetting Curve**: Memory retention decreases over time w..."
+    }
+  },
+  "metrics": {
+    "tokens_in": 95,
+    "tokens_out": 96,
+    "latency_ms": 1027.31,
+    "retrieval_scores": [
+      0.32896752206368574,
+      0.32896752206368574,
+      0.2785555112613333,
+      0.2785555112613333,
+      0.2658962770875461
+    ]
+  }
+}

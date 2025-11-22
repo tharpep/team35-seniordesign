@@ -1,0 +1,741 @@
+{
+  "demo_info": {
+    "timestamp": "2025-11-11T15:22:55.687126",
+    "topic": "Newton's laws of motion",
+    "config": {
+      "model": "mistral:latest",
+      "provider": "Purdue API"
+    }
+  },
+  "tests": {
+    "single_sequential": {
+      "results": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "cards": [
+            {
+              "id": "fc_001",
+              "front": "What are Newton's laws of motion?",
+              "back": "[First Law] An object at rest stays at rest and an object in motion stays in motion with the same speed and direction unless acted upon by an unbalanced force. [Second Law] The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass. F = ma. [Third Law] For every action, there is an equal and opposite reaction.",
+              "tags": [
+                "Physics",
+                "Newton's laws"
+              ],
+              "difficulty": 2,
+              "source_refs": [
+                "N1"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.326,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.326,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.267,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.267,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.226,
+              "preview": "on**: Lagrange interpolation, Newton interpolation, spline interpolation ## Mathematical Application..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 115,
+            "tokens_out": 162,
+            "latency_ms": 6325.76,
+            "retrieval_scores": [
+              0.3263943637517775,
+              0.3263943637517775,
+              0.26727875439091253,
+              0.26727875439091253,
+              0.22620468407942115
+            ]
+          },
+          "_api_metrics": {
+            "total_time_seconds": 6.350919723510742,
+            "http_status": 200
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "questions": [
+            {
+              "id": "mcq_001",
+              "stem": "Which of the following statements correctly describes Newton's second law?",
+              "options": [
+                "Force equals mass times acceleration (F = ma)",
+                "Acceleration equals force divided by mass (a = F/m)",
+                "Work equals force times distance (W = Fd)",
+                "Energy equals force squared over mass (E = F^2 / m)"
+              ],
+              "answer_index": 0,
+              "rationale": "Newton's second law states that the acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.",
+              "bloom_level": "understand",
+              "source_refs": [
+                "N1"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.31,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.31,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.278,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.278,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.274,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 136,
+            "tokens_out": 172,
+            "latency_ms": 1417.09,
+            "retrieval_scores": [
+              0.31034498605561445,
+              0.31034498605561445,
+              0.2780847222570504,
+              0.2780847222570504,
+              0.2744206196373778
+            ]
+          },
+          "_api_metrics": {
+            "total_time_seconds": 1.4292430877685547,
+            "http_status": 200
+          }
+        },
+        "insights": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "Newton's Laws of Motion",
+              "takeaway": "Fundamental laws describing the relationships among a body and the forces acting upon it, including the law of inertia, the law of acceleration, and the law of action and reaction."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.329,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.329,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.279,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.279,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.266,
+              "preview": "essions over time rather than massing - **Forgetting Curve**: Memory retention decreases over time w..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 95,
+            "tokens_out": 88,
+            "latency_ms": 1005.98,
+            "retrieval_scores": [
+              0.32896752206368574,
+              0.32896752206368574,
+              0.2785555112613333,
+              0.2785555112613333,
+              0.2658962770875461
+            ]
+          },
+          "_api_metrics": {
+            "total_time_seconds": 1.0150010585784912,
+            "http_status": 200
+          }
+        }
+      },
+      "metrics": {
+        "total_time": 8.815011739730835,
+        "mode": "sequential"
+      },
+      "artifact_metrics": {
+        "flashcard": {
+          "api_total_time_seconds": 6.350919723510742,
+          "http_status": 200,
+          "generation_latency_ms": 6325.76,
+          "tokens_in": 115,
+          "tokens_out": 162,
+          "retrieval_scores": [
+            0.3263943637517775,
+            0.3263943637517775,
+            0.26727875439091253,
+            0.26727875439091253,
+            0.22620468407942115
+          ],
+          "num_sources": 5,
+          "has_error": false,
+          "items_generated": 1
+        },
+        "mcq": {
+          "api_total_time_seconds": 1.4292430877685547,
+          "http_status": 200,
+          "generation_latency_ms": 1417.09,
+          "tokens_in": 136,
+          "tokens_out": 172,
+          "retrieval_scores": [
+            0.31034498605561445,
+            0.31034498605561445,
+            0.2780847222570504,
+            0.2780847222570504,
+            0.2744206196373778
+          ],
+          "num_sources": 5,
+          "has_error": false,
+          "items_generated": 1
+        },
+        "insights": {
+          "api_total_time_seconds": 1.0150010585784912,
+          "http_status": 200,
+          "generation_latency_ms": 1005.98,
+          "tokens_in": 95,
+          "tokens_out": 88,
+          "retrieval_scores": [
+            0.32896752206368574,
+            0.32896752206368574,
+            0.2785555112613333,
+            0.2785555112613333,
+            0.2658962770875461
+          ],
+          "num_sources": 5,
+          "has_error": false,
+          "items_generated": 1
+        }
+      }
+    },
+    "multiple_batch": {
+      "results": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "cards": [
+            {
+              "id": "fc_001",
+              "front": "What is Newton's first law of motion?",
+              "back": "Newton's First Law, also known as the law of inertia, states that an object at rest stays at rest and an object in motion stays in motion with the same speed and direction unless acted upon by an unbalanced force.",
+              "tags": [
+                "Newton's laws",
+                "physics"
+              ],
+              "difficulty": 2
+            },
+            {
+              "id": "fc_002",
+              "front": "What is Newton's second law of motion?",
+              "back": "Newton's Second Law states that the acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass. The formula is F = ma.",
+              "tags": [
+                "Newton's laws",
+                "physics"
+              ],
+              "difficulty": 3
+            },
+            {
+              "id": "fc_003",
+              "front": "What is Newton's third law of motion?",
+              "back": "Newton's Third Law states that for every action, there is an equal and opposite reaction.",
+              "tags": [
+                "Newton's laws",
+                "physics"
+              ],
+              "difficulty": 2
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.338,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.338,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.276,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.276,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.24,
+              "preview": "ems - Work on eigenvalue calculations - Complete Python class implementation - Review physics formul..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 115,
+            "tokens_out": 270,
+            "latency_ms": 2022.38,
+            "retrieval_scores": [
+              0.3382215907996885,
+              0.3382215907996885,
+              0.27594075478679536,
+              0.27594075478679536,
+              0.24021519759244547
+            ]
+          },
+          "_api_metrics": {
+            "total_time_seconds": 2.0379538536071777,
+            "http_status": 200
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "error": "JSON parsing failed",
+          "raw_response": " {\n  \"artifact_type\": \"mcq\",\n  \"version\": \"1.0\",\n  \"questions\": [\n    {\n      \"id\": \"mcq_001\",\n      \"stem\": \"What is the first law of motion, also known as Newton's Law of Inertia, stated in terms of the net force acting on an object?\",\n      \"options\": [\"The net force equals mass times acceleration.\", \"The net force is equal to the rate of change of momentum.\", \"An object at rest stays at rest unless acted upon by an unbalanced force.\", \"An object in motion tends to stay in motion with the sam...",
+          "topic": "Newton's laws of motion",
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.32,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.32,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.285,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.285,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.285,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 136,
+            "tokens_out": 435,
+            "latency_ms": 2850.27,
+            "retrieval_scores": [
+              0.31983891642629314,
+              0.31983891642629314,
+              0.28543976276439503,
+              0.28543976276439503,
+              0.28532761265221973
+            ]
+          },
+          "_api_metrics": {
+            "total_time_seconds": 2.8622846603393555,
+            "http_status": 200
+          }
+        },
+        "insights": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "First Law of Motion (Law of Inertia)",
+              "takeaway": "An object at rest stays at rest, and an object in motion stays in motion unless acted upon by a net external force."
+            },
+            {
+              "id": "ins_002",
+              "title": "Second Law of Motion (Law of Acceleration)",
+              "takeaway": "The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass. This is represented by the equation F = ma."
+            },
+            {
+              "id": "ins_003",
+              "title": "Third Law of Motion (Law of Action and Reaction)",
+              "takeaway": "For every action, there is an equal and opposite reaction. This means that when one object exerts a force on another object, the second object exerts an equal but oppositely directed force back on the first."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.352,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.352,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.296,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.296,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.29,
+              "preview": "position and momentum cannot be simultaneously known precisely) - **Schrödinger Equation**: iℏ∂ψ/∂t ..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 95,
+            "tokens_out": 229,
+            "latency_ms": 1827.82,
+            "retrieval_scores": [
+              0.35180062971387616,
+              0.35180062971387616,
+              0.29624796664509084,
+              0.29624796664509084,
+              0.2901987445386375
+            ]
+          },
+          "_api_metrics": {
+            "total_time_seconds": 1.839172601699829,
+            "http_status": 200
+          }
+        }
+      },
+      "metrics": {
+        "total_time": 6.7513957023620605,
+        "mode": "batch"
+      },
+      "artifact_metrics": {
+        "flashcard": {
+          "api_total_time_seconds": 2.0379538536071777,
+          "http_status": 200,
+          "generation_latency_ms": 2022.38,
+          "tokens_in": 115,
+          "tokens_out": 270,
+          "retrieval_scores": [
+            0.3382215907996885,
+            0.3382215907996885,
+            0.27594075478679536,
+            0.27594075478679536,
+            0.24021519759244547
+          ],
+          "num_sources": 5,
+          "has_error": false,
+          "items_generated": 3
+        },
+        "mcq": {
+          "api_total_time_seconds": 2.8622846603393555,
+          "http_status": 200,
+          "generation_latency_ms": 2850.27,
+          "tokens_in": 136,
+          "tokens_out": 435,
+          "retrieval_scores": [
+            0.31983891642629314,
+            0.31983891642629314,
+            0.28543976276439503,
+            0.28543976276439503,
+            0.28532761265221973
+          ],
+          "num_sources": 5,
+          "has_error": true,
+          "items_generated": 0
+        },
+        "insights": {
+          "api_total_time_seconds": 1.839172601699829,
+          "http_status": 200,
+          "generation_latency_ms": 1827.82,
+          "tokens_in": 95,
+          "tokens_out": 229,
+          "retrieval_scores": [
+            0.35180062971387616,
+            0.35180062971387616,
+            0.29624796664509084,
+            0.29624796664509084,
+            0.2901987445386375
+          ],
+          "num_sources": 5,
+          "has_error": false,
+          "items_generated": 3
+        }
+      }
+    },
+    "concurrent_parallel": {
+      "results": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "cards": [
+            {
+              "id": "fc_001",
+              "front": "What are Newton's three laws of motion?",
+              "back": "1. An object at rest stays at rest and an object in motion stays in motion with the same speed and direction unless acted upon by an unbalanced force.\n2. The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.\n3. For every action, there is an equal and opposite reaction.",
+              "tags": [
+                "Physics",
+                "Newton's laws"
+              ],
+              "difficulty": 2,
+              "source_refs": [
+                "N1"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.326,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.326,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.267,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.267,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.226,
+              "preview": "on**: Lagrange interpolation, Newton interpolation, spline interpolation ## Mathematical Application..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 115,
+            "tokens_out": 155,
+            "latency_ms": 1311.98,
+            "retrieval_scores": [
+              0.3263943637517775,
+              0.3263943637517775,
+              0.26727875439091253,
+              0.26727875439091253,
+              0.22620468407942115
+            ]
+          },
+          "_api_metrics": {
+            "total_time_seconds": 1.3259730339050293,
+            "http_status": 200
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "error": "JSON parsing failed",
+          "raw_response": " {\n  \"artifact_type\": \"mcq\",\n  \"version\": \"1.0\",\n  \"questions\": [\n    {\n      \"id\": \"mcq_001\",\n      \"stem\": \"Which of the following is NOT a Newton's law of motion?\",\n      \"options\": [\"F = ma\", \"F = m\\*a^2\", \"Every action has an equal and opposite reaction\", \"An object in motion stays in motion unless acted upon by another force\"],\n      \"answer_index\": 1,\n      \"rationale\": \"The correct statement is F = m*a^2, which is incorrect according to Newton's laws of motion.\",\n      \"bloom_level\": \"un...",
+          "topic": "Newton's laws of motion",
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.31,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.31,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.278,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.278,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.274,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 136,
+            "tokens_out": 137,
+            "latency_ms": 5589.58,
+            "retrieval_scores": [
+              0.31034498605561445,
+              0.31034498605561445,
+              0.2780847222570504,
+              0.2780847222570504,
+              0.27442061963737785
+            ]
+          },
+          "_api_metrics": {
+            "total_time_seconds": 5.624427795410156,
+            "http_status": 200
+          }
+        },
+        "insights": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "Newton's Laws of Motion Insight",
+              "takeaway": "Newton's first law (law of inertia) states that an object at rest stays at rest and an object in motion stays in motion with the same speed and direction unless acted upon by a net external force; Newton's second law (F=ma) relates the acceleration of an object to its mass and the applied force, and Newton's third law (action-reaction law) states that for every action, there is an equal and opposite reaction."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.329,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.329,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.279,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.279,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.266,
+              "preview": "essions over time rather than massing - **Forgetting Curve**: Memory retention decreases over time w..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 95,
+            "tokens_out": 148,
+            "latency_ms": 5692.58,
+            "retrieval_scores": [
+              0.32896752206368574,
+              0.32896752206368574,
+              0.2785555112613333,
+              0.2785555112613333,
+              0.2658962770875461
+            ]
+          },
+          "_api_metrics": {
+            "total_time_seconds": 5.721037864685059,
+            "http_status": 200
+          }
+        }
+      },
+      "metrics": {
+        "total_time": 5.723037481307983,
+        "mode": "concurrent"
+      },
+      "artifact_metrics": {
+        "flashcard": {
+          "api_total_time_seconds": 1.3259730339050293,
+          "http_status": 200,
+          "generation_latency_ms": 1311.98,
+          "tokens_in": 115,
+          "tokens_out": 155,
+          "retrieval_scores": [
+            0.3263943637517775,
+            0.3263943637517775,
+            0.26727875439091253,
+            0.26727875439091253,
+            0.22620468407942115
+          ],
+          "num_sources": 5,
+          "has_error": false,
+          "items_generated": 1
+        },
+        "mcq": {
+          "api_total_time_seconds": 5.624427795410156,
+          "http_status": 200,
+          "generation_latency_ms": 5589.58,
+          "tokens_in": 136,
+          "tokens_out": 137,
+          "retrieval_scores": [
+            0.31034498605561445,
+            0.31034498605561445,
+            0.2780847222570504,
+            0.2780847222570504,
+            0.27442061963737785
+          ],
+          "num_sources": 5,
+          "has_error": true,
+          "items_generated": 0
+        },
+        "insights": {
+          "api_total_time_seconds": 5.721037864685059,
+          "http_status": 200,
+          "generation_latency_ms": 5692.58,
+          "tokens_in": 95,
+          "tokens_out": 148,
+          "retrieval_scores": [
+            0.32896752206368574,
+            0.32896752206368574,
+            0.2785555112613333,
+            0.2785555112613333,
+            0.2658962770875461
+          ],
+          "num_sources": 5,
+          "has_error": false,
+          "items_generated": 1
+        }
+      }
+    }
+  },
+  "summary": {
+    "sequential_time": 8.815011739730835,
+    "batch_time": 6.7513957023620605,
+    "concurrent_time": 5.723037481307983,
+    "speedup_ratio": 1.5402680427170974
+  }
+}
