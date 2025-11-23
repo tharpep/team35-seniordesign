@@ -46,25 +46,16 @@ class InsightsGenerator(BaseArtifactGenerator):
         """
         start_time = time.time()
         
-        # Create specific prompt for insights
-        prompt = f"""Create {num_items} key insight about "{topic}".
-
-IMPORTANT: Respond with ONLY valid JSON. No additional text, explanations, or markdown formatting.
-
-Required JSON format:
-{{
-  "artifact_type": "insights",
-  "version": "1.0",
-  "insights": [
-    {{
-      "id": "ins_001",
-      "title": "Insight title",
-      "takeaway": "Main insight here"
-    }}
-  ]
-}}
-
-Generate the JSON now:"""
+        # Load insights generation prompt template
+        from src.utils.prompt_loader import load_prompt_template
+        prompt = load_prompt_template(
+            "artifact_insights_template.txt",
+            num_items=num_items,
+            topic=topic
+        )
+        if not prompt:
+            # Fallback if template file missing
+            prompt = f'Create {num_items} key insight about "{topic}". Respond with ONLY valid JSON matching the insights schema.'
         
         # Use existing RAG system with artifact token limit
         result = self.rag.query(prompt, max_tokens=self.rag.config.max_tokens)

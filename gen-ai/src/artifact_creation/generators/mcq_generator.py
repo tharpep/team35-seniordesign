@@ -46,29 +46,16 @@ class MCQGenerator(BaseArtifactGenerator):
         """
         start_time = time.time()
         
-        # Create specific prompt for MCQs
-        prompt = f"""Create {num_items} multiple-choice question about "{topic}".
-
-IMPORTANT: Respond with ONLY valid JSON. No additional text, explanations, or markdown formatting.
-
-Required JSON format:
-{{
-  "artifact_type": "mcq",
-  "version": "1.0",
-  "questions": [
-    {{
-      "id": "mcq_001",
-      "stem": "Question here?",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "answer_index": 0,
-      "rationale": "Explanation here",
-      "bloom_level": "understand",
-      "source_refs": ["N1"]
-    }}
-  ]
-}}
-
-Generate the JSON now:"""
+        # Load MCQ generation prompt template
+        from src.utils.prompt_loader import load_prompt_template
+        prompt = load_prompt_template(
+            "artifact_mcq_template.txt",
+            num_items=num_items,
+            topic=topic
+        )
+        if not prompt:
+            # Fallback if template file missing
+            prompt = f'Create {num_items} multiple-choice question about "{topic}". Respond with ONLY valid JSON matching the MCQ schema.'
         
         # Use existing RAG system with artifact token limit
         result = self.rag.query(prompt, max_tokens=self.rag.config.max_tokens)
@@ -81,23 +68,11 @@ Generate the JSON now:"""
             context_docs = []
             context_scores = []
         
-        # Try to parse JSON with cleanup
-        try:
-            # Clean up common JSON issues
-            cleaned_answer = answer.strip()
-            
-            # Remove markdown code blocks if present
-            if cleaned_answer.startswith('```json'):
-                cleaned_answer = cleaned_answer[7:]  # Remove ```json
-            if cleaned_answer.startswith('```'):
-                cleaned_answer = cleaned_answer[3:]   # Remove ```
-            if cleaned_answer.endswith('```'):
-                cleaned_answer = cleaned_answer[:-3]  # Remove trailing ```
-            
-            cleaned_answer = cleaned_answer.strip()
-            
-            artifact = json.loads(cleaned_answer)
-        except json.JSONDecodeError:
+        # Try to parse JSON using extraction method (more robust)
+        artifact = self._extract_json_from_response(answer)
+        
+        # If extraction failed (error question present), try fallback
+        if artifact.get("questions") and artifact["questions"][0].get("id") == "mcq_error":
             artifact = self._create_fallback_artifact(answer, topic)
         
         # Add provenance and metrics
@@ -150,16 +125,42 @@ Use the retrieved context to ensure accuracy and create questions that test real
         Returns:
             Parsed JSON dictionary
         """
-        # Try to find JSON block
-        start_idx = response.find('{')
-        end_idx = response.rfind('}')
+        # First, try to clean markdown code blocks
+        cleaned = response.strip()
+        if cleaned.startswith('```json'):
+            cleaned = cleaned[7:].strip()
+        elif cleaned.startswith('```'):
+            cleaned = cleaned[3:].strip()
+        if cleaned.endswith('```'):
+            cleaned = cleaned[:-3].strip()
         
-        if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
-            json_str = response[start_idx:end_idx + 1]
-            try:
-                return json.loads(json_str)
-            except json.JSONDecodeError:
-                pass
+        # Try direct parse first (most common case)
+        try:
+            return json.loads(cleaned)
+        except json.JSONDecodeError:
+            pass
+        
+        # Try to find JSON block using brace counting (handles nested JSON)
+        start_idx = cleaned.find('{')
+        if start_idx != -1:
+            brace_count = 0
+            json_end = start_idx
+            
+            for i, char in enumerate(cleaned[start_idx:], start_idx):
+                if char == '{':
+                    brace_count += 1
+                elif char == '}':
+                    brace_count -= 1
+                    if brace_count == 0:
+                        json_end = i
+                        break
+            
+            if brace_count == 0:  # Found complete JSON
+                json_str = cleaned[start_idx:json_end + 1]
+                try:
+                    return json.loads(json_str)
+                except json.JSONDecodeError:
+                    pass
         
         # Fallback: return template structure with error
         return {
