@@ -221,10 +221,117 @@ const deleteMaterial = async (req, res) => {
   }
 };
 
+// Inject artifact from gen-ai system (no auth required for internal service)
+const injectArtifact = async (req, res) => {
+  try {
+    const { artifact, session_id } = req.body;
+
+    console.log('[Artifact Injection] Received request');
+    console.log('[Artifact Injection] Session ID:', session_id);
+    console.log('[Artifact Injection] Artifact Type:', artifact?.artifact_type);
+
+    // Validate request
+    if (!artifact || !artifact.artifact_type) {
+      return res.status(400).json({ 
+        error: 'Missing artifact data',
+        message: 'artifact object with artifact_type is required'
+      });
+    }
+
+    let targetSessionId = session_id;
+
+    // If no session_id provided, use the most recent session
+    if (!targetSessionId) {
+      console.log('[Artifact Injection] No session_id provided, finding most recent session...');
+      const recentSession = await getOne(
+        'SELECT id FROM sessions ORDER BY created_at DESC, id DESC LIMIT 1'
+      );
+      
+      if (!recentSession) {
+        return res.status(404).json({ 
+          error: 'No sessions found',
+          message: 'No sessions available in database'
+        });
+      }
+      
+      targetSessionId = recentSession.id;
+      console.log('[Artifact Injection] Using most recent session:', targetSessionId);
+    } else {
+      // Verify session exists
+      const session = await getOne(
+        'SELECT * FROM sessions WHERE id = ?',
+        [targetSessionId]
+      );
+
+      if (!session) {
+        return res.status(404).json({ 
+          error: 'Session not found',
+          message: `Session ${targetSessionId} does not exist`
+        });
+      }
+    }
+
+    // Map artifact_type to database type
+    const typeMapping = {
+      'flashcards': 'flashcard',
+      'mcq': 'multiple_choice',
+      'insights': 'insights',
+      'equation': 'equation'
+    };
+
+    const dbType = typeMapping[artifact.artifact_type] || artifact.artifact_type;
+
+    // Generate title based on artifact type and content
+    let title = 'Generated Artifact';
+    if (artifact.artifact_type === 'flashcards' && artifact.cards && artifact.cards.length > 0) {
+      title = artifact.cards[0].front.substring(0, 100);
+    } else if (artifact.artifact_type === 'mcq' && artifact.questions && artifact.questions.length > 0) {
+      title = artifact.questions[0].stem.substring(0, 100);
+    } else if (artifact.artifact_type === 'insights' && artifact.insights && artifact.insights.length > 0) {
+      title = artifact.insights[0].title || artifact.insights[0].takeaway.substring(0, 100);
+    }
+
+    // Store entire artifact as JSON string in content field
+    const content = JSON.stringify(artifact);
+
+    // Insert into database
+    const result = await runQuery(
+      `INSERT INTO study_artifacts (session_id, type, title, content) 
+       VALUES (?, ?, ?, ?)`,
+      [targetSessionId, dbType, title, content]
+    );
+
+    const newMaterial = await getOne('SELECT * FROM study_artifacts WHERE id = ?', [result.id]);
+
+    console.log('[Artifact Injection] Successfully inserted artifact:', result.id);
+
+    // Emit socket event for real-time updates
+    if (req.app.get('io')) {
+      req.app.get('io').to(`session-${targetSessionId}`).emit('material-created', newMaterial);
+      console.log(`[Artifact Injection] Emitted material-created event for session ${targetSessionId}`);
+    }
+
+    res.status(201).json({ 
+      success: true,
+      material: newMaterial,
+      message: 'Artifact injected successfully'
+    });
+
+  } catch (error) {
+    console.error('[Artifact Injection] Error:', error);
+    res.status(500).json({ 
+      error: 'Server error',
+      message: 'Could not inject artifact',
+      details: error.message
+    });
+  }
+};
+
 module.exports = {
   getMaterialsBySession,
   getMaterialById,
   createMaterial,
   updateMaterial,
-  deleteMaterial
+  deleteMaterial,
+  injectArtifact
 };
