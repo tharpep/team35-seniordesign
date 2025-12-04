@@ -219,35 +219,29 @@ class EmotionClassifier:
         """Rule-based emotion classification"""
 
         scores = {
-            EmotionClass.NEUTRAL: 0.5,  # Default baseline
+            EmotionClass.NEUTRAL: 1.0,  # Very high baseline - neutral is the default
             EmotionClass.HAPPY: 0.0,
             EmotionClass.STRESSED: 0.0,
             EmotionClass.FATIGUED: 0.0
         }
 
-        # Happy: smile (positive mouth corners), normal eye openness
-        if features['mouth_corners_angle'] > 5.0:
-            scores[EmotionClass.HAPPY] += 0.4
-        if features['mouth_aspect_ratio'] > 2.0:
-            scores[EmotionClass.HAPPY] += 0.2
-        if features['eye_openness'] > 0.7:
-            scores[EmotionClass.HAPPY] += 0.2
+        # Happy: Only very clear, obvious smiles
+        if features['mouth_corners_angle'] > 7.0:  # Very clear smile only
+            scores[EmotionClass.HAPPY] += 1.4  # Strong enough to beat neutral
+        if features['mouth_corners_angle'] > 5.0 and features['mouth_aspect_ratio'] > 1.2:
+            scores[EmotionClass.HAPPY] += 1.0  # Moderate smile + wide mouth
 
-        # Stressed: furrowed brows, tension, frown
-        if features['eyebrow_angle'] < -5.0:
-            scores[EmotionClass.STRESSED] += 0.3
-        if features['forehead_tension'] > 0.5:
-            scores[EmotionClass.STRESSED] += 0.3
-        if features['mouth_corners_angle'] < -5.0:
-            scores[EmotionClass.STRESSED] += 0.2
+        # Stressed: Only very obvious stress indicators
+        if features['eyebrow_angle'] < -30.0:  # Extremely furrowed brows only
+            scores[EmotionClass.STRESSED] += 1.2  # Strong enough to beat neutral
+        if features['forehead_tension'] > 0.8 and features['mouth_corners_angle'] < -8.0:
+            scores[EmotionClass.STRESSED] += 1.0  # High tension + clear frown
 
-        # Fatigued: low eye openness, low brow height, neutral mouth
-        if features['eye_openness'] < 0.5:
-            scores[EmotionClass.FATIGUED] += 0.4
-        if features['eyebrow_height'] < 0.3:
-            scores[EmotionClass.FATIGUED] += 0.2
-        if abs(features['mouth_corners_angle']) < 3.0:
-            scores[EmotionClass.FATIGUED] += 0.2
+        # Fatigued: Only very obvious fatigue (like yawning or very droopy eyes)
+        if features['eye_openness'] < 0.2:  # Eyes almost closed
+            scores[EmotionClass.FATIGUED] += 1.2  # Strong enough to beat neutral
+
+
 
         # Normalize scores to probabilities
         total = sum(scores.values())

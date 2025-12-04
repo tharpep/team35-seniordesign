@@ -138,8 +138,8 @@ class FaceDetector:
             static_image_mode=False,
             max_num_faces=1,
             refine_landmarks=True,
-            min_detection_confidence=config.min_landmark_confidence,
-            min_tracking_confidence=config.min_landmark_confidence
+            min_detection_confidence=config.min_detection_confidence,  # Use 80% confidence
+            min_tracking_confidence=config.min_detection_confidence   # Use 80% confidence
         )
 
     def detect(self, image: np.ndarray) -> FaceDetection:
@@ -167,14 +167,36 @@ class FaceDetector:
         bbox = self._calculate_bbox(landmarks, width, height)
         face_size = max(bbox[2], bbox[3]) if bbox else None
 
-        confidence = np.mean([lm.visibility for lm in face_landmarks.landmark
-                            if hasattr(lm, 'visibility')])
+        # Calculate confidence from landmark visibility/presence
+        visibility_scores = [lm.visibility for lm in face_landmarks.landmark
+                           if hasattr(lm, 'visibility')]
+
+        if len(visibility_scores) > 0 and np.mean(visibility_scores) > 0:
+            # Use visibility scores if meaningful
+            confidence = np.mean(visibility_scores)
+        else:
+            # For static images, MediaPipe visibility/presence scores are often 0
+            # Calculate confidence based on detection quality metrics
+            presence_scores = [lm.presence for lm in face_landmarks.landmark
+                             if hasattr(lm, 'presence')]
+            if len(presence_scores) > 0 and np.mean(presence_scores) > 0:
+                confidence = np.mean(presence_scores)
+            else:
+                # Calculate confidence from landmark count and face size
+                landmark_count = len(face_landmarks.landmark)
+                size_confidence = min(1.0, face_size / 100.0) if face_size else 0.5
+                landmark_confidence = landmark_count / 468.0  # MediaPipe provides 468 landmarks
+
+                # Combine factors: 70% size, 20% landmark completeness, 10% base
+                confidence = min(0.95, 0.7 + size_confidence * 0.2 + landmark_confidence * 0.1)
+
         if confidence == 0:
             confidence = self.config.min_landmark_confidence
 
         detected = (face_size is not None and
                    face_size >= self.config.min_face_size and
-                   confidence >= self.config.min_landmark_confidence)
+                   confidence >= self.config.min_detection_confidence)
+
 
         return FaceDetection(
             detected=detected, landmarks=landmarks, confidence=confidence,

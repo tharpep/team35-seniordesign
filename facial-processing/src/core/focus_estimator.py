@@ -27,6 +27,7 @@ class BlinkMetrics:
     blink_rate: float         # Blinks per minute
     eye_openness: float       # 0 (closed) to 1 (open)
     is_normal_rate: bool      # Within tolerance
+    eyes_closed: bool         # True if eyes are mostly/completely closed
 
 
 @dataclass
@@ -87,13 +88,16 @@ class FocusEstimator:
         timestamp = time.time()
 
         # Calculate individual metrics
-        gaze_metrics = self._estimate_gaze(landmarks)
-        blink_metrics = self._estimate_blink_rate(landmarks, timestamp)
         head_pose_metrics = self._estimate_head_pose(landmarks)
+        gaze_metrics = self._estimate_gaze(landmarks, head_pose_metrics)
+        blink_metrics = self._estimate_blink_rate(landmarks, timestamp)
+
+        # Detect yawning/mouth openness for fatigue
+        mouth_openness = self._calculate_mouth_openness(landmarks)
 
         # Calculate overall focus score
         focus_score = self._calculate_focus_score(
-            gaze_metrics, blink_metrics, head_pose_metrics
+            gaze_metrics, blink_metrics, head_pose_metrics, mouth_openness
         )
 
         # Apply temporal smoothing
@@ -114,30 +118,57 @@ class FocusEstimator:
             confidence=confidence
         )
 
-    def _estimate_gaze(self, landmarks: np.ndarray) -> GazeMetrics:
+    def _estimate_gaze(self, landmarks: np.ndarray, head_pose: HeadPoseMetrics) -> GazeMetrics:
         """Estimate gaze direction from eye and iris landmarks"""
 
         # Get iris centers
         left_iris = landmarks[self.LEFT_IRIS_INDICES].mean(axis=0)
         right_iris = landmarks[self.RIGHT_IRIS_INDICES].mean(axis=0)
 
-        # Get eye corners
-        left_eye_corner = landmarks[self.LEFT_EYE_CORNER]
-        right_eye_corner = landmarks[self.RIGHT_EYE_CORNER]
-
         # Get eye centers (midpoint of eye landmarks)
         left_eye_center = landmarks[self.LEFT_EYE_INDICES].mean(axis=0)
         right_eye_center = landmarks[self.RIGHT_EYE_INDICES].mean(axis=0)
+
+        # Get eye corners for width calculation
+        left_eye_inner = landmarks[self.LEFT_EYE_INDICES][0]
+        left_eye_outer = landmarks[self.LEFT_EYE_INDICES][3]
+        right_eye_inner = landmarks[self.RIGHT_EYE_INDICES][0]
+        right_eye_outer = landmarks[self.RIGHT_EYE_INDICES][3]
+
+        # Calculate eye widths
+        left_eye_width = np.linalg.norm(left_eye_outer - left_eye_inner)
+        right_eye_width = np.linalg.norm(right_eye_outer - right_eye_inner)
+        avg_eye_width = (left_eye_width + right_eye_width) / 2
 
         # Calculate gaze offset (iris position relative to eye center)
         left_gaze_offset = left_iris - left_eye_center
         right_gaze_offset = right_iris - right_eye_center
         gaze_offset = (left_gaze_offset + right_gaze_offset) / 2
 
-        # Convert to angles (simplified - more accurate would use camera calibration)
-        # Assuming face is roughly frontal
-        horizontal_angle = np.arctan2(gaze_offset[0], 100) * 180 / np.pi
-        vertical_angle = np.arctan2(gaze_offset[1], 100) * 180 / np.pi
+        # Normalize by eye width and amplify the sensitivity
+        normalized_horizontal = gaze_offset[0] / (avg_eye_width / 2 + 1e-6)
+        normalized_vertical = gaze_offset[1] / (avg_eye_width / 2 + 1e-6)
+
+        # Convert to degrees with higher sensitivity
+        horizontal_angle = normalized_horizontal * 30  # Scale up for better sensitivity
+        vertical_angle = normalized_vertical * 30
+
+        # CRITICAL: Compensate for head pose to get absolute gaze direction
+        # When head is tilted up (positive pitch), "forward" gaze is actually looking up
+        # Use even more conservative compensation - only for extreme head poses
+        if abs(head_pose.yaw) > 20:  # Only compensate for significant head turns
+            absolute_horizontal = horizontal_angle + head_pose.yaw * 0.15
+        else:
+            absolute_horizontal = horizontal_angle
+
+        if abs(head_pose.pitch) > 30:  # Only compensate for significant head tilts
+            absolute_vertical = vertical_angle + head_pose.pitch * 0.2
+        else:
+            absolute_vertical = vertical_angle
+
+        # Use absolute gaze for focus determination
+        horizontal_angle = absolute_horizontal
+        vertical_angle = absolute_vertical
 
         # Check if within focus threshold
         is_focused = (
@@ -169,6 +200,10 @@ class FocusEstimator:
         # EAR typically ranges from 0.1 (closed) to 0.3 (open)
         eye_openness = np.clip((ear - 0.1) / 0.2, 0.0, 1.0)
         self.eye_openness_history.append(eye_openness)
+
+        # Check if eyes are effectively closed (very low openness)
+        # Only flag as closed for very obvious cases (like yawning with eyes shut)
+        eyes_closed = eye_openness < 0.15  # Eyes clearly closed/almost closed
 
         # Detect blink (EAR drops below threshold)
         blink_threshold = 0.15
@@ -202,7 +237,8 @@ class FocusEstimator:
             blink_detected=blink_detected,
             blink_rate=float(blink_rate),
             eye_openness=float(eye_openness),
-            is_normal_rate=is_normal_rate
+            is_normal_rate=is_normal_rate,
+            eyes_closed=eyes_closed
         )
 
     def _calculate_eye_aspect_ratio(self, landmarks: np.ndarray,
@@ -243,7 +279,8 @@ class FocusEstimator:
         yaw = np.arctan2(nose_tip[0] - eye_center[0], face_width) * 180 / np.pi
 
         # Pitch (up/down nod) - based on nose-chin vertical alignment
-        pitch = np.arctan2(vertical_vec[1], vertical_vec[2] + 1e-6) * 180 / np.pi
+        # Normalize by face width to get relative angle
+        pitch = np.arctan2(vertical_vec[1], face_width + 1e-6) * 180 / np.pi
 
         # Roll (tilt) - based on eye line angle
         roll = np.arctan2(horizontal_vec[1], horizontal_vec[0]) * 180 / np.pi
@@ -261,32 +298,93 @@ class FocusEstimator:
             is_centered=is_centered
         )
 
+    def _calculate_mouth_openness(self, landmarks: np.ndarray) -> float:
+        """Calculate mouth openness to detect yawning/fatigue"""
+        # Correct MediaPipe face mesh indices for mouth landmarks
+        # Upper lip bottom and lower lip top for mouth opening
+        upper_lip_bottom = landmarks[14]  # Upper lip bottom center
+        lower_lip_top = landmarks[15]     # Lower lip top center
+
+        # Mouth corner points for width reference
+        left_mouth_corner = landmarks[61]   # Left mouth corner
+        right_mouth_corner = landmarks[291] # Right mouth corner
+
+        # Calculate mouth opening (vertical distance between lips)
+        mouth_height = np.linalg.norm(upper_lip_bottom - lower_lip_top)
+
+        # Calculate mouth width for normalization
+        mouth_width = np.linalg.norm(right_mouth_corner - left_mouth_corner)
+
+        # Normalize mouth opening by width (aspect ratio approach)
+        # Normal closed mouth ratio ~0.05, yawning ~0.4+
+        mouth_ratio = mouth_height / (mouth_width + 1e-6)
+
+        # Scale to 0-1 range with more sensitive thresholds
+        # Closed mouth: ~0.05 ratio -> 0.0 openness
+        # Yawning: ~0.4+ ratio -> 1.0 openness
+        normalized = np.clip((mouth_ratio - 0.05) / 0.35, 0.0, 1.0)
+
+        return float(normalized)
+
     def _calculate_focus_score(self, gaze: GazeMetrics,
                                blink: BlinkMetrics,
-                               head_pose: HeadPoseMetrics) -> float:
+                               head_pose: HeadPoseMetrics,
+                               mouth_openness: float) -> float:
         """Calculate overall focus score from individual metrics"""
 
-        # Gaze component (40% weight)
-        gaze_score = 1.0 if gaze.is_focused else 0.5
+        # Gaze component (70% weight) - most important for focus
+        # More reasonable gaze scoring thresholds
+        max_angle = max(abs(gaze.horizontal_angle), abs(gaze.vertical_angle))
+        if max_angle <= 5:  # Very focused
+            gaze_score = 1.0
+        elif max_angle <= 10:  # Moderately focused
+            gaze_score = 0.8
+        elif max_angle <= 15:  # Slightly distracted but acceptable
+            gaze_score = 0.6
+        elif max_angle <= 25:  # Clearly distracted
+            gaze_score = 0.3
+        else:  # Very distracted
+            gaze_score = 0.1
+
         gaze_score *= gaze.confidence
 
-        # Blink rate component (20% weight)
+        # CLOSED EYES - Major penalty (like during yawning or sleeping)
+        if blink.eyes_closed:
+            gaze_score *= 0.1  # Massive penalty for closed eyes
+
+        # YAWN DETECTION - Only penalize obvious yawning
+        # Use a more sophisticated penalty system based on mouth openness level
+        if mouth_openness > 0.8:  # Very obvious yawning (like image7)
+            gaze_score *= 0.1  # Severe penalty for clear yawning
+            # Also reduce other components for obvious fatigue
+            openness_score *= 0.3  # Fatigue affects alertness
+        elif mouth_openness > 0.6:  # Moderate mouth opening
+            gaze_score *= 0.7  # Mild penalty only
+        # No penalty for mouth_openness <= 0.6 (normal talking, small mouth movements)
+
+        # Blink rate component (10% weight)
         # Abnormal blink rate suggests fatigue or stress
         blink_score = 1.0 if blink.is_normal_rate else 0.6
 
-        # Eye openness component (20% weight)
+        # Eye openness component (10% weight)
         # Lower openness suggests fatigue
         openness_score = blink.eye_openness
 
-        # Head pose component (20% weight)
-        head_score = 1.0 if head_pose.is_centered else 0.5
+        # Head pose component (10% weight) - more lenient for pitch
+        yaw_penalty = min(1.0, abs(head_pose.yaw) / self.config.max_head_pose_deviation_deg)
 
-        # Weighted average
+        # Be more lenient with pitch since images seem to have systematic bias
+        adjusted_pitch = max(0, abs(head_pose.pitch) - 20)  # Subtract 20° bias
+        pitch_penalty = min(1.0, adjusted_pitch / self.config.max_head_pose_deviation_deg)
+
+        head_score = 1.0 - 0.5 * max(yaw_penalty, pitch_penalty)
+
+        # Weighted average - gaze dominates focus determination
         focus_score = (
-            0.40 * gaze_score +
-            0.20 * blink_score +
-            0.20 * openness_score +
-            0.20 * head_score
+            0.80 * gaze_score +    # Gaze is primary indicator
+            0.05 * blink_score +   # Secondary indicators
+            0.05 * openness_score +
+            0.1 * head_score
         )
 
         return max(0.0, min(1.0, focus_score))
