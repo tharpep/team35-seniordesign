@@ -1,0 +1,23 @@
+{
+  "run_id": "run_20251027_190822_f79239b9",
+  "total_pages": 1,
+  "total_words": 305,
+  "total_tables": 2,
+  "total_equations": 0,
+  "flagged_pages": 0,
+  "average_page_confidence_mean": 0.9936690120136037,
+  "average_page_confidence_min": 0.9837262630462646,
+  "processing_time_seconds": 10.374214172363281,
+  "confidence_histogram": {
+    "0.9-1.0": 17,
+    "0.8-0.9": 0,
+    "0.0-0.8": 0
+  },
+  "timing_breakdown": {
+    "initialization": 0.5471010208129883,
+    "ocr_processing": 9.787839889526367
+  },
+  "input_path": "dataset/bio_test.png",
+  "output_path": "dataset/output/run_20251027_190822_f79239b9",
+  "language": "en"
+}

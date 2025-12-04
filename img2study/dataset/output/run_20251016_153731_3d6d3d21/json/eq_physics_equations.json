@@ -1,0 +1,126 @@
+{
+  "filename": "eq_physics",
+  "total_equations": 4,
+  "equations": [
+    {
+      "type": "equation",
+      "raw_text": "p = vi",
+      "normalized": {
+        "latex": "p = vi",
+        "format": "latex"
+      },
+      "confidence": 0.9373108744621277,
+      "bbox": [
+        [
+          874,
+          249
+        ],
+        [
+          986,
+          241
+        ],
+        [
+          988,
+          276
+        ],
+        [
+          877,
+          283
+        ]
+      ],
+      "low_confidence": false,
+      "eq_number": "2.12",
+      "is_standalone": true
+    },
+    {
+      "type": "equation",
+      "raw_text": "p =vi =",
+      "normalized": {
+        "latex": "p = vi = (2.13)",
+        "format": "latex"
+      },
+      "confidence": 0.947203740477562,
+      "bbox": [
+        [
+          793,
+          531
+        ],
+        [
+          915,
+          524
+        ],
+        [
+          917,
+          561
+        ],
+        [
+          795,
+          568
+        ]
+      ],
+      "low_confidence": true,
+      "eq_number": "2.13",
+      "is_standalone": false
+    },
+    {
+      "type": "equation",
+      "raw_text": "p=vi=(iR)i,",
+      "normalized": {
+        "latex": "p = vi = (iR)i,",
+        "format": "latex"
+      },
+      "confidence": 0.9940799474716187,
+      "bbox": [
+        [
+          804,
+          924
+        ],
+        [
+          1054,
+          919
+        ],
+        [
+          1054,
+          964
+        ],
+        [
+          805,
+          969
+        ]
+      ],
+      "low_confidence": true,
+      "eq_number": "2.15",
+      "is_standalone": true
+    },
+    {
+      "type": "equation",
+      "raw_text": "p =i?R.",
+      "normalized": {
+        "latex": "p = i?R.",
+        "format": "latex"
+      },
+      "confidence": 0.9307116866111755,
+      "bbox": [
+        [
+          862,
+          1059
+        ],
+        [
+          1004,
+          1059
+        ],
+        [
+          1004,
+          1104
+        ],
+        [
+          862,
+          1104
+        ]
+      ],
+      "low_confidence": false,
+      "eq_number": "2.16",
+      "is_standalone": true
+    }
+  ]
+}
