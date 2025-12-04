@@ -1,6 +1,6 @@
 @echo off
 REM Cognitive Coach - Startup Script (Windows Batch)
-REM This script starts both the backend and frontend servers
+REM This script starts the backend, frontend, and gen-ai API servers
 
 echo =================================
 echo ^|  Starting Cognitive Coach    ^|
@@ -19,7 +19,14 @@ echo    Starting Frontend Server
 echo =================================
 start "Frontend Server" cmd /k "cd cognitive-coach && npm run dev"
 
-timeout /t 3 /nobreak >nul
+timeout /t 2 /nobreak >nul
+
+echo =================================
+echo    Starting Gen-AI API Server
+echo =================================
+start "Gen-AI API Server" cmd /k "cd ..\gen-ai && python run start"
+
+timeout /t 2 /nobreak >nul
 
 echo.
 echo Opening browser...
@@ -32,8 +39,9 @@ echo =================================
 echo.
 echo Backend:  http://localhost:3001
 echo Frontend: http://localhost:5173
+echo Gen-AI:   http://localhost:8000
 echo.
-echo Two new command windows have opened.
+echo Three new command windows have opened.
 echo Close those windows to stop the servers.
 echo.
 pause

@@ -1,0 +1,50 @@
+{
+  "artifact_type": "insights",
+  "version": "1.0",
+  "insights": [
+    {
+      "id": "ins_001",
+      "title": "Newton's Laws of Motion Insight",
+      "takeaway": "Newton's First Law (Law of Inertia) states that an object in motion will remain in motion, and an object at rest will remain at rest unless acted upon by a net external force."
+    }
+  ],
+  "provenance": {
+    "N1": {
+      "note_id": "note_001",
+      "similarity": 0.329,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N2": {
+      "note_id": "note_002",
+      "similarity": 0.329,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N3": {
+      "note_id": "note_003",
+      "similarity": 0.279,
+      "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+    },
+    "N4": {
+      "note_id": "note_004",
+      "similarity": 0.279,
+      "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+    },
+    "N5": {
+      "note_id": "note_005",
+      "similarity": 0.266,
+      "preview": "essions over time rather than massing - **Forgetting Curve**: Memory retention decreases over time w..."
+    }
+  },
+  "metrics": {
+    "tokens_in": 95,
+    "tokens_out": 89,
+    "latency_ms": 1474.76,
+    "retrieval_scores": [
+      0.32896752206368574,
+      0.32896752206368574,
+      0.2785555112613333,
+      0.2785555112613333,
+      0.2658962770875461
+    ]
+  }
+}
