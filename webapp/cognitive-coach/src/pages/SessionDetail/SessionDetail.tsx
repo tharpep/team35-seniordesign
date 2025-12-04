@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../services/api';
+import { genaiApi } from '../../services/genaiApi';
 import './SessionDetail.css';
 import ArtifactPopupController from '../../components/ArtifactPopup/ArtifactPopupController';
 import StudyArtifacts from '../../components/StudyArtifacts/StudyArtifacts';
@@ -173,28 +174,15 @@ export default function SessionDetail() {
         }
     }, [chatHistory, isTyping]);
 
-    // Mock AI responses based on keywords
-    const getMockAIResponse = (userMessage: string): string => {
-        const message = userMessage.toLowerCase();
-        
-        if (message.includes("markovnikov")) {
-            return "Markovnikov's rule states that in the addition of HX to an alkene, the hydrogen atom attaches to the carbon with the greater number of hydrogen atoms, while the halogen attaches to the carbon with fewer hydrogen atoms. This occurs because the reaction proceeds through the more stable carbocation intermediate.";
-        } else if (message.includes("practice problem")) {
-            return "Here's a practice problem: Draw the major product when 2-methyl-2-butene reacts with HBr. Remember to apply Markovnikov's rule! The answer would be 2-bromo-2-methylbutane, as the Br⁻ adds to the more substituted carbon.";
-        } else if (message.includes("common mistakes") || message.includes("mistakes")) {
-            return "Common mistakes in alkene reactions include: 1) Forgetting to consider carbocation stability, 2) Not applying Markovnikov's rule correctly, 3) Ignoring stereochemistry in addition reactions, and 4) Confusing syn vs anti addition mechanisms.";
-        } else if (message.includes("alkene") || message.includes("alkenes")) {
-            return "Alkenes are hydrocarbons with C=C double bonds. Key reactions include: addition reactions (hydrohalogenation, hydration, halogenation), oxidation (ozonolysis, epoxidation), and polymerization. The double bond makes them reactive nucleophiles.";
-        } else if (message.includes("stereochemistry")) {
-            return "Stereochemistry in alkene reactions is crucial! Syn addition (both groups add to the same face) occurs in catalytic hydrogenation and osmium tetroxide reactions. Anti addition (groups add to opposite faces) occurs in bromine addition and acid-catalyzed hydration.";
-        } else if (message.includes("carbocation")) {
-            return "Carbocation stability follows the order: tertiary > secondary > primary > methyl. This is due to hyperconjugation and inductive effects from alkyl groups. More stable carbocations form preferentially, explaining Markovnikov's rule.";
-        } else if (message.includes("focus") || message.includes("attention")) {
-            return "I noticed your focus was highest during the alkene reactions section (around 3:00-3:20). This suggests you learn best when working with specific mechanisms. Try breaking down complex topics into step-by-step mechanisms like you did with those reactions!";
-        } else {
-            return "That's a great question! Based on your session, you showed strong understanding of reaction mechanisms. Could you be more specific about which aspect you'd like me to explain? I can help with any topics you covered.";
-        }
-    };
+    // Clear chat session when component unmounts (chat closes/opens)
+    useEffect(() => {
+        return () => {
+            // Clear chat session when component unmounts
+            genaiApi.clearChatSession('global').catch(error => {
+                console.warn('Failed to clear chat session on unmount:', error);
+            });
+        };
+    }, []);
 
     const handleSendMessage = async () => {
         if (!chatMessage.trim()) return;
@@ -207,20 +195,37 @@ export default function SessionDetail() {
         };
 
         setChatHistory(prev => [...prev, userMessage]);
+        const messageToSend = chatMessage;
         setChatMessage('');
         setIsTyping(true);
 
-        setTimeout(() => {
+        try {
+            // Call gen-ai API directly (bypasses backend)
+            const response = await genaiApi.chat(messageToSend, 'global');
+            
             const aiResponse: ChatMessage = {
                 id: (Date.now() + 1).toString(),
                 type: 'ai',
-                text: getMockAIResponse(chatMessage),
+                text: response.answer,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
 
             setChatHistory(prev => [...prev, aiResponse]);
+        } catch (error: any) {
+            console.error('Chat error:', error);
+            
+            // Show error message to user
+            const errorMessage: ChatMessage = {
+                id: (Date.now() + 1).toString(),
+                type: 'ai',
+                text: error.message || 'Sorry, I encountered an error. Please try again.',
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            setChatHistory(prev => [...prev, errorMessage]);
+        } finally {
             setIsTyping(false);
-        }, 1500);
+        }
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {

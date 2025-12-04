@@ -5,6 +5,7 @@ Artifact generation and chat API with startup/shutdown lifecycle
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from src.api.dependencies import initialize_app, shutdown_app
 from src.api.routes import health, artifacts, chat
@@ -40,6 +41,21 @@ app = FastAPI(
     description="API for generating educational artifacts (flashcards, MCQ, insights) and context-aware chat",
     version="1.0.0",
     lifespan=lifespan
+)
+
+
+# Configure CORS middleware
+# Allow requests from frontend (Vite dev server on 5173) and backend (port 8001)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",  # Vite dev server (React frontend)
+        "http://localhost:3000",  # Alternative frontend port
+        "http://localhost:8001",  # Node.js backend
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, DELETE, etc.)
+    allow_headers=["*"],  # Allow all headers
 )
 
 
