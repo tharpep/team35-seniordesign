@@ -1,0 +1,13 @@
+User question: {user_question}
+
+Recent conversation context:
+{recent_context}
+
+Generate a concise search query (3-5 keywords) to find relevant study materials from the student's notes.
+- Focus ONLY on the main topic/subject the user is asking about
+- If the question is vague (uses "that", "it", "this", "what did we talk about"), use keywords from recent context
+- Use academic/educational terminology that would appear in study materials
+- Keep it brief: 3-5 keywords maximum
+
+Search query:
+

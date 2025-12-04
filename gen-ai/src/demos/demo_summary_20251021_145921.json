@@ -1,0 +1,518 @@
+{
+  "demo_timestamp": "20251021_145921",
+  "total_specifications": 7,
+  "successful_specifications": 6,
+  "success_rate": 0.8571428571428571,
+  "results": {
+    "Artifact Generation": {
+      "specification": "Artifact Generation",
+      "target": "3+ artifact types",
+      "achieved": 3,
+      "success": true,
+      "artifact_types": [
+        "insights",
+        "flashcards",
+        "mcq"
+      ],
+      "generation_times": {
+        "flashcard": 5.941540956497192,
+        "mcq": 5.412501335144043,
+        "insight": 1.1286816596984863
+      },
+      "artifacts": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "cards": [
+            {
+              "id": "fc_002",
+              "front": "What are Newton's laws of motion?",
+              "back": "1) Inertia: An object at rest stays at rest, and an object in motion stays in motion with the same speed and direction unless acted upon by a force. 2) F=ma: The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass. 3) Action and reaction: For every action, there is an equal and opposite reaction.",
+              "tags": [
+                "Physics",
+                "Newton's laws"
+              ],
+              "difficulty": 2,
+              "source_refs": [
+                "N1"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.326,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.326,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.267,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.267,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.226,
+              "preview": "on**: Lagrange interpolation, Newton interpolation, spline interpolation ## Mathematical Application..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 115,
+            "tokens_out": 159,
+            "latency_ms": 5941.54,
+            "retrieval_scores": [
+              0.3263943637517775,
+              0.3263943637517775,
+              0.26727875439091253,
+              0.26727875439091253,
+              0.22620468407942115
+            ]
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "questions": [
+            {
+              "id": "mcq_001",
+              "stem": "Which of the following equations represents Newton's second law (F=ma) in integral form?",
+              "options": [
+                "∫F dt = m ∫adt",
+                "m ∫adt = ∫F dt",
+                "∫F dt = ∫madt",
+                "None of the above"
+              ],
+              "answer_index": 1,
+              "rationale": "Newton's second law in integral form is m ∫adt = ∫F dt.",
+              "bloom_level": "understand",
+              "source_refs": [
+                "N2"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.31,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.31,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.278,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.278,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.274,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 136,
+            "tokens_out": 117,
+            "latency_ms": 5412.5,
+            "retrieval_scores": [
+              0.31034498605561445,
+              0.31034498605561445,
+              0.2780847222570504,
+              0.2780847222570504,
+              0.2744206196373778
+            ]
+          }
+        },
+        "insight": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "Key Insight About Newton's Laws of Motion",
+              "takeaway": "Newton's first law (Law of Inertia) states that an object in motion tends to stay in motion, and an object at rest tends to stay at rest unless acted upon by a net force. Newton's second law (F=ma) relates the force acting on an object to its acceleration, while the third law (Action-Reaction) asserts that for every action, there is an equal and opposite reaction."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.329,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.329,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.279,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.279,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.266,
+              "preview": "essions over time rather than massing - **Forgetting Curve**: Memory retention decreases over time w..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 95,
+            "tokens_out": 139,
+            "latency_ms": 1128.68,
+            "retrieval_scores": [
+              0.32896752206368574,
+              0.32896752206368574,
+              0.2785555112613333,
+              0.2785555112613333,
+              0.2658962770875461
+            ]
+          }
+        }
+      }
+    },
+    "Schema Compliance": {
+      "specification": "Schema Compliance",
+      "target": "Fixed JSON schema per artifact type",
+      "success": true,
+      "validation_results": {
+        "flashcard": true,
+        "mcq": true,
+        "insight": true
+      },
+      "artifacts": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "cards": [
+            {
+              "id": "fc_001",
+              "front": "What is machine learning?",
+              "back": "A subfield of artificial intelligence that focuses on the development of algorithms and statistical models to enable computers to perform tasks without explicit programming.",
+              "tags": [
+                "machine learning"
+              ],
+              "difficulty": 2,
+              "source_refs": [
+                "ML1"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.249,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.249,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.233,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.233,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.227,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 115,
+            "tokens_out": 107,
+            "latency_ms": 914.02,
+            "retrieval_scores": [
+              0.24878626018948963,
+              0.24878626018948963,
+              0.23251623431246693,
+              0.23251623431246693,
+              0.22737440638145243
+            ]
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "questions": [
+            {
+              "id": "ml_basics_001",
+              "stem": "Which of the following is NOT a fundamental concept in machine learning?",
+              "options": [
+                "Data Mining",
+                "Supervised Learning",
+                "Unsupervised Learning",
+                "Artificial Intelligence"
+              ],
+              "answer_index": 0,
+              "rationale": "Data mining is not a fundamental concept of machine learning but rather a broader field that includes it.",
+              "bloom_level": "understand",
+              "source_refs": [
+                "N2"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.273,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.273,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.251,
+              "preview": "y optimization, connection pooling ### Security Principles - **Input Validation**: Checking and sani..."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.251,
+              "preview": "y optimization, connection pooling ### Security Principles - **Input Validation**: Checking and sani..."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.25,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 136,
+            "tokens_out": 131,
+            "latency_ms": 1113.97,
+            "retrieval_scores": [
+              0.27346547056935333,
+              0.27346547056935333,
+              0.25051668600085586,
+              0.25051668600085586,
+              0.24990016721100466
+            ]
+          }
+        },
+        "insight": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "Machine Learning Basics Insight",
+              "takeaway": "Understanding key concepts like regression, classification, clustering, neural networks, and reinforcement learning is essential for grasping the fundamentals of machine learning."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.286,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.286,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.281,
+              "preview": "essions over time rather than massing - **Forgetting Curve**: Memory retention decreases over time w..."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.281,
+              "preview": "essions over time rather than massing - **Forgetting Curve**: Memory retention decreases over time w..."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.255,
+              "preview": "ferent operations - **Status Codes**: HTTP response codes indicating request results - **API Documen..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 95,
+            "tokens_out": 90,
+            "latency_ms": 932.68,
+            "retrieval_scores": [
+              0.28648801813169394,
+              0.28648801813169394,
+              0.2807844499012929,
+              0.2807844499012929,
+              0.2550540302695117
+            ]
+          }
+        }
+      }
+    },
+    "Token Management": {
+      "specification": "Token Management",
+      "target": "<500 tokens per artifact, <150 per chat (tolerance: +50 tokens)",
+      "success": true,
+      "artifact_tokens": {
+        "flashcard": {
+          "tokens": 117,
+          "limit": 500,
+          "tolerance_limit": 550,
+          "within_limit": true,
+          "within_tolerance": true
+        },
+        "mcq": {
+          "tokens": 116,
+          "limit": 500,
+          "tolerance_limit": 550,
+          "within_limit": true,
+          "within_tolerance": true
+        },
+        "insight": {
+          "tokens": 107,
+          "limit": 500,
+          "tolerance_limit": 550,
+          "within_limit": true,
+          "within_tolerance": true
+        }
+      },
+      "chat_tokens": [
+        {
+          "query": "What is inheritance?",
+          "tokens": 127,
+          "limit": 150,
+          "tolerance_limit": 200,
+          "within_limit": true,
+          "within_tolerance": true
+        },
+        {
+          "query": "Explain polymorphism",
+          "tokens": 173,
+          "limit": 150,
+          "tolerance_limit": 200,
+          "within_limit": false,
+          "within_tolerance": true
+        },
+        {
+          "query": "How does encapsulation work?",
+          "tokens": 186,
+          "limit": 150,
+          "tolerance_limit": 200,
+          "within_limit": false,
+          "within_tolerance": true
+        }
+      ]
+    },
+    "Processing Latency": {
+      "specification": "Processing Latency",
+      "target": "<5.0s at 95th percentile",
+      "achieved": 1.1783959865570068,
+      "success": true,
+      "avg_latency": 1.0330871105194093,
+      "p95_latency": 1.1783959865570068,
+      "max_latency": 1.1783959865570068,
+      "min_latency": 0.8181803226470947,
+      "response_times": [
+        0.9246618747711182,
+        1.1335961818695068,
+        1.1130878925323486,
+        0.9697668552398682,
+        1.1783959865570068,
+        1.0200762748718262,
+        1.1251041889190674,
+        1.0214545726776123,
+        0.8181803226470947,
+        1.0265469551086426
+      ]
+    },
+    "Factual Accuracy": {
+      "specification": "Factual Accuracy",
+      "target": "90% accuracy",
+      "achieved_accuracy": 0.8722222222222222,
+      "success": false,
+      "llm_accuracy": 0.8611111111111112,
+      "hitl_accuracy": 0.8833333333333334,
+      "individual_scores": {
+        "llm_scores": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.2,
+          0.95,
+          1.0,
+          0.8,
+          0.8
+        ],
+        "hitl_scores": [
+          0.8500000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.8500000000000001,
+          0.8500000000000001,
+          0.9000000000000001
+        ]
+      }
+    },
+    "System Reliability": {
+      "specification": "System Reliability",
+      "target": "98% uptime, <2% drop rate",
+      "achieved_uptime": 1.0,
+      "achieved_drop_rate": 0.0,
+      "success": true,
+      "reliability_results": {
+        "success_rate": 1.0,
+        "failure_rate": 0.0,
+        "avg_response_time": 1.0435878912607828,
+        "p95_response_time": 1.0435878912607828,
+        "total_requests": 15,
+        "successful_requests": 15,
+        "failed_requests": 0
+      },
+      "degradation_results": {
+        "graceful_handling": true,
+        "response_time": 1.1135931015014648,
+        "has_response": true,
+        "response_length": 706,
+        "context_docs_retrieved": 5,
+        "avg_context_score": 0.24295395480309082
+      }
+    },
+    "Data Encryption": {
+      "specification": "Data Encryption",
+      "target": "Demonstrate encryption/decryption capability",
+      "success": true,
+      "tests": {
+        "document_encryption": true,
+        "artifact_encryption": true,
+        "api_encryption": true
+      },
+      "implementation_note": "Mock encryption using base64 for demonstration. Production would use AES-256 or similar."
+    }
+  }
+}

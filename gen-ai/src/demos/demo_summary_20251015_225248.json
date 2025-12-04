@@ -1,0 +1,377 @@
+{
+  "demo_timestamp": "20251015_225248",
+  "total_specifications": 6,
+  "successful_specifications": 3,
+  "success_rate": 0.5,
+  "results": {
+    "Artifact Generation": {
+      "specification": "Artifact Generation",
+      "target": "3+ artifact types",
+      "achieved": 3,
+      "success": true,
+      "artifact_types": [
+        "flashcards",
+        "insights",
+        "mcq"
+      ],
+      "generation_times": {
+        "flashcard": 3.149409770965576,
+        "mcq": 1.439000129699707,
+        "insight": 1.4728338718414307
+      },
+      "artifacts": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "error": "JSON parsing failed",
+          "raw_response": "```json\n{\n  \"artifact_type\": \"flashcards\",\n  \"version\": \"1.0\",\n  \"cards\": [\n    {\n      \"id\": \"fc_001\",\n      \"front\": \"State Newton's three laws of motion.\",\n      \"back\": \"1. First Law (Law of Inertia): An object at rest stays at rest, and an object in motion stays in motion with the same speed and direction unless acted upon by an unbalanced force. \\n2. Second Law: The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass (F = ...",
+          "topic": "Newton's laws of motion",
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.326,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.326,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.267,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 115,
+            "tokens_out": 145,
+            "latency_ms": 3149.41,
+            "retrieval_scores": [
+              0.3263943637517775,
+              0.3263943637517775,
+              0.26727875439091253
+            ]
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "error": "JSON parsing failed",
+          "raw_response": "```json\n{\n  \"artifact_type\": \"mcq\",\n  \"version\": \"1.0\",\n  \"questions\": [\n    {\n      \"id\": \"mcq_001\",\n      \"stem\": \"According to Newton's second law of motion, if a constant force is applied to two objects with different masses, which object will experience greater acceleration?\",\n      \"options\": [\n        \"The object with the larger mass\",\n        \"The object with the smaller mass\",\n        \"Both objects will experience the same acceleration\",\n        \"Acceleration cannot be determined withou...",
+          "topic": "Newton's laws of motion",
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.325,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.325,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.298,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 108,
+            "tokens_out": 166,
+            "latency_ms": 1439.0,
+            "retrieval_scores": [
+              0.32485831588703384,
+              0.32485831588703384,
+              0.2976019901709757
+            ]
+          }
+        },
+        "insight": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "error": "JSON parsing failed",
+          "raw_response": "```json\n{\n  \"artifact_type\": \"insights\",\n  \"version\": \"1.0\",\n  \"insights\": [\n    {\n      \"id\": \"ins_001\",\n      \"title\": \"The Role of Newton's Second Law in Problem Solving\",\n      \"takeaway\": \"Newton's second law, expressed as F = ma (Force equals mass times acceleration), is fundamental for understanding how forces affect the motion of objects. This insight emphasizes that by knowing an object's mass and the net force acting on it, one can predict its acceleration, which is crucial for solving...",
+          "topic": "Newton's laws of motion",
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.291,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.291,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.263,
+              "preview": "ems - Work on eigenvalue calculations - Complete Python class implementation - Review physics formul..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 67,
+            "tokens_out": 173,
+            "latency_ms": 1472.83,
+            "retrieval_scores": [
+              0.2914213024044007,
+              0.2914213024044007,
+              0.26306214506402464
+            ]
+          }
+        }
+      }
+    },
+    "Schema Compliance": {
+      "specification": "Schema Compliance",
+      "target": "Fixed JSON schema per artifact type",
+      "success": false,
+      "validation_results": {
+        "flashcard": false,
+        "mcq": false,
+        "insight": false
+      },
+      "artifacts": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "cards": [
+            {
+              "id": "fc_001",
+              "front": "What is supervised learning in machine learning?",
+              "back": "Supervised learning is a type of machine learning where the model is trained on labeled data, meaning that each training example is paired with an output label. The algorithm learns to predict the output from the input data.",
+              "tags": [
+                "Machine Learning Basics"
+              ],
+              "difficulty": 2,
+              "source_refs": [],
+              "hints": []
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.249,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.249,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.233,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 115,
+            "tokens_out": 134,
+            "latency_ms": 1332.8,
+            "retrieval_scores": [
+              0.24878626018948963,
+              0.24878626018948963,
+              0.23251623431246693
+            ]
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "error": "JSON parsing failed",
+          "raw_response": "```json\n{\n  \"artifact_type\": \"mcq\",\n  \"version\": \"1.0\",\n  \"questions\": [\n    {\n      \"id\": \"mcq_001\",\n      \"stem\": \"Which of the following is NOT a type of machine learning model?\",\n      \"options\": [\"Supervised Learning\", \"Unsupervised Learning\", \"Reinforcement Learning\", \"Classical Learning\"],\n      \"answer_index\": 3,\n      \"rationale\": \"Supervised Learning, Unsupervised Learning, and Reinforcement Learning are the three main types of machine learning models. Classical Learning is not a recog...",
+          "topic": "Machine learning basics",
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.278,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.25,
+              "preview": "inutes) - **Lunch Break**: 12:00 PM (already taken) - **Study Partner Break**: 3:45 PM (10 minutes) ..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.25,
+              "preview": "inutes) - **Lunch Break**: 12:00 PM (already taken) - **Study Partner Break**: 3:45 PM (10 minutes) ..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 108,
+            "tokens_out": 147,
+            "latency_ms": 3176.0,
+            "retrieval_scores": [
+              0.2784083058616946,
+              0.24952417475838162,
+              0.24952417475838157
+            ]
+          }
+        },
+        "insight": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "The Importance of Iterative Learning in Machine Learning Models",
+              "takeaway": "Machine learning models improve their performance through iterative training processes, where they learn from data patterns and refine predictions over time. This emphasizes the necessity for continuous model evaluation and adjustment to enhance accuracy and adaptability."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.24,
+              "preview": "essions over time rather than massing - **Forgetting Curve**: Memory retention decreases over time w..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.233,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.21,
+              "preview": "# Academic Writing and Research ## Writing Process and Structure ### Pre-Writing Strategies - **Brai..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 67,
+            "tokens_out": 124,
+            "latency_ms": 1166.94,
+            "retrieval_scores": [
+              0.2397298421262731,
+              0.23306835520578745,
+              0.20960203094511437
+            ]
+          }
+        }
+      }
+    },
+    "Token Management": {
+      "specification": "Token Management",
+      "target": "<500 tokens per artifact, <150 per chat",
+      "success": false,
+      "artifact_tokens": {
+        "flashcard": {
+          "tokens": 174,
+          "limit": 500,
+          "within_limit": true
+        },
+        "mcq": {
+          "tokens": 154,
+          "limit": 500,
+          "within_limit": true
+        },
+        "insight": {
+          "tokens": 172,
+          "limit": 500,
+          "within_limit": true
+        }
+      },
+      "chat_tokens": [
+        {
+          "query": "What is inheritance?",
+          "tokens": 195,
+          "limit": 150,
+          "within_limit": false
+        },
+        {
+          "query": "Explain polymorphism",
+          "tokens": 188,
+          "limit": 150,
+          "within_limit": false
+        },
+        {
+          "query": "How does encapsulation work?",
+          "tokens": 207,
+          "limit": 150,
+          "within_limit": false
+        }
+      ]
+    },
+    "Processing Latency": {
+      "specification": "Processing Latency",
+      "target": "<5.0s at 95th percentile",
+      "achieved": 2.456879138946533,
+      "success": true,
+      "avg_latency": 1.7176493883132935,
+      "p95_latency": 2.456879138946533,
+      "max_latency": 2.456879138946533,
+      "min_latency": 1.4338374137878418,
+      "response_times": [
+        1.4367475509643555,
+        1.4696013927459717,
+        1.494884729385376,
+        1.4338374137878418,
+        1.4798951148986816,
+        1.4749641418457031,
+        2.1341023445129395,
+        2.456879138946533,
+        2.336148738861084,
+        1.4594333171844482
+      ]
+    },
+    "Factual Accuracy": {
+      "specification": "Factual Accuracy",
+      "target": "90% accuracy, <5% hallucination",
+      "achieved_accuracy": 0.4848636576400653,
+      "achieved_hallucination": 92.87423604131375,
+      "success": false,
+      "llm_accuracy": 0.5,
+      "hitl_accuracy": 0.8833333333333334,
+      "individual_scores": {
+        "llm_scores": [
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "hitl_scores": [
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.8500000000000001,
+          0.8500000000000001,
+          0.8500000000000001
+        ]
+      }
+    },
+    "System Reliability": {
+      "specification": "System Reliability",
+      "target": "98% uptime, <2% drop rate",
+      "achieved_uptime": 1.0,
+      "achieved_drop_rate": 0.0,
+      "success": true,
+      "reliability_results": {
+        "success_rate": 1.0,
+        "failure_rate": 0.0,
+        "avg_response_time": 2.6828628381093345,
+        "p95_response_time": 2.6828628381093345,
+        "total_requests": 15,
+        "successful_requests": 15,
+        "failed_requests": 0
+      },
+      "degradation_results": {
+        "graceful_handling": true,
+        "response_time": 2.5166523456573486,
+        "has_response": true,
+        "response_length": 830,
+        "context_docs_retrieved": 3,
+        "avg_context_score": 0.22788490371055584
+      }
+    }
+  }
+}

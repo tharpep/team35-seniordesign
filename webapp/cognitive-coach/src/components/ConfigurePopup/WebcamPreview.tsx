@@ -4,10 +4,14 @@ type WebcamState = 'idle' | 'requesting' | 'active' | 'error';
 
 interface WebcamPreviewProps {
     isActive: boolean;
+    deviceId?: string | null;
+    deviceLabel?: string;
     onStreamChange?: (stream: MediaStream | null) => void;
+    availableDevices?: Array<{ deviceId: string; label: string }>;
+    onDeviceChange?: (deviceId: string) => void;
 }
 
-export default function WebcamPreview({ isActive, onStreamChange }: WebcamPreviewProps) {
+export default function WebcamPreview({ isActive, deviceId, deviceLabel = 'Webcam', onStreamChange, availableDevices = [], onDeviceChange }: WebcamPreviewProps) {
     const [webcamState, setWebcamState] = useState<WebcamState>('idle');
     const [webcamStream, setWebcamStream] = useState<MediaStream | null>(null);
     const webcamVideoRef = useRef<HTMLVideoElement>(null);
@@ -31,11 +35,29 @@ export default function WebcamPreview({ isActive, onStreamChange }: WebcamPrevie
         }
     }, [webcamStream, onStreamChange]);
 
+    // Stop current stream if selected device becomes unavailable
+    useEffect(() => {
+        if (!deviceId && webcamStream) {
+            stopWebcam();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [deviceId]);
+
     const startWebcam = async () => {
+        if (!deviceId) {
+            setWebcamState('error');
+            setTimeout(() => setWebcamState('idle'), 3000);
+            return;
+        }
         setWebcamState('requesting');
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: true,
+                video: {
+                    deviceId: { exact: deviceId },
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 },
+                    frameRate: { ideal: 30 }
+                },
                 audio: false
             });
             
@@ -67,9 +89,32 @@ export default function WebcamPreview({ isActive, onStreamChange }: WebcamPrevie
             {webcamState === 'idle' && (
                 <>
                     <span className="material-icons-round preview-icon">videocam</span>
-                    <h4>Webcam Preview</h4>
-                    <p>Click the button below to enable webcam access</p>
-                    <button className="start-recording-button" onClick={startWebcam}>
+                    <h4>{deviceLabel} Preview</h4>
+                    {availableDevices.length > 0 && onDeviceChange && (
+                        <div style={{ width: '100%', maxWidth: '400px', marginBottom: '20px' }}>
+                            <select
+                                value={deviceId || ''}
+                                onChange={(e) => onDeviceChange(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '10px',
+                                    fontSize: '14px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #ddd',
+                                    backgroundColor: 'white'
+                                }}
+                            >
+                                <option value="" disabled>Select a camera</option>
+                                {availableDevices.map(device => (
+                                    <option key={device.deviceId} value={device.deviceId}>
+                                        {device.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+                    <p>{deviceId ? 'Click below to enable this camera' : 'Select a camera in the dropdown to preview'}</p>
+                    <button className="start-recording-button" onClick={startWebcam} disabled={!deviceId}>
                         <span className="material-icons-round">play_circle</span>
                         Start Webcam
                     </button>

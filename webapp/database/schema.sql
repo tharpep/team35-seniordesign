@@ -1,4 +1,4 @@
--- Study Coach Database Schema (Updated)
+-- Study Coach Database Schema (Clean - No Test Data)
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
@@ -28,13 +28,13 @@ CREATE TABLE IF NOT EXISTS sessions (
 CREATE TABLE IF NOT EXISTS captured_frames (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     session_id INTEGER NOT NULL,
-    frame_type TEXT CHECK(frame_type IN ('webcam', 'screen')),
+    frame_type TEXT CHECK(frame_type IN ('webcam', 'screen', 'external')),
     file_path TEXT NOT NULL,
     captured_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
 );
 
--- Study artifacts table (renamed from study_materials)
+-- Study artifacts table
 CREATE TABLE IF NOT EXISTS study_artifacts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     session_id INTEGER NOT NULL,
@@ -62,15 +62,3 @@ CREATE TABLE IF NOT EXISTS session_distraction_events (
     data TEXT,
     FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
 );
-
--- Insert test user (password: 'password')
-INSERT OR IGNORE INTO users (id, email, password_hash, first_name, last_name) 
-VALUES (1, 'test@example.com', 'placeholder_hash', 'Test', 'User');
-
--- Insert test sessions
-INSERT OR IGNORE INTO sessions (id, user_id, title, duration, focus_score, status) 
-VALUES 
-    (1, 1, 'Organic Chemistry Review', 8100, 88, 'completed'),
-    (2, 1, 'Calculus Problem Solving', 6300, 92, 'completed'),
-    (3, 1, 'World History Reading', 12000, 76, 'completed'),
-    (4, 1, 'Physics Lab Analysis', 10200, 94, 'completed');

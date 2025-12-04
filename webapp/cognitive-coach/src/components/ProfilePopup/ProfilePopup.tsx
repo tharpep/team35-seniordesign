@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { api } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 import './ProfilePopup.css';
 
 interface ProfilePopupProps {
@@ -7,16 +8,49 @@ interface ProfilePopupProps {
     onClose: () => void;
 }
 
+interface UserData {
+    firstName: string;
+    lastName: string;
+    email: string;
+    memberSince: string; // YYYY-MM-DD
+}
+
 export default function ProfilePopup({ isOpen, onClose }: ProfilePopupProps) {
-    const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate();
-    
-    // Fake user data
-    const userData = {
-        firstName: "John",
-        lastName: "Doe",
-        email: "john.doe@email.com",
-        password: "password123"
+    const [userData, setUserData] = useState<UserData | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [error, setError] = useState('');
+    const { logout } = useAuth();
+
+    useEffect(() => {
+        if (isOpen) {
+            fetchUserData();
+        }
+    }, [isOpen]);
+
+    const fetchUserData = async () => {
+        setIsLoading(true);
+        setError('');
+        try {
+            const user = await api.getCurrentUser();
+            if (user) {
+                const rawCreated = user.created_at || '';
+                const memberSince = typeof rawCreated === 'string' ? rawCreated.substring(0, 10) : '';
+                setUserData({
+                    firstName: user.first_name || '',
+                    lastName: user.last_name || '',
+                    email: user.email || '',
+                    memberSince
+                });
+            } else {
+                setError('Failed to load user data');
+            }
+        } catch (err) {
+            console.error('Error fetching user data:', err);
+            setError('Failed to load user data');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     if (!isOpen) return null;
@@ -27,13 +61,22 @@ export default function ProfilePopup({ isOpen, onClose }: ProfilePopupProps) {
         }
     };
 
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-    };
-
-    const handleSignOut = () => {
-        onClose(); // Close the popup first
-        navigate('/login'); // Navigate to login page
+    const handleSignOut = async () => {
+        setIsLoggingOut(true);
+        try {
+            // Call logout from AuthContext
+            // This will handle API call, cleanup, navigation, and notify other tabs
+            await logout();
+            
+            // Close the popup
+            onClose();
+        } catch (err) {
+            console.error('Error signing out:', err);
+            // AuthContext logout handles cleanup even on error
+            onClose();
+        } finally {
+            setIsLoggingOut(false);
+        }
     };
 
     return (
@@ -45,45 +88,55 @@ export default function ProfilePopup({ isOpen, onClose }: ProfilePopupProps) {
                         <span className="material-icons-round">close</span>
                     </button>
                 </div>
-                
+
                 <div className="profile-popup-content">
-                    <div className="profile-field">
-                        <label>First Name</label>
-                        <div className="profile-value">{userData.firstName}</div>
-                    </div>
-                    
-                    <div className="profile-field">
-                        <label>Last Name</label>
-                        <div className="profile-value">{userData.lastName}</div>
-                    </div>
-                    
-                    <div className="profile-field">
-                        <label>Email</label>
-                        <div className="profile-value">{userData.email}</div>
-                    </div>
-                    
-                    <div className="profile-field">
-                        <label>Password</label>
-                        <div className="profile-password-container">
-                            <div className="profile-value">
-                                {showPassword ? userData.password : '••••••••'}
-                            </div>
-                            <button 
-                                className="password-toggle-button"
-                                onClick={togglePasswordVisibility}
-                                title={showPassword ? 'Hide password' : 'Show password'}
-                            >
-                                <span className="material-icons-round">
-                                    {showPassword ? 'visibility_off' : 'visibility'}
-                                </span>
-                            </button>
+                    {isLoading ? (
+                        <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+                            Loading...
                         </div>
-                    </div>
-                    
+                    ) : error ? (
+                        <div style={{
+                            textAlign: 'center',
+                            padding: '20px',
+                            color: '#ea4335',
+                            background: '#fce8e6',
+                            borderRadius: '8px',
+                            marginBottom: '16px'
+                        }}>
+                            {error}
+                        </div>
+                    ) : userData ? (
+                        <>
+                            <div className="profile-field">
+                                <label>First Name</label>
+                                <div className="profile-value">{userData.firstName}</div>
+                            </div>
+
+                            <div className="profile-field">
+                                <label>Last Name</label>
+                                <div className="profile-value">{userData.lastName}</div>
+                            </div>
+
+                            <div className="profile-field">
+                                <label>Email</label>
+                                <div className="profile-value">{userData.email}</div>
+                            </div>
+
+                            <div className="profile-field">
+                                <label>Member Since</label>
+                                <div className="profile-value">{userData.memberSince || '-'}</div>
+                            </div>
+                        </>
+                    ) : null}
+
                     <div className="profile-actions">
-                        <button className="sign-out-button" onClick={handleSignOut}>
+                        <button 
+                            className="sign-out-button" 
+                            onClick={handleSignOut}
+                            disabled={isLoggingOut}
+                        >
                             <span className="material-icons-round">logout</span>
-                            Sign Out
+                            {isLoggingOut ? 'Signing Out...' : 'Sign Out'}
                         </button>
                     </div>
                 </div>
@@ -91,3 +144,4 @@ export default function ProfilePopup({ isOpen, onClose }: ProfilePopupProps) {
         </div>
     );
 }
+

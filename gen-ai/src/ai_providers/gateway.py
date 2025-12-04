@@ -7,7 +7,7 @@ Designed to be easily extended for additional providers
 import os
 import sys
 import asyncio
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Union
 from .purdue_api import PurdueGenAI
 from .local import OllamaClient, OllamaConfig
 
@@ -67,14 +67,16 @@ class AIGateway:
             )
             self.providers["ollama"] = OllamaClient(ollama_config)
     
-    def chat(self, message: str, provider: Optional[str] = None, model: Optional[str] = None) -> str:
+    def chat(self, messages: Union[str, List[Dict[str, str]]], provider: Optional[str] = None, model: Optional[str] = None, max_tokens: Optional[int] = None, system_prompt: Optional[str] = None) -> str:
         """
         Send a chat message to specified AI provider
         
         Args:
-            message: Your message to the AI
+            messages: Your message (str) or messages array (List[Dict])
             provider: AI provider to use (auto-selects based on availability)
             model: Model to use (uses provider default if not specified)
+            max_tokens: Maximum tokens in response (optional)
+            system_prompt: System prompt (only used if messages is a string)
             
         Returns:
             str: AI response
@@ -98,18 +100,38 @@ class AIGateway:
         
         provider_client = self.providers[provider]
         
-        # Handle different provider types
+        # Handle messages array format (stateful chat)
+        if isinstance(messages, list):
+            # Messages array provided - pass directly to provider
+            model = model or self.rag_config.model_name
+            return provider_client.chat(messages, model, max_tokens)
+        
+        # Handle string format (backward compatibility)
         if provider == "ollama":
-            return self._chat_ollama(provider_client, message, model)
+            return self._chat_ollama(provider_client, messages, model, max_tokens, system_prompt)
         else:
             # Use config model for Purdue API if no model specified
             model = model or self.rag_config.model_name
-            return provider_client.chat(message, model)
+            return self._chat_with_system_prompt(provider_client, messages, model, max_tokens, system_prompt)
     
-    def _chat_ollama(self, client: OllamaClient, message: str, model: Optional[str] = None) -> str:
+    def _chat_ollama(self, client: OllamaClient, message: str, model: Optional[str] = None, max_tokens: Optional[int] = None, system_prompt: Optional[str] = None) -> str:
         """Helper to handle Ollama calls"""
-        # Now that OllamaClient.chat() is synchronous, we can call it directly
-        return client.chat(message, model=model)
+        # For now, Ollama doesn't support system prompts in our current implementation
+        # Just use the message directly
+        return client.chat(message, model=model, max_tokens=max_tokens)
+    
+    def _chat_with_system_prompt(self, client, message: str, model: Optional[str] = None, max_tokens: Optional[int] = None, system_prompt: Optional[str] = None) -> str:
+        """Helper to handle calls with system prompt"""
+        if system_prompt:
+            # Create messages list with system prompt
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": message}
+            ]
+            return client.chat(messages, model, max_tokens)
+        else:
+            # Use simple string message
+            return client.chat(message, model, max_tokens)
     
     def get_available_providers(self) -> List[str]:
         """Get list of available providers"""

@@ -7,8 +7,12 @@ import json
 import os
 import urllib.request
 import urllib.error
+import time
 from typing import Optional, List, Any
 from .base_client import BaseLLMClient
+from logging_config import get_logger
+
+logger = get_logger(__name__)
 
 # Load environment variables from .env file
 def load_env_file():
@@ -40,13 +44,14 @@ class PurdueGenAI(BaseLLMClient):
             raise ValueError("API key is required. Provide it directly or set PURDUE_API_KEY environment variable.")
         self.base_url = "https://genai.rcac.purdue.edu/api/chat/completions"
     
-    def chat(self, messages: Any, model: Optional[str] = None, **kwargs) -> str:
+    def chat(self, messages: Any, model: Optional[str] = None, max_tokens: Optional[int] = None, **kwargs) -> str:
         """
         Send a message and get a response
         
         Args:
             messages: Your message (str) or messages list
             model: Model to use (default: llama3.1:latest)
+            max_tokens: Maximum tokens in response (optional)
             
         Returns:
             str: AI response
@@ -75,22 +80,74 @@ class PurdueGenAI(BaseLLMClient):
                 "stream": False
             }
             
+            # Add max_tokens if specified
+            if max_tokens is not None:
+                body["max_tokens"] = max_tokens
+            
             # Make request
             data = json.dumps(body).encode('utf-8')
             req = urllib.request.Request(self.base_url, data=data, headers=headers, method='POST')
             
-            with urllib.request.urlopen(req) as response:
-                if response.status == 200:
-                    response_data = json.loads(response.read().decode('utf-8'))
-                    return response_data["choices"][0]["message"]["content"]
-                else:
-                    error_text = response.read().decode('utf-8')
-                    raise Exception(f"API Error {response.status}: {error_text}")
+            request_start_time = time.time()
+            
+            try:
+                with urllib.request.urlopen(req) as response:
+                    request_time = time.time() - request_start_time
                     
-        except urllib.error.HTTPError as e:
-            error_text = e.read().decode('utf-8') if hasattr(e, 'read') else str(e)
-            raise Exception(f"HTTP Error {e.code}: {error_text}")
+                    # Check for rate limiting (HTTP 429)
+                    if response.status == 429:
+                        logger.warning("⚠️  RATE LIMIT DETECTED: Purdue API returned HTTP 429 (Too Many Requests)")
+                        logger.warning(f"   Request time: {request_time:.2f}s")
+                        logger.warning(f"   Model: {model}")
+                        error_text = response.read().decode('utf-8')
+                        logger.warning(f"   Error details: {error_text}")
+                        raise Exception(f"Rate Limited: HTTP 429 - {error_text}")
+                    
+                    # Check for other rate limit indicators in headers
+                    rate_limit_remaining = response.headers.get('X-RateLimit-Remaining')
+                    rate_limit_reset = response.headers.get('X-RateLimit-Reset')
+                    
+                    if rate_limit_remaining is not None:
+                        remaining = int(rate_limit_remaining)
+                        if remaining <= 5:
+                            logger.warning(f"⚠️  RATE LIMIT WARNING: Only {remaining} requests remaining before rate limit")
+                            if rate_limit_reset:
+                                logger.warning(f"   Rate limit resets at: {rate_limit_reset}")
+                    
+                    if response.status == 200:
+                        response_data = json.loads(response.read().decode('utf-8'))
+                        return response_data["choices"][0]["message"]["content"]
+                    else:
+                        error_text = response.read().decode('utf-8')
+                        logger.error(f"Purdue API Error {response.status}: {error_text}")
+                        raise Exception(f"API Error {response.status}: {error_text}")
+                        
+            except urllib.error.HTTPError as e:
+                request_time = time.time() - request_start_time
+                
+                # Check for rate limiting
+                if e.code == 429:
+                    logger.warning("⚠️  RATE LIMIT DETECTED: Purdue API returned HTTP 429 (Too Many Requests)")
+                    logger.warning(f"   Request time: {request_time:.2f}s")
+                    logger.warning(f"   Model: {model}")
+                    error_text = e.read().decode('utf-8') if hasattr(e, 'read') else str(e)
+                    logger.warning(f"   Error details: {error_text}")
+                    
+                    # Try to extract retry-after header
+                    retry_after = e.headers.get('Retry-After') if hasattr(e, 'headers') else None
+                    if retry_after:
+                        logger.warning(f"   Retry after: {retry_after} seconds")
+                    
+                    raise Exception(f"Rate Limited: HTTP 429 - {error_text}")
+                
+                error_text = e.read().decode('utf-8') if hasattr(e, 'read') else str(e)
+                logger.error(f"Purdue API HTTP Error {e.code}: {error_text}")
+                raise Exception(f"HTTP Error {e.code}: {error_text}")
         except Exception as e:
+            # Re-raise if it's already a rate limit exception
+            if "Rate Limited" in str(e):
+                raise
+            logger.error(f"Error calling Purdue GenAI: {str(e)}")
             raise Exception(f"Error calling Purdue GenAI: {str(e)}")
     
     def get_available_models(self) -> List[str]:

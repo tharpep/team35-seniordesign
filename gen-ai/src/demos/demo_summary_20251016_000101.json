@@ -1,0 +1,506 @@
+{
+  "demo_timestamp": "20251016_000101",
+  "total_specifications": 6,
+  "successful_specifications": 4,
+  "success_rate": 0.6666666666666666,
+  "results": {
+    "Artifact Generation": {
+      "specification": "Artifact Generation",
+      "target": "3+ artifact types",
+      "achieved": 3,
+      "success": true,
+      "artifact_types": [
+        "mcq",
+        "insights",
+        "flashcards"
+      ],
+      "generation_times": {
+        "flashcard": 3.8979578018188477,
+        "mcq": 1.5460600852966309,
+        "insight": 1.7870922088623047
+      },
+      "artifacts": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "cards": [
+            {
+              "id": "fc_001",
+              "front": "What are Newton's laws of motion?",
+              "back": "1) An object at rest stays at rest and an object in motion stays in motion with the same speed and direction unless acted upon by an unbalanced force.\n2) The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.\n3) For every action, there is an equal and opposite reaction.",
+              "tags": [
+                "Physics",
+                "Newton's laws"
+              ],
+              "difficulty": 2,
+              "source_refs": [
+                "N1"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.326,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.326,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.267,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.267,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.226,
+              "preview": "on**: Lagrange interpolation, Newton interpolation, spline interpolation ## Mathematical Application..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 115,
+            "tokens_out": 153,
+            "latency_ms": 3897.96,
+            "retrieval_scores": [
+              0.3263943637517775,
+              0.3263943637517775,
+              0.26727875439091253,
+              0.26727875439091253,
+              0.22620468407942115
+            ]
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "questions": [
+            {
+              "id": "mcq_001",
+              "stem": "What is the third law of Newton's laws of motion, also known as the action-reaction principle?",
+              "options": [
+                "Every action has an equal and opposite reaction, but only in the same direction.",
+                "Every action has an equal and opposite reaction, but only in the opposite direction.",
+                "Every action has a reaction, but it is always greater than the action.",
+                "A larger action produces a smaller reaction."
+              ],
+              "answer_index": 1,
+              "rationale": "The third law states that for every action, there is an equal and opposite reaction in the opposite direction.",
+              "bloom_level": "understand",
+              "source_refs": [
+                "N1"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.31,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.31,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.278,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.274,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.274,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 136,
+            "tokens_out": 188,
+            "latency_ms": 1546.06,
+            "retrieval_scores": [
+              0.31034498605561445,
+              0.31034498605561445,
+              0.2780847222570504,
+              0.2744206196373778,
+              0.2744206196373778
+            ]
+          }
+        },
+        "insight": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "Newton's Laws of Motion Insight",
+              "takeaway": "Newton's first law, also known as the law of inertia, states that an object at rest will stay at rest and an object in motion will stay in motion unless acted upon by an external force."
+            },
+            {
+              "id": "ins_002",
+              "title": "Newton's Second Law Insight",
+              "takeaway": "Newton's second law, also known as F = ma, describes the relationship between an object's acceleration, mass, and the net force acting upon it."
+            },
+            {
+              "id": "ins_003",
+              "title": "Newton's Third Law Insight",
+              "takeaway": "Newton's third law states that for every action, there is an equal and opposite reaction. This means that when one object exerts a force on another, the second object exerts an equal and opposite force back on the first."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.329,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.329,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.279,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.279,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.266,
+              "preview": "essions over time rather than massing - **Forgetting Curve**: Memory retention decreases over time w..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 95,
+            "tokens_out": 233,
+            "latency_ms": 1787.09,
+            "retrieval_scores": [
+              0.32896752206368574,
+              0.32896752206368574,
+              0.2785555112613333,
+              0.2785555112613333,
+              0.2658962770875461
+            ]
+          }
+        }
+      }
+    },
+    "Schema Compliance": {
+      "specification": "Schema Compliance",
+      "target": "Fixed JSON schema per artifact type",
+      "success": true,
+      "validation_results": {
+        "flashcard": true,
+        "mcq": true,
+        "insight": true
+      },
+      "artifacts": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "cards": [
+            {
+              "id": "fc_002",
+              "front": "What is machine learning?",
+              "back": "A subfield of artificial intelligence that focuses on the development of algorithms and statistical models that can learn patterns in data and make decisions with minimal human intervention.",
+              "tags": [
+                "machine learning basics"
+              ],
+              "difficulty": 2,
+              "source_refs": [
+                "N1"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.249,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.249,
+              "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.233,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.227,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.227,
+              "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+            }
+          },
+          "metrics": {
+            "tokens_in": 115,
+            "tokens_out": 113,
+            "latency_ms": 1104.71,
+            "retrieval_scores": [
+              0.24878626018948963,
+              0.24878626018948963,
+              0.23251623431246693,
+              0.22737440638145243,
+              0.22737440638145243
+            ]
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "questions": [
+            {
+              "id": "ml_basic_001",
+              "stem": "Which of the following is NOT a fundamental concept in Machine Learning?",
+              "options": [
+                "Supervised Learning",
+                "Unsupervised Learning",
+                "Reinforcement Learning",
+                "Categorization"
+              ],
+              "answer_index": 3,
+              "rationale": "In machine learning, categorization refers to the process of organizing data into predefined categories. However, it is a part of supervised learning.",
+              "bloom_level": "understand",
+              "source_refs": [
+                "N2"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.273,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.251,
+              "preview": "y optimization, connection pooling ### Security Principles - **Input Validation**: Checking and sani..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.25,
+              "preview": "ormality**: Using appropriate level of formality for academic writing - **Objectivity**: Presenting ..."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.239,
+              "preview": "inutes) - **Lunch Break**: 12:00 PM (already taken) - **Study Partner Break**: 3:45 PM (10 minutes) ..."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.239,
+              "preview": "inutes) - **Lunch Break**: 12:00 PM (already taken) - **Study Partner Break**: 3:45 PM (10 minutes) ..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 136,
+            "tokens_out": 143,
+            "latency_ms": 1349.68,
+            "retrieval_scores": [
+              0.27346547056935333,
+              0.25051668600085586,
+              0.24990016721100466,
+              0.23865184763885702,
+              0.23865184763885697
+            ]
+          }
+        },
+        "insight": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "Machine Learning Basics Insight",
+              "takeaway": "Understanding machine learning basics involves familiarizing oneself with various concepts such as supervised and unsupervised learning, neural networks, and deep learning algorithms."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.286,
+              "preview": "summary sections - **Mind Mapping**: Visual representation of concepts and relationships - **Outline..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": 0.281,
+              "preview": "essions over time rather than massing - **Forgetting Curve**: Memory retention decreases over time w..."
+            },
+            "N3": {
+              "note_id": "note_003",
+              "similarity": 0.255,
+              "preview": "ferent operations - **Status Codes**: HTTP response codes indicating request results - **API Documen..."
+            },
+            "N4": {
+              "note_id": "note_004",
+              "similarity": 0.24,
+              "preview": "# Academic Writing and Research ## Writing Process and Structure ### Pre-Writing Strategies - **Brai..."
+            },
+            "N5": {
+              "note_id": "note_005",
+              "similarity": 0.24,
+              "preview": "ical Reasoning - **Deductive Reasoning**: Drawing specific conclusions from general premises - **Ind..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 95,
+            "tokens_out": 91,
+            "latency_ms": 964.43,
+            "retrieval_scores": [
+              0.28648801813169394,
+              0.2807844499012929,
+              0.2550540302695117,
+              0.24041903019560715,
+              0.24031756227855267
+            ]
+          }
+        }
+      }
+    },
+    "Token Management": {
+      "specification": "Token Management",
+      "target": "<500 tokens per artifact, <150 per chat",
+      "success": false,
+      "artifact_tokens": {
+        "flashcard": {
+          "tokens": 101,
+          "limit": 500,
+          "within_limit": true
+        },
+        "mcq": {
+          "tokens": 117,
+          "limit": 500,
+          "within_limit": true
+        },
+        "insight": {
+          "tokens": 89,
+          "limit": 500,
+          "within_limit": true
+        }
+      },
+      "chat_tokens": [
+        {
+          "query": "What is inheritance?",
+          "tokens": 123,
+          "limit": 150,
+          "within_limit": true
+        },
+        {
+          "query": "Explain polymorphism",
+          "tokens": 175,
+          "limit": 150,
+          "within_limit": false
+        },
+        {
+          "query": "How does encapsulation work?",
+          "tokens": 181,
+          "limit": 150,
+          "within_limit": false
+        }
+      ]
+    },
+    "Processing Latency": {
+      "specification": "Processing Latency",
+      "target": "<5.0s at 95th percentile",
+      "achieved": 1.231673240661621,
+      "success": true,
+      "avg_latency": 1.0760967254638671,
+      "p95_latency": 1.231673240661621,
+      "max_latency": 1.231673240661621,
+      "min_latency": 0.9926104545593262,
+      "response_times": [
+        0.9926104545593262,
+        1.0390467643737793,
+        1.0945301055908203,
+        1.122161626815796,
+        1.128873586654663,
+        1.231673240661621,
+        1.0241365432739258,
+        1.049924612045288,
+        1.0005371570587158,
+        1.0774731636047363
+      ]
+    },
+    "Factual Accuracy": {
+      "specification": "Factual Accuracy",
+      "target": "90% accuracy, <5% hallucination",
+      "achieved_accuracy": 0.9083333333333334,
+      "achieved_hallucination": 99.02894491129786,
+      "success": false,
+      "llm_accuracy": 0.9222222222222222,
+      "hitl_accuracy": 0.8944444444444446,
+      "individual_scores": {
+        "llm_scores": [
+          0.7,
+          1.0,
+          1.0,
+          1.0,
+          0.6,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "hitl_scores": [
+          0.8500000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.9000000000000001,
+          0.8500000000000001,
+          0.9500000000000001,
+          0.9000000000000001
+        ]
+      }
+    },
+    "System Reliability": {
+      "specification": "System Reliability",
+      "target": "98% uptime, <2% drop rate",
+      "achieved_uptime": 1.0,
+      "achieved_drop_rate": 0.0,
+      "success": true,
+      "reliability_results": {
+        "success_rate": 1.0,
+        "failure_rate": 0.0,
+        "avg_response_time": 1.8708688577016195,
+        "p95_response_time": 1.8708688577016195,
+        "total_requests": 15,
+        "successful_requests": 15,
+        "failed_requests": 0
+      },
+      "degradation_results": {
+        "graceful_handling": true,
+        "response_time": 2.1801469326019287,
+        "has_response": true,
+        "response_length": 685,
+        "context_docs_retrieved": 5,
+        "avg_context_score": 0.19334562901370395
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "artifact_type": "insights",
+  "version": "1.0",
+  "insights": [
+    {
+      "id": "ins_001",
+      "title": "Newton's Second Law of Motion",
+      "takeaway": "Force (F) is equal to mass (m) times acceleration (a), or F = ma, which describes the relationship between a body's force, mass, and acceleration."
+    }
+  ],
+  "provenance": {
+    "N1": {
+      "note_id": "note_001",
+      "similarity": 0.291,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N2": {
+      "note_id": "note_002",
+      "similarity": 0.291,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N3": {
+      "note_id": "note_003",
+      "similarity": 0.263,
+      "preview": "ems - Work on eigenvalue calculations - Complete Python class implementation - Review physics formul..."
+    }
+  },
+  "metrics": {
+    "tokens_in": 67,
+    "tokens_out": 84,
+    "latency_ms": 3944.53,
+    "retrieval_scores": [
+      0.2914213024044007,
+      0.2914213024044007,
+      0.26306214506402464
+    ]
+  }
+}

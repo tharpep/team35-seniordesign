@@ -4,11 +4,19 @@ import MCQContent from './MCQContent';
 import EquationContent from './EquationContent';
 import type { PopupState } from './types';
 
+interface Artifact {
+    id: number;
+    type: string;
+    title: string;
+    content: string;
+}
+
 interface ArtifactPopupControllerProps {
     popup: PopupState;
     closePopup: () => void;
     navigatePopup: (direction: 'prev' | 'next') => void;
     setPopup: React.Dispatch<React.SetStateAction<PopupState>>;
+    artifacts: Artifact[];
     totalCount: number;
 }
 
@@ -17,9 +25,21 @@ export default function ArtifactPopupController({
     closePopup,
     navigatePopup,
     setPopup,
+    artifacts,
     totalCount
 }: ArtifactPopupControllerProps) {
     const popupRef = useRef<HTMLDivElement>(null);
+
+    // Filter artifacts by type
+    const filteredArtifacts = artifacts.filter(artifact => {
+        if (popup.type === 'flashcard') return artifact.type === 'flashcard';
+        if (popup.type === 'MCQ') return artifact.type === 'multiple_choice';
+        if (popup.type === 'equation') return artifact.type === 'equation';
+        return false;
+    });
+
+    // Get current artifact
+    const currentArtifact = filteredArtifacts[popup.currentIndex];
 
     // Auto-focus the popup when it opens to enable keyboard navigation
     useEffect(() => {
@@ -42,13 +62,15 @@ export default function ArtifactPopupController({
     };
 
     const renderContent = () => {
+        if (!currentArtifact) return <div>No artifact found</div>;
+
         switch (popup.type) {
             case 'flashcard':
-                return <FlashcardContent popup={popup} setPopup={setPopup} />;
+                return <FlashcardContent popup={popup} setPopup={setPopup} artifact={currentArtifact} />;
             case 'MCQ':
-                return <MCQContent popup={popup} setPopup={setPopup} />;
+                return <MCQContent popup={popup} setPopup={setPopup} artifact={currentArtifact} />;
             case 'equation':
-                return <EquationContent popup={popup} setPopup={setPopup} />;
+                return <EquationContent artifact={currentArtifact} />;
             default:
                 return null;
         }

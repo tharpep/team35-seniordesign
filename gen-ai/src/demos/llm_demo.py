@@ -36,12 +36,12 @@ def run_llm_demo(mode="automated"):
         print(f"Available providers: {', '.join(available_providers)}")
         
         if not available_providers:
-            print("❌ No AI providers available!")
+            print("[ERROR] No AI providers available!")
             return
         
         # Show stats
-        print(f"\n✅ AI Gateway initialized successfully")
-        print(f"✅ Ready to chat with {len(available_providers)} provider(s)")
+        print(f"\n[OK] AI Gateway initialized successfully")
+        print(f"[OK] Ready to chat with {len(available_providers)} provider(s)")
         
         if mode == "interactive":
             # Interactive mode
@@ -102,6 +102,7 @@ def run_llm_demo(mode="automated"):
                         response_time = time.time() - start_time
                         
                         print(f"LLM: {result}")
+                        print(f"[TIME] Response time: {response_time:.2f}s")
                         
                         # Log the result
                         log_rag_result(
@@ -120,15 +121,11 @@ def run_llm_demo(mode="automated"):
                         import traceback
                         print(f"Full traceback:\n{traceback.format_exc()}")
         else:
-            # Automated mode - run test queries
+            # Automated mode - run two test queries
             print("\n=== Automated Mode ===")
             test_queries = [
                 "What is artificial intelligence?",
-                "Explain the concept of machine learning",
-                "What are the benefits of renewable energy?",
-                "How does photosynthesis work?",
-                "What is the difference between a list and a tuple in Python?",
-                "Explain the water cycle"
+                "Explain the concept of machine learning"
             ]
             
             for query in test_queries:
@@ -139,6 +136,7 @@ def run_llm_demo(mode="automated"):
                     response_time = time.time() - start_time
                     
                     print(f"A: {result[:200]}...")  # Truncate long answers
+                    print(f"[TIME] Response time: {response_time:.2f}s")
                     
                     # Log the result
                     log_rag_result(
@@ -157,32 +155,36 @@ def run_llm_demo(mode="automated"):
                     print(f"Full traceback:\n{traceback.format_exc()}")
     
     except Exception as e:
-        print(f"❌ Failed to initialize LLM demo: {e}")
+        print(f"[ERROR] Failed to initialize LLM demo: {e}")
         import traceback
         print(f"Full traceback:\n{traceback.format_exc()}")
 
 
 def test_individual_providers():
-    """Test individual providers directly"""
+    """Test individual providers directly with two questions"""
     print("=== Individual Provider Tests ===")
     
     config = get_rag_config()
+    test_questions = [
+        "What is artificial intelligence?",
+        "Explain the concept of machine learning"
+    ]
     
     # Test Purdue API if available
     if not config.use_ollama:
         print("\n--- Testing Purdue API ---")
         try:
             purdue_client = PurdueGenAI()
-            test_question = "What is the capital of France?"
-            print(f"Q: {test_question}")
-            
-            start_time = time.time()
-            result = purdue_client.chat(test_question)
-            response_time = time.time() - start_time
-            
-            print(f"A: {result}")
-            print(f"Response time: {response_time:.2f} seconds")
-            
+            for question in test_questions:
+                print(f"Q: {question}")
+                
+                start_time = time.time()
+                result = purdue_client.chat(question)
+                response_time = time.time() - start_time
+                
+                print(f"A: {result[:200]}...")
+                print(f"Response time: {response_time:.2f} seconds\n")
+                
         except Exception as e:
             print(f"❌ Purdue API test failed: {e}")
     
@@ -191,59 +193,63 @@ def test_individual_providers():
         print("\n--- Testing Ollama ---")
         try:
             ollama_client = OllamaClient()
-            test_question = "What is the largest planet in our solar system?"
-            print(f"Q: {test_question}")
-            
-            start_time = time.time()
-            result = ollama_client.chat(test_question)
-            response_time = time.time() - start_time
-            
-            print(f"A: {result}")
-            print(f"Response time: {response_time:.2f} seconds")
-            
+            for question in test_questions:
+                print(f"Q: {question}")
+                
+                start_time = time.time()
+                result = ollama_client.chat(question)
+                response_time = time.time() - start_time
+                
+                print(f"A: {result[:200]}...")
+                print(f"Response time: {response_time:.2f} seconds\n")
+                
         except Exception as e:
             print(f"❌ Ollama test failed: {e}")
 
 
 def run_provider_comparison():
-    """Compare responses from different providers"""
+    """Compare responses from different providers with two questions"""
     print("=== Provider Comparison ===")
     
     config = get_rag_config()
-    test_question = "Explain the concept of gravity in simple terms."
+    test_questions = [
+        "What is artificial intelligence?",
+        "Explain the concept of machine learning"
+    ]
     
-    print(f"Test question: {test_question}")
-    print("-" * 50)
-    
-    # Test Purdue API
-    if not config.use_ollama:
-        print("\n--- Purdue API Response ---")
-        try:
-            purdue_client = PurdueGenAI()
-            start_time = time.time()
-            purdue_result = purdue_client.chat(test_question)
-            purdue_time = time.time() - start_time
-            
-            print(f"Response: {purdue_result}")
-            print(f"Time: {purdue_time:.2f} seconds")
-            
-        except Exception as e:
-            print(f"❌ Purdue API failed: {e}")
-    
-    # Test Ollama
-    if config.use_ollama:
-        print("\n--- Ollama Response ---")
-        try:
-            ollama_client = OllamaClient()
-            start_time = time.time()
-            ollama_result = ollama_client.chat(test_question)
-            ollama_time = time.time() - start_time
-            
-            print(f"Response: {ollama_result}")
-            print(f"Time: {ollama_time:.2f} seconds")
-            
-        except Exception as e:
-            print(f"❌ Ollama failed: {e}")
+    for test_question in test_questions:
+        print(f"\nTest question: {test_question}")
+        print("-" * 50)
+        
+        # Test Purdue API
+        if not config.use_ollama:
+            print("\n--- Purdue API Response ---")
+            try:
+                purdue_client = PurdueGenAI()
+                start_time = time.time()
+                purdue_result = purdue_client.chat(test_question)
+                purdue_time = time.time() - start_time
+                
+                print(f"Response: {purdue_result[:200]}...")
+                print(f"Time: {purdue_time:.2f} seconds")
+                
+            except Exception as e:
+                print(f"❌ Purdue API failed: {e}")
+        
+        # Test Ollama
+        if config.use_ollama:
+            print("\n--- Ollama Response ---")
+            try:
+                ollama_client = OllamaClient()
+                start_time = time.time()
+                ollama_result = ollama_client.chat(test_question)
+                ollama_time = time.time() - start_time
+                
+                print(f"Response: {ollama_result[:200]}...")
+                print(f"Time: {ollama_time:.2f} seconds")
+                
+            except Exception as e:
+                print(f"❌ Ollama failed: {e}")
 
 
 if __name__ == "__main__":

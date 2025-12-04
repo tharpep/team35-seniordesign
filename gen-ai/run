@@ -53,16 +53,44 @@ def check_venv_health():
         print("❌ Pip not working")
         return False
     
-    # Check if key packages are installed
-    key_packages = [
-        ("torch", "torch"),
-        ("transformers", "transformers"), 
-        ("sentence-transformers", "sentence_transformers"),
-        ("qdrant-client", "qdrant_client"),
-        ("pytest", "pytest"),
-        ("pytest-asyncio", "pytest_asyncio"),
-        ("httpx", "httpx")
-    ]
+    # Parse requirements.txt to get all packages
+    key_packages = []
+    requirements_file = Path("requirements.txt")
+    
+    if requirements_file.exists():
+        with open(requirements_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                # Skip comments and empty lines
+                if not line or line.startswith('#'):
+                    continue
+                
+                # Parse package name (handle version specifiers and extras)
+                # Examples: "fastapi>=0.104.0" -> "fastapi", "uvicorn[standard]>=0.24.0" -> "uvicorn"
+                package_name = line.split('>=')[0].split('==')[0].split('<=')[0].split('[')[0].strip()
+                
+                # Convert package name to import name (replace hyphens with underscores)
+                import_name = package_name.replace('-', '_')
+                
+                # Skip if already added
+                if (package_name, import_name) not in key_packages:
+                    key_packages.append((package_name, import_name))
+    else:
+        print("⚠️  requirements.txt not found, using default package list")
+        # Fallback to default packages if requirements.txt doesn't exist
+        key_packages = [
+            ("torch", "torch"),
+            ("transformers", "transformers"), 
+            ("sentence-transformers", "sentence_transformers"),
+            ("qdrant-client", "qdrant_client"),
+            ("pytest", "pytest"),
+            ("pytest-asyncio", "pytest_asyncio"),
+            ("httpx", "httpx"),
+            ("fastapi", "fastapi"),
+            ("uvicorn", "uvicorn"),
+            ("pydantic", "pydantic")
+        ]
+    
     missing_packages = []
     
     for package_name, import_name in key_packages:
@@ -237,7 +265,10 @@ def run_demo():
     demo_files = []
     for item in demos_dir.iterdir():
         if item.is_file() and item.name.endswith('_demo.py'):
-            demo_name = item.stem.replace('_demo', '').replace('_', ' ').title()
+            if item.name == 'subsystem_demo.py':
+                demo_name = "Subsystem (All Specifications)"
+            else:
+                demo_name = item.stem.replace('_demo', '').replace('_', ' ').title()
             demo_files.append((demo_name, item.stem))
     
     if not demo_files:
@@ -343,6 +374,38 @@ def run_config():
     return 0
 
 
+def run_start():
+    """Start the FastAPI server"""
+    if not check_venv():
+        return 1
+    
+    print("=== Starting FastAPI Server ===")
+    print("Server: http://127.0.0.1:8000")
+    print("Docs: http://127.0.0.1:8000/docs")
+    print("")
+    print("Press Ctrl+C to stop the server")
+    print("")
+    
+    python_cmd = get_python_cmd()
+    
+    try:
+        # Run uvicorn with the FastAPI app
+        result = subprocess.run([
+            python_cmd, "-m", "uvicorn",
+            "src.api.main:app",
+            "--host", "127.0.0.1",
+            "--port", "8000",
+            "--reload"
+        ])
+        return result.returncode
+    except KeyboardInterrupt:
+        print("\n\n Server stopped by user")
+        return 0
+    except Exception as e:
+        print(f"\n Error starting server: {e}")
+        return 1
+
+
 def main():
     """Main CLI function"""
     if len(sys.argv) < 2:
@@ -352,6 +415,7 @@ def main():
         print("")
         print("Commands:")
         print("  setup  - Setup virtual environment and install dependencies")
+        print("  start  - Start the FastAPI server")
         print("  test   - Interactive test selection menu")
         print("  test all - Run all tests")
         print("  demo   - RAG demo selection (automated/interactive)")
@@ -367,6 +431,8 @@ def main():
     
     if command == "setup":
         return run_setup()
+    elif command == "start":
+        return run_start()
     elif command == "test":
         return run_tests()
     elif command == "demo":
@@ -380,6 +446,7 @@ def main():
         print("")
         print("Commands:")
         print("  setup  - Setup virtual environment and install dependencies")
+        print("  start  - Start the FastAPI server (http://127.0.0.1:8000)")
         print("  test   - Interactive test selection menu")
         print("  test all - Run all tests")
         print("  demo   - RAG demo selection (automated/interactive)")
@@ -392,6 +459,7 @@ def main():
         print("")
         print("Examples:")
         print("  python run setup     # First time setup")
+        print("  python run start     # Start FastAPI server")
         print("  python run test      # Choose which tests to run")
         print("  python run demo      # Choose demo type and mode")
         print("  python run config    # View current settings")
@@ -399,7 +467,7 @@ def main():
     else:
         print(f"Unknown command: '{command}'")
         print("")
-        print("Available commands: setup, test, demo, config, help")
+        print("Available commands: setup, start, test, demo, config, help")
         print("Use 'python run help' for more information")
         return 1
 

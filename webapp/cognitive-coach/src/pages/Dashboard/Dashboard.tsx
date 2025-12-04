@@ -1,81 +1,114 @@
-import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useCallback, useEffect } from 'react';
+import { api } from '../../services/api';
+import { socket } from '../../services/socket';
 import './Dashboard.css';
 import ConfigurePopup from '../../components/ConfigurePopup/ConfigurePopup';
 import CurrentSession from '../../components/CurrentSession/CurrentSession';
 import ProfilePopup from '../../components/ProfilePopup/ProfilePopup';
+import CurrentSessionDetails from '../../components/CurrentSessionDetails/CurrentSessionDetails';
+
+type SessionState = 'idle' | 'active' | 'paused';
 
 interface Session {
-    id: string;
+    id: number;
     title: string;
-    date: string;
-    duration: string;
+    start_time?: string;
+    end_time?: string;
+    duration: number;
     focusScore: number;
-    materials: number;
-    attention: number;
-    emotion: string;
-    artifacts: {
-        equations?: number;
-        flashcards?: number;
-        questions?: number;
+    focus_score?: number;
+    status: string;
+    artifact_counts?: {
+        flashcard: number;
+        equation: number;
+        multiple_choice: number;
+        insights: number;
     };
+    total_artifacts?: number;
 }
 
 export default function Dashboard() {
-    const navigate = useNavigate();
     const [isConfigurePopupOpen, setIsConfigurePopupOpen] = useState(false);
     const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
     const [sessionSettings, setSessionSettings] = useState({ photoInterval: 2 });
+    const [userInitials, setUserInitials] = useState('');
+    const [sessions, setSessions] = useState<Session[]>([]);
+    const [isLoadingSessions, setIsLoadingSessions] = useState(true);
+    const [isPreviousSessionsExpanded, setIsPreviousSessionsExpanded] = useState(true);
+    const [currentSessionState, setCurrentSessionState] = useState<SessionState>('idle');
+    const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
+    const [currentSessionArtifacts, setCurrentSessionArtifacts] = useState<any[]>([]);
+    const [cameraSelections, setCameraSelections] = useState<{ webcam: string | null; external: string | null }>({
+        webcam: null,
+        external: null
+    });
 
-    const sessions: Session[] = [
-        {
-            id: '1',
-            title: 'Organic Chemistry Review',
-            date: 'Today, 2:30 PM',
-            duration: '2h 15m',
-            focusScore: 88,
-            materials: 34,
-            attention: 78,
-            emotion: 'Focused',
-            artifacts: { equations: 12, flashcards: 15, questions: 3 }
-        },
-        {
-            id: '2',
-            title: 'Calculus Problem Solving',
-            date: 'Yesterday, 7:45 PM',
-            duration: '1h 45m',
-            focusScore: 92,
-            materials: 28,
-            attention: 89,
-            emotion: 'Confident',
-            artifacts: { equations: 18, flashcards: 15, questions: 2 }
-        },
-        {
-            id: '3',
-            title: 'World History Reading',
-            date: '2 days ago, 3:15 PM',
-            duration: '3h 20m',
-            focusScore: 76,
-            materials: 45,
-            attention: 72,
-            emotion: 'Calm',
-            artifacts: { flashcards: 18, questions: 5 }
-        },
-        {
-            id: '4',
-            title: 'Physics Lab Analysis',
-            date: '3 days ago, 1:00 PM',
-            duration: '2h 50m',
-            focusScore: 94,
-            materials: 31,
-            attention: 91,
-            emotion: 'Engaged',
-            artifacts: { equations: 8, flashcards: 9, questions: 4 }
+    // Auto-collapse/expand Previous Sessions based on current session state
+    useEffect(() => {
+        if (currentSessionState === 'active' || currentSessionState === 'paused') {
+            // Collapse previous sessions when session starts
+            setIsPreviousSessionsExpanded(false);
+        } else if (currentSessionState === 'idle') {
+            // Expand previous sessions when session ends
+            setIsPreviousSessionsExpanded(true);
         }
-    ];
+    }, [currentSessionState]);
 
-    const handleSessionClick = () => {
-        navigate(`/session`);
+    // Listen for real-time artifact updates
+    useEffect(() => {
+        if (!currentSessionId) return;
+
+        const handleMaterialCreated = (material: any) => {
+            console.log('[Dashboard] Received material-created event:', material);
+            // Add new artifact to current session artifacts
+            setCurrentSessionArtifacts(prev => [...prev, material]);
+        };
+
+        socket.on('material-created', handleMaterialCreated);
+
+        return () => {
+            socket.off('material-created', handleMaterialCreated);
+        };
+    }, [currentSessionId]);
+
+    // Fetch user data on component mount
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const user = await api.getCurrentUser();
+                if (user && user.first_name && user.last_name) {
+                    const initials = `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
+                    setUserInitials(initials);
+                } else {
+                    setUserInitials('?');
+                }
+            } catch (error) {
+                console.error('Error fetching user:', error);
+                setUserInitials('?');
+            }
+        };
+        fetchUser();
+    }, []);
+
+    // Fetch sessions on component mount
+    useEffect(() => {
+        const fetchSessions = async () => {
+            setIsLoadingSessions(true);
+            try {
+                const sessionsData = await api.getSessions();
+                setSessions(sessionsData || []);
+            } catch (error) {
+                console.error('Error fetching sessions:', error);
+                setSessions([]);
+            } finally {
+                setIsLoadingSessions(false);
+            }
+        };
+        fetchSessions();
+    }, []);
+
+    const handleSessionClick = (sessionId: number) => {
+        window.open(`/session/${sessionId}`, '_blank');
     };
 
     const handleConfigureClick = () => {
@@ -98,33 +131,75 @@ export default function Dashboard() {
         setSessionSettings(settings);
     }, []);
 
-    const renderArtifacts = (artifacts: Session['artifacts']) => {
-        const items = [];
-        if (artifacts.equations) {
-            items.push(
+    // Format duration from seconds to readable format
+    const formatDuration = (seconds: number): string => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        if (hours > 0) {
+            return `${hours}h ${minutes}m`;
+        }
+        return `${minutes}m`;
+    };
+
+    // Format date from ISO string
+    const formatDate = (isoString: string): string => {
+        const date = new Date(isoString);
+        const now = new Date();
+        const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 0) {
+            return `Today, ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+        } else if (diffDays === 1) {
+            return `Yesterday, ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+        } else if (diffDays < 7) {
+            return `${diffDays} days ago, ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+        } else {
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+    };
+
+    // Render artifact chips for a session
+    const renderArtifactChips = (session: Session) => {
+        const counts = session.artifact_counts;
+        if (!counts || session.total_artifacts === 0) {
+            return (
+                <div className="artifact-chip">
+                    <span className="material-icons-round" style={{fontSize: '12px'}}>auto_awesome</span>
+                    No artifacts yet
+                </div>
+            );
+        }
+
+        const chips = [];
+        
+        if (counts.equation > 0) {
+            chips.push(
                 <div key="equations" className="artifact-chip equation">
                     <span className="material-icons-round" style={{fontSize: '12px'}}>functions</span>
-                    {artifacts.equations} equations
+                    {counts.equation} {counts.equation === 1 ? 'equation' : 'equations'}
                 </div>
             );
         }
-        if (artifacts.flashcards) {
-            items.push(
+        
+        if (counts.flashcard > 0) {
+            chips.push(
                 <div key="flashcards" className="artifact-chip flashcard">
                     <span className="material-icons-round" style={{fontSize: '12px'}}>quiz</span>
-                    {artifacts.flashcards} flashcards
+                    {counts.flashcard} {counts.flashcard === 1 ? 'flashcard' : 'flashcards'}
                 </div>
             );
         }
-        if (artifacts.questions) {
-            items.push(
-                <div key="questions" className="artifact-chip question">
+        
+        if (counts.multiple_choice > 0) {
+            chips.push(
+                <div key="mcq" className="artifact-chip question">
                     <span className="material-icons-round" style={{fontSize: '12px'}}>help</span>
-                    {artifacts.questions} questions
+                    {counts.multiple_choice} {counts.multiple_choice === 1 ? 'question' : 'questions'}
                 </div>
             );
         }
-        return items;
+
+        return chips;
     };
 
     return (
@@ -144,7 +219,9 @@ export default function Dashboard() {
                         <button className="icon-button" title="Settings">
                             <span className="material-icons-round">settings</span>
                         </button>
-                        <button className="user-avatar" title="Profile" onClick={handleProfileClick}>JD</button>
+                        <button className="user-avatar" title="Profile" onClick={handleProfileClick}>
+                            {userInitials || 'JD'}
+                        </button>
                     </div>
                 </div>
             </header>
@@ -154,46 +231,96 @@ export default function Dashboard() {
                 <CurrentSession 
                     onConfigureClick={handleConfigureClick} 
                     sessionSettings={sessionSettings}
+                    onSessionStateChange={setCurrentSessionState}
+                    onSessionIdChange={setCurrentSessionId}
+                    onArtifactsChange={setCurrentSessionArtifacts}
+                    webcamDeviceId={cameraSelections.webcam}
+                    externalDeviceId={cameraSelections.external}
                 />
 
+                {/* Current Session Details Section - Only show when session is active or paused */}
+                {(currentSessionState === 'active' || currentSessionState === 'paused') && (
+                    <CurrentSessionDetails 
+                        artifacts={currentSessionArtifacts}
+                        focusScore={85}
+                    />
+                )}
+
                 {/* Previous Sessions Section */}
-                <div className="sessions-header">
-                    <h2>Previous sessions</h2>
+                <div className="sessions-header" style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => setIsPreviousSessionsExpanded(!isPreviousSessionsExpanded)}>
+                    <h2>
+                        <span className="material-icons-round section-icon">history</span>
+                        Previous sessions
+                    </h2>
+                    <button 
+                        className="icon-button" 
+                        style={{ marginLeft: 'auto' }}
+                        aria-label={isPreviousSessionsExpanded ? 'Collapse' : 'Expand'}
+                    >
+                        <span className="material-icons-round">
+                            {isPreviousSessionsExpanded ? 'expand_less' : 'expand_more'}
+                        </span>
+                    </button>
                 </div>
-                <div className="sessions-list">
-                    {sessions.map((session) => (
-                        <div 
-                            key={session.id} 
-                            className="session-card"
-                            onClick={handleSessionClick}
-                        >
-                            <div className="session-card-header">
-                                <div className="session-info">
-                                    <h3>{session.title}</h3>
-                                    <div className="session-date">{session.date}</div>
-                                </div>
-                                <div className="session-duration">{session.duration}</div>
+                
+                {isPreviousSessionsExpanded && (
+                    <>
+                        {isLoadingSessions ? (
+                            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                                Loading sessions...
                             </div>
+                        ) : sessions.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                                No sessions found. Start your first study session!
+                            </div>
+                        ) : (
+                            <div className="sessions-list">
+                                {sessions.map((session) => (
+                                    <div 
+                                        key={session.id} 
+                                        className="session-card"
+                                        onClick={() => handleSessionClick(session.id)}
+                                    >
+                                        <div className="session-card-header">
+                                            <div className="session-info">
+                                                <h3>{session.title}</h3>
+                                                <div className="session-date">
+                                                    {session.start_time ? formatDate(session.start_time) : 'No date'}
+                                                </div>
+                                            </div>
+                                            <div className="session-duration">
+                                                {formatDuration(session.duration)}
+                                            </div>
+                                        </div>
 
-                            <div className="session-metrics">
-                                <div className="session-focus-score">
-                                    <span className="focus-score">Focus: {session.focusScore}%</span>
-                                    <span className="emotion-label" style={{fontSize: '18px', fontWeight: '500', color: '#3b82f6', marginLeft: '16px'}}>Emotion: {session.emotion}</span>
-                                </div>
-                            </div>
+                                        <div className="session-metrics">
+                                            <div className="session-focus-score">
+                                                <span className="focus-score">
+                                                    Focus: {session.focusScore || session.focus_score || 0}%
+                                                </span>
+                                                <span className="emotion-label" style={{fontSize: '18px', fontWeight: '500', color: '#3b82f6', marginLeft: '16px'}}>
+                                                    Status: {session.status}
+                                                </span>
+                                            </div>
+                                        </div>
 
-                            <div className="session-artifacts">
-                                {renderArtifacts(session.artifacts)}
+                                        <div className="session-artifacts">
+                                            {renderArtifactChips(session)}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        )}
+                    </>
+                )}
             </main>
             
             <ConfigurePopup 
                 isOpen={isConfigurePopupOpen}
                 onClose={handleCloseConfigurePopup}
                 onSettingsChange={handleSettingsChange}
+                cameraSelections={cameraSelections}
+                onCameraSelectionChange={setCameraSelections}
             />
             
             <ProfilePopup 

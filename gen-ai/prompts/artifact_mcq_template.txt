@@ -1,0 +1,23 @@
+Create {num_items} multiple-choice question about "{topic}".
+
+IMPORTANT: Respond with ONLY valid JSON. No additional text, explanations, or markdown formatting.
+
+Required JSON format:
+{{
+  "artifact_type": "mcq",
+  "version": "1.0",
+  "questions": [
+    {{
+      "id": "mcq_001",
+      "stem": "Question here?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "answer_index": 0,
+      "rationale": "Explanation here",
+      "bloom_level": "understand",
+      "source_refs": ["N1"]
+    }}
+  ]
+}}
+
+Generate the JSON now:
+

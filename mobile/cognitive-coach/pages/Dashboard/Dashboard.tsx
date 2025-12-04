@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator, RefreshControl } from 'react-native';
 import { router } from 'expo-router';
 import { Typography, Card } from '../../components/ui';
 import { commonStyles, tokens } from '../../styles/theme';
+import { ProtectedRoute } from '../../components/ProtectedRoute';
+import { useAuth } from '../../contexts/AuthContext';
+import { sessionService, Session as BackendSession } from '../../services/session.service';
 
 interface Session {
   id: string;
@@ -18,48 +21,63 @@ interface Session {
   };
 }
 
-export default function Dashboard() {
-  const sessions: Session[] = [
-    {
-      id: '1',
-      title: 'Organic Chemistry Review',
-      date: 'Today, 2:30 PM',
-      duration: '2h 15m',
-      focusScore: 88,
-      emotion: 'Focused',
-      artifacts: { equations: 12, flashcards: 15, questions: 3 }
-    },
-    {
-      id: '2',
-      title: 'Calculus Problem Solving',
-      date: 'Yesterday, 7:45 PM',
-      duration: '1h 45m',
-      focusScore: 92,
-      emotion: 'Confident',
-      artifacts: { equations: 18, flashcards: 15, questions: 2 }
-    },
-    {
-      id: '3',
-      title: 'World History Reading',
-      date: '2 days ago, 3:15 PM',
-      duration: '3h 20m',
-      focusScore: 76,
-      emotion: 'Calm',
-      artifacts: { flashcards: 18, questions: 5 }
-    },
-    {
-      id: '4',
-      title: 'Physics Lab Analysis',  
-      date: '3 days ago, 1:00 PM',
-      duration: '2h 50m',
-      focusScore: 94,
-      emotion: 'Engaged',
-      artifacts: { equations: 8, flashcards: 9, questions: 4 }
+function DashboardContent() {
+  const { user, logout } = useAuth();
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Load sessions on mount
+  useEffect(() => {
+    loadSessions();
+  }, []);
+
+  const loadSessions = async () => {
+    try {
+      setIsLoading(true);
+      const response = await sessionService.getAllSessions();
+
+      if (response.error || !response.data) {
+        Alert.alert('Error', response.message || 'Failed to load sessions');
+        return;
+      }
+
+      // Transform backend sessions to display format
+      const transformedSessions: Session[] = response.data.sessions.map((session: BackendSession) => ({
+        id: session.id.toString(),
+        title: session.title,
+        date: sessionService.formatSessionDate(session.start_time),
+        duration: sessionService.formatDuration(session.duration),
+        focusScore: session.focus_score || 0,
+        emotion: session.status === 'completed' ? 'Focused' : 'In Progress',
+        artifacts: {
+          // Note: Artifacts count will be added when we integrate materials
+          flashcards: 0,
+          equations: 0,
+          questions: 0
+        }
+      }));
+
+      setSessions(transformedSessions);
+    } catch (error: any) {
+      console.error('Error loading sessions:', error);
+      Alert.alert('Error', 'Failed to load sessions');
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await loadSessions();
+    setIsRefreshing(false);
+  };
 
   const handleSessionClick = (sessionId: string) => {
-    router.push('/session');
+    router.push({
+      pathname: '/session',
+      params: { id: sessionId }
+    });
   };
 
   const handleProfilePress = () => {
@@ -68,6 +86,32 @@ export default function Dashboard() {
 
   const handleNotificationsPress = () => {
     Alert.alert('Notifications', 'No new notifications.');
+  };
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Logout', 
+          style: 'destructive',
+          onPress: async () => {
+            await logout();
+            router.replace('/login');
+          }
+        }
+      ]
+    );
+  };
+
+  // Get user initials for profile button
+  const getUserInitials = () => {
+    if (!user) return 'U';
+    const firstInitial = user.first_name?.charAt(0).toUpperCase() || '';
+    const lastInitial = user.last_name?.charAt(0).toUpperCase() || '';
+    return firstInitial && lastInitial ? `${firstInitial}${lastInitial}` : user.email.charAt(0).toUpperCase();
   };
 
   const renderArtifacts = (artifacts: Session['artifacts']) => {
@@ -123,12 +167,12 @@ export default function Dashboard() {
               <Text style={styles.headerButtonIcon}>🔔</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.profileButton} onPress={handleProfilePress}>
-              <Text style={styles.profileText}>JD</Text>
+              <Text style={styles.profileText}>{getUserInitials()}</Text>
             </TouchableOpacity>
           </View>
         </View>
         <Typography variant="bodyLarge" color="secondary" style={{ marginTop: tokens.spacing.sm }}>
-          Welcome back! Here's your study progress.
+          Welcome back{user?.first_name ? `, ${user.first_name}` : ''}! Here's your study progress.
         </Typography>
       </View>
 
@@ -136,6 +180,13 @@ export default function Dashboard() {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: tokens.spacing.xl }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            tintColor={tokens.colors.primary}
+          />
+        }
       >
         {/* Previous Sessions Section */}
         <View style={styles.sessionsSection}>
@@ -143,13 +194,33 @@ export default function Dashboard() {
             Previous sessions
           </Typography>
           
-          {sessions.map((session) => (
-            <TouchableOpacity
-              key={session.id}
-              onPress={() => handleSessionClick(session.id)}
-              activeOpacity={0.7}
-            >
-              <Card style={styles.sessionCard}>
+          {isLoading ? (
+            <View style={{ padding: tokens.spacing.xl, alignItems: 'center' }}>
+              <ActivityIndicator size="large" color={tokens.colors.primary} />
+              <Typography variant="bodyMedium" color="secondary" style={{ marginTop: tokens.spacing.md }}>
+                Loading sessions...
+              </Typography>
+            </View>
+          ) : sessions.length === 0 ? (
+            <Card style={styles.sessionCard}>
+              <View style={{ padding: tokens.spacing.lg, alignItems: 'center' }}>
+                <Text style={{ fontSize: 48, marginBottom: tokens.spacing.md }}>📚</Text>
+                <Typography variant="titleMedium" style={{ marginBottom: tokens.spacing.sm }}>
+                  No sessions yet
+                </Typography>
+                <Typography variant="bodyMedium" color="secondary" style={{ textAlign: 'center' }}>
+                  Your study sessions will appear here once you create them on the web app.
+                </Typography>
+              </View>
+            </Card>
+          ) : (
+            sessions.map((session) => (
+              <TouchableOpacity
+                key={session.id}
+                onPress={() => handleSessionClick(session.id)}
+                activeOpacity={0.7}
+              >
+                <Card style={styles.sessionCard}>
                 <View style={styles.sessionHeader}>
                   <View style={styles.sessionInfo}>
                     <Typography variant="titleMedium" style={styles.sessionTitle}>
@@ -180,7 +251,8 @@ export default function Dashboard() {
                 </View>
               </Card>
             </TouchableOpacity>
-          ))}
+            ))
+          )}
         </View>
       </ScrollView>
     </View>
@@ -353,3 +425,12 @@ const styles = {
     color: tokens.colors.questionText,
   },
 };
+
+// Wrap with ProtectedRoute
+export default function Dashboard() {
+  return (
+    <ProtectedRoute>
+      <DashboardContent />
+    </ProtectedRoute>
+  );
+}

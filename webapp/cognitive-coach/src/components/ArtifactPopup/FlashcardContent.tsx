@@ -1,15 +1,26 @@
 import React from 'react';
 import type { PopupState } from './types';
-import { mockFlashcards } from '../../assets/data';
 
 interface FlashcardContentProps {
     popup: PopupState;
     setPopup: React.Dispatch<React.SetStateAction<PopupState>>;
+    artifact: {
+        id: number;
+        type: string;
+        title: string;
+        content: string;
+    };
 }
 
-export default function FlashcardContent({ popup, setPopup }: FlashcardContentProps) {
-    const card = mockFlashcards.cards[popup.currentIndex];
-    if (!card) return null;
+export default function FlashcardContent({ popup, setPopup, artifact }: FlashcardContentProps) {
+    // Parse JSON content
+    let card;
+    try {
+        card = JSON.parse(artifact.content);
+    } catch (error) {
+        console.error('Error parsing flashcard content:', error);
+        return <div>Error loading flashcard</div>;
+    }
 
     return (
         <div className="flashcard-popup">
@@ -43,7 +54,7 @@ export default function FlashcardContent({ popup, setPopup }: FlashcardContentPr
                                     </div>
                                     {popup.showHint && (
                                         <div className="hint-expanded-content">
-                                            {card.hints.map((hint, index) => (
+                                            {card.hints.map((hint: string, index: number) => (
                                                 <p key={index}>{hint}</p>
                                             ))}
                                         </div>

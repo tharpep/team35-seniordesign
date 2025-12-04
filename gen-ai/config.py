@@ -15,7 +15,7 @@ class RAGConfig:
     use_laptop: bool = True  # True for laptop (llama3.2:1b), False for PC (qwen3:8b)
     
     # AI Provider settings
-    use_ollama: bool = True  # True for Ollama (local), False for Purdue API
+    use_ollama: bool = False  # True for Ollama (local), False for Purdue API
     
     # Vector store settings
     use_persistent: bool = True  # True for persistent storage, False for in-memory only
@@ -23,17 +23,25 @@ class RAGConfig:
     clear_on_ingest: bool = True  # Clear collection before ingesting new documents
     
     # Retrieval settings
-    top_k: int = 5  # Number of documents to retrieve (1-20 recommended)
+    top_k: int = 5  # Number of documents to retrieve (increased for better context)
     similarity_threshold: float = 0.7  # Minimum similarity score (0.0-1.0)
     
     # Generation settings
-    max_tokens: int = 100  # Maximum tokens in response (50-500 recommended)
-    temperature: float = 0.7  # Creativity level (0.0-1.0, lower = more focused)
+    max_tokens: int = 500  # Maximum tokens in response (optimal for artifact generation)
+    max_chat_tokens: int = 300  # Maximum tokens for chatbot responses (increased from 150 for complete answers)
+    temperature: float = 0.4  # Creativity level (lower for more focused JSON generation)
+    
+    # Chat session settings
+    max_history_size: int = 10  # Maximum number of conversation exchanges to keep in memory
+    summary_interval: int = 5  # Regenerate summary every N messages when at history limit
     
     @property
     def model_name(self) -> str:
-        """Get model name based on hardware configuration"""
-        return "deepseek-r1:8b" if self.use_laptop else "qwen3:8b"
+        """Get model name based on hardware and provider configuration"""
+        if self.use_ollama:
+            return "llama3.2:1b" if self.use_laptop else "qwen3:8b"
+        else:
+            return "mistral:latest"  # Balanced speed and accuracy
 
 
 # Default configurations
