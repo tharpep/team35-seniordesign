@@ -327,11 +327,156 @@ const injectArtifact = async (req, res) => {
   }
 };
 
+// Generate artifact via gen-ai and inject into database
+const generateMaterial = async (req, res) => {
+  try {
+    const { type, topic, session_id, num_items } = req.body;
+    const userId = req.session.userId;
+
+    // Validate required fields
+    if (!type || !session_id) {
+      return res.status(400).json({ 
+        error: 'Missing fields',
+        message: 'type and session_id are required'
+      });
+    }
+
+    // Validate type
+    const validTypes = ['flashcard', 'mcq', 'insights'];
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({ 
+        error: 'Invalid type',
+        message: `type must be one of: ${validTypes.join(', ')}`
+      });
+    }
+
+    // Verify session belongs to user
+    const session = await getOne(
+      'SELECT * FROM sessions WHERE id = ? AND user_id = ?',
+      [session_id, userId]
+    );
+
+    if (!session) {
+      return res.status(404).json({ 
+        error: 'Not found',
+        message: 'Session not found'
+      });
+    }
+
+    // Default topic and num_items
+    const artifactTopic = topic || "Newton's laws of motion";
+    const itemCount = num_items || 1;
+
+    // Map type to gen-ai endpoint
+    const endpointMap = {
+      'flashcard': '/flashcards',
+      'mcq': '/mcq',
+      'insights': '/insights'
+    };
+
+    const genaiEndpoint = endpointMap[type];
+    const genaiUrl = `http://localhost:8000/api${genaiEndpoint}`;
+
+    console.log(`[Artifact Generation] Calling gen-ai: ${genaiUrl}`);
+    console.log(`[Artifact Generation] Topic: ${artifactTopic}, Items: ${itemCount}`);
+
+    // Call gen-ai API
+    const axios = require('axios');
+    const genaiResponse = await axios.post(genaiUrl, {
+      topic: artifactTopic,
+      num_items: itemCount
+    }, {
+      timeout: 60000 // 60 second timeout for generation
+    });
+
+    const artifact = genaiResponse.data;
+
+    if (!artifact || !artifact.artifact_type) {
+      return res.status(500).json({ 
+        error: 'Invalid response',
+        message: 'Gen-AI API returned invalid artifact'
+      });
+    }
+
+    console.log(`[Artifact Generation] Successfully generated ${type} artifact`);
+
+    // Inject artifact into database using existing logic
+    const typeMapping = {
+      'flashcards': 'flashcard',
+      'mcq': 'multiple_choice',
+      'insights': 'insights',
+      'equation': 'equation'
+    };
+
+    const dbType = typeMapping[artifact.artifact_type] || artifact.artifact_type;
+
+    // Generate title based on artifact type and content
+    let title = 'Generated Artifact';
+    if (artifact.artifact_type === 'flashcards' && artifact.cards && artifact.cards.length > 0) {
+      title = artifact.cards[0].front.substring(0, 100);
+    } else if (artifact.artifact_type === 'mcq' && artifact.questions && artifact.questions.length > 0) {
+      title = artifact.questions[0].stem.substring(0, 100);
+    } else if (artifact.artifact_type === 'insights' && artifact.insights && artifact.insights.length > 0) {
+      title = artifact.insights[0].title || artifact.insights[0].takeaway.substring(0, 100);
+    }
+
+    const content = JSON.stringify(artifact);
+
+    // Insert into database
+    const result = await runQuery(
+      `INSERT INTO study_artifacts (session_id, type, title, content) 
+       VALUES (?, ?, ?, ?)`,
+      [session_id, dbType, title, content]
+    );
+
+    const newMaterial = await getOne('SELECT * FROM study_artifacts WHERE id = ?', [result.id]);
+
+    console.log(`[Artifact Generation] Successfully injected artifact: ${result.id}`);
+
+    // Emit socket event for real-time updates
+    if (req.app.get('io')) {
+      req.app.get('io').to(`session-${session_id}`).emit('material-created', newMaterial);
+      console.log(`[Artifact Generation] Emitted material-created event for session ${session_id}`);
+    }
+
+    res.status(201).json({ 
+      success: true,
+      material: newMaterial,
+      message: 'Artifact generated and stored successfully'
+    });
+
+  } catch (error) {
+    console.error('[Artifact Generation] Error:', error);
+    
+    // Provide helpful error messages
+    if (error.code === 'ECONNREFUSED' || error.message?.includes('ECONNREFUSED')) {
+      return res.status(503).json({ 
+        error: 'Service unavailable',
+        message: 'Gen-AI service is not available. Please ensure the gen-ai API server is running on port 8000.'
+      });
+    }
+
+    if (error.response?.status) {
+      return res.status(error.response.status).json({ 
+        error: 'Generation failed',
+        message: error.response.data?.detail?.error || error.response.data?.error || 'Failed to generate artifact'
+      });
+    }
+
+    res.status(500).json({ 
+      error: 'Server error',
+      message: 'Could not generate artifact',
+      details: error.message
+    });
+  }
+};
+
 module.exports = {
   getMaterialsBySession,
   getMaterialById,
   createMaterial,
   updateMaterial,
   deleteMaterial,
-  injectArtifact
+  injectArtifact,
+  generateMaterial
 };

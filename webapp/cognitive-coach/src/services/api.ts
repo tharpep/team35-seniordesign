@@ -135,5 +135,25 @@ export const api = {
       console.error('Registration error:', error);
       throw new Error(error.response?.data?.message || 'Registration failed');
     }
+  },
+
+  // Generate artifact via gen-ai and inject into database
+  generateArtifact: async (
+    sessionId: string,
+    type: 'flashcard' | 'mcq' | 'insights',
+    topic?: string
+  ): Promise<any> => {
+    try {
+      const response = await axios.post(`${API_BASE}/materials/generate`, {
+        session_id: sessionId,
+        type: type,
+        topic: topic || "Newton's laws of motion",
+        num_items: 1
+      });
+      return response.data.material;
+    } catch (error: any) {
+      console.error('Error generating artifact:', error);
+      throw new Error(error.response?.data?.message || 'Failed to generate artifact');
+    }
   }
 };
