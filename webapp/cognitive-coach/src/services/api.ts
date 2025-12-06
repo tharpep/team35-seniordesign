@@ -144,6 +144,10 @@ export const api = {
     topic?: string
   ): Promise<any> => {
     try {
+      if (!sessionId) {
+        throw new Error('Session ID is required');
+      }
+
       const response = await axios.post(`${API_BASE}/materials/generate`, {
         session_id: sessionId,
         type: type,
@@ -153,7 +157,25 @@ export const api = {
       return response.data.material;
     } catch (error: any) {
       console.error('Error generating artifact:', error);
-      throw new Error(error.response?.data?.message || 'Failed to generate artifact');
+      
+      // Provide more specific error messages
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      
+      if (error.response?.data?.error) {
+        throw new Error(error.response.data.error);
+      }
+      
+      if (error.code === 'ECONNREFUSED' || error.message?.includes('ECONNREFUSED')) {
+        throw new Error('Backend server is not available. Please ensure the backend is running on port 3001.');
+      }
+      
+      if (error.message) {
+        throw new Error(error.message);
+      }
+      
+      throw new Error('Failed to generate artifact. Please check the console for details.');
     }
   }
 };

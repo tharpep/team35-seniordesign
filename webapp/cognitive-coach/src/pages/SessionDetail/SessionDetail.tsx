@@ -146,26 +146,39 @@ export default function SessionDetail() {
     ];
 
     // Parse insights from database artifacts
+    // Structure: { artifact_type: "insights", insights: [{ title, takeaway, ... }] }
     const insights: Insight[] = artifacts
         .filter(artifact => artifact.type === 'insights')
-        .slice(0, 3) // Only take first 3 insights
-        .map((artifact, index) => {
+        .flatMap((artifact, artifactIndex) => {
             try {
                 const content = JSON.parse(artifact.content);
-                return {
-                    title: content.title || artifact.title,
-                    description: content.takeaway || 'No description available',
-                    icon: index === 0 ? 'trending_up' : index === 1 ? 'psychology' : 'balance'
-                };
+                // Extract all insights from the array
+                if (content.insights && Array.isArray(content.insights) && content.insights.length > 0) {
+                    return content.insights.map((insight: any, insightIndex: number) => ({
+                        title: insight.title || artifact.title,
+                        description: insight.takeaway || 'No description available',
+                        icon: (artifactIndex + insightIndex) === 0 ? 'trending_up' : 
+                              (artifactIndex + insightIndex) === 1 ? 'psychology' : 'balance'
+                    }));
+                } else {
+                    // Fallback if structure is unexpected
+                    console.warn('Insight artifact has no insights array:', artifact.id);
+                    return [{
+                        title: artifact.title,
+                        description: 'No description available',
+                        icon: artifactIndex === 0 ? 'trending_up' : artifactIndex === 1 ? 'psychology' : 'balance'
+                    }];
+                }
             } catch (error) {
-                console.error('Error parsing insight:', error);
-                return {
+                console.error('Error parsing insight:', error, artifact);
+                return [{
                     title: artifact.title,
                     description: 'Error loading insight',
                     icon: 'lightbulb'
-                };
+                }];
             }
-        });
+        })
+        .slice(0, 3); // Only take first 3 insights total
 
     // Auto-scroll to bottom when new messages are added
     useEffect(() => {
@@ -292,6 +305,34 @@ export default function SessionDetail() {
         }));
     };
 
+    const handleGenerateArtifact = async (type: 'flashcard' | 'mcq' | 'insights') => {
+        if (!sessionId) {
+            alert('Error: No session ID found. Please navigate to a valid session.');
+            return;
+        }
+        
+        try {
+            await api.generateArtifact(sessionId, type);
+            
+            // Refresh artifacts
+            const artifactsData = await api.getMaterials(sessionId);
+            setArtifacts(artifactsData || []);
+            
+            // Recalculate counts
+            const counts = {
+                flashcard: artifactsData.filter(a => a.type === 'flashcard').length,
+                MCQ: artifactsData.filter(a => a.type === 'multiple_choice').length,
+                equation: artifactsData.filter(a => a.type === 'equation').length,
+                total: artifactsData.length
+            };
+            setArtifactCounts(counts);
+        } catch (error: any) {
+            console.error('Generate artifact error:', error);
+            // Show the actual error message from the API
+            alert(error.message || 'Failed to generate artifact');
+        }
+    };
+
     if (isLoading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -385,7 +426,9 @@ export default function SessionDetail() {
 
                         <StudyArtifacts 
                             artifacts={artifacts}
-                            onArtifactClick={handleArtifactClick} 
+                            onArtifactClick={handleArtifactClick}
+                            sessionId={sessionId!}
+                            onGenerate={handleGenerateArtifact}
                         />
 
                         <div className="section card">
