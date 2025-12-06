@@ -3,6 +3,7 @@ import './CurrentSessionDetails.css';
 import FocusAnalytics from '../FocusAnalytics/FocusAnalytics';
 import StudyArtifacts from '../StudyArtifacts/StudyArtifacts';
 import { genaiApi } from '../../services/genaiApi';
+import { api } from '../../services/api';
 
 interface ChatMessage {
     id: string;
@@ -18,7 +19,7 @@ interface CurrentSessionDetailsProps {
     onArtifactClick?: (artifact: any, index: number) => void;
 }
 
-export default function CurrentSessionDetails({ artifacts = [], focusScore = 0, onArtifactClick }: CurrentSessionDetailsProps) {
+export default function CurrentSessionDetails({ sessionId, artifacts = [], focusScore = 0, onArtifactClick }: CurrentSessionDetailsProps) {
     const [isExpanded, setIsExpanded] = useState(true);
     const [chatMessage, setChatMessage] = useState('');
     const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
@@ -48,6 +49,23 @@ export default function CurrentSessionDetails({ artifacts = [], focusScore = 0, 
         };
     }, []);
 
+    const handleGenerateArtifact = async (type: 'flashcard' | 'mcq' | 'insights') => {
+        if (!sessionId) {
+            alert('Error: No session ID found. Cannot generate artifact.');
+            return;
+        }
+        
+        try {
+            await api.generateArtifact(String(sessionId), type);
+            // Note: Artifacts refresh would need to be handled by parent component
+            // since artifacts are passed as props
+            alert(`${type} generated successfully!`);
+        } catch (error: any) {
+            console.error('Generate artifact error:', error);
+            alert(error.message || 'Failed to generate artifact');
+        }
+    };
+
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!chatMessage.trim()) return;
@@ -66,7 +84,12 @@ export default function CurrentSessionDetails({ artifacts = [], focusScore = 0, 
 
         try {
             // Call gen-ai API directly (bypasses backend)
-            const response = await genaiApi.chat(messageToSend, 'global');
+            // Pass sessionId if available, but no full context since we don't have session data here
+            const response = await genaiApi.chat(
+                messageToSend, 
+                sessionId ? String(sessionId) : 'global',
+                sessionId ? { session_id: sessionId } : undefined
+            );
             
             const aiResponse: ChatMessage = {
                 id: (Date.now() + 1).toString(),
@@ -125,6 +148,8 @@ export default function CurrentSessionDetails({ artifacts = [], focusScore = 0, 
                         <StudyArtifacts 
                             artifacts={artifacts}
                             onArtifactClick={onArtifactClick || (() => {})}
+                            sessionId={sessionId ? String(sessionId) : ''}
+                            onGenerate={handleGenerateArtifact}
                         />
                     </div>
 

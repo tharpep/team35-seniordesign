@@ -29,6 +29,17 @@ export const api = {
     }
   },
 
+  // Get single session by ID
+  getSession: async (sessionId: string): Promise<any | null> => {
+    try {
+      const response = await axios.get(`${API_BASE}/sessions/${sessionId}`);
+      return response.data.session || null;
+    } catch (error) {
+      console.error('Error fetching session:', error);
+      return null;
+    }
+  },
+
   // Get incomplete session (active or paused)
   getIncompleteSession: async (): Promise<any | null> => {
     try {

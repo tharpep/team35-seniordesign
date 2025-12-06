@@ -6,7 +6,7 @@ Generates flashcards from retrieved context using RAG
 import json
 import time
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 # Add project root to path for imports
 import sys
@@ -33,13 +33,14 @@ class FlashcardGenerator(BaseArtifactGenerator):
         
         super().__init__(rag_system, str(template_path))
     
-    def generate(self, topic: str, num_items: int = 1) -> Dict[str, Any]:
+    def generate(self, topic: str, num_items: int = 1, session_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Generate flashcards for the given topic
         
         Args:
             topic: Topic to generate flashcards about
             num_items: Number of flashcards to generate (default 1)
+            session_context: Optional session context dict with session_id, session_title
             
         Returns:
             Dictionary containing the generated flashcards
@@ -56,6 +57,18 @@ class FlashcardGenerator(BaseArtifactGenerator):
         if not prompt:
             # Fallback if template file missing
             prompt = f'Create {num_items} flashcard about "{topic}". Respond with ONLY valid JSON matching the flashcard schema.'
+        
+        # Append session context to prompt if available
+        if session_context:
+            context_parts = []
+            if session_context.get('session_id'):
+                context_parts.append(f"Session ID: {session_context['session_id']}")
+            if session_context.get('session_title'):
+                context_parts.append(f"Session: {session_context['session_title']}")
+            
+            if context_parts:
+                context_text = "\n\nSession Context:\n" + "\n".join(context_parts)
+                prompt = prompt + context_text
         
         # Use existing RAG system with artifact token limit
         result = self.rag.query(prompt, max_tokens=self.rag.config.max_tokens)

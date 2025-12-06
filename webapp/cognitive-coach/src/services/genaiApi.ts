@@ -46,13 +46,28 @@ export const genaiApi = {
    * 
    * @param message - User's chat message
    * @param sessionId - Optional session ID (defaults to 'global' for single-user system)
+   * @param sessionContext - Optional session context with session_id, session_title, start_time, end_time, duration, status, created_at, focus_score
    * @returns Chat response with answer and metadata
    */
-  chat: async (message: string, sessionId?: string): Promise<ChatResponse> => {
+  chat: async (
+    message: string, 
+    sessionId?: string,
+    sessionContext?: { 
+      session_id?: string | number;
+      session_title?: string;
+      start_time?: string;
+      end_time?: string;
+      duration?: number;
+      status?: string;
+      created_at?: string;
+      focus_score?: number | null;
+    }
+  ): Promise<ChatResponse> => {
     try {
       const response = await genaiAxios.post<ChatResponse>('/chat', {
         message,
-        session_id: sessionId || 'global'
+        session_id: sessionId || 'global',
+        session_context: sessionContext || undefined
       });
       return response.data;
     } catch (error: any) {

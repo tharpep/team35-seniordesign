@@ -7,7 +7,7 @@ import json
 import time
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 # Add project root to path for imports
 import sys
@@ -46,13 +46,14 @@ class BaseArtifactGenerator(ABC):
             raise Exception(f"Failed to load JSON file {file_path}: {str(e)}")
     
     @abstractmethod
-    def generate(self, topic: str, num_items: int = 1) -> Dict[str, Any]:
+    def generate(self, topic: str, num_items: int = 1, session_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Generate artifacts for the given topic
         
         Args:
             topic: Topic to generate artifacts about
             num_items: Number of items to generate (default 1)
+            session_context: Optional session context dict with session_id, session_title
             
         Returns:
             Dictionary containing the generated artifact

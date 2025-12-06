@@ -62,6 +62,7 @@ export default function SessionDetail() {
     });
 
     const [sessionData, setSessionData] = useState<any>(null);
+    const [rawSession, setRawSession] = useState<any>(null); // Store raw session data for context
     const [artifacts, setArtifacts] = useState<Artifact[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [artifactCounts, setArtifactCounts] = useState({ flashcard: 0, MCQ: 0, equation: 0, total: 0 });
@@ -92,8 +93,17 @@ export default function SessionDetail() {
             
             setIsLoading(true);
             try {
-                // Fetch artifacts
-                const artifactsData = await api.getMaterials(sessionId);
+                // Fetch session data and artifacts in parallel
+                const [sessionResponse, artifactsData] = await Promise.all([
+                    api.getSession(sessionId),
+                    api.getMaterials(sessionId)
+                ]);
+                
+                // Store raw session data for passing to chat
+                if (sessionResponse) {
+                    setRawSession(sessionResponse);
+                }
+                
                 setArtifacts(artifactsData || []);
                 
                 // Calculate artifact counts
@@ -105,20 +115,50 @@ export default function SessionDetail() {
                 };
                 setArtifactCounts(counts);
 
-                // For now, use mock session data (TODO: fetch from API)
-                setSessionData({
-                    title: 'Organic Chemistry Review',
-                    date: 'Today, 2:30 PM - 4:45 PM',
-                    duration: '2h 15m',
-                    sessionId: '#' + sessionId,
-                    status: 'Completed',
-                    metrics: {
-                        focusScore: 88,
-                        emotion: "focused",
-                        materials: artifactsData.length,
-                        artifacts: artifactsData.length
-                    }
-                });
+                // Format session data for display
+                if (sessionResponse) {
+                    const startTime = sessionResponse.start_time ? new Date(sessionResponse.start_time) : null;
+                    const endTime = sessionResponse.end_time ? new Date(sessionResponse.end_time) : null;
+                    const durationMinutes = sessionResponse.duration || 0;
+                    const durationHours = Math.floor(durationMinutes / 60);
+                    const durationMins = durationMinutes % 60;
+                    const durationStr = durationHours > 0 
+                        ? `${durationHours}h ${durationMins}m` 
+                        : `${durationMins}m`;
+
+                    setSessionData({
+                        title: sessionResponse.title || 'Untitled Session',
+                        date: startTime && endTime 
+                            ? `${startTime.toLocaleDateString()}, ${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                            : startTime 
+                                ? `${startTime.toLocaleDateString()}, ${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                                : 'Unknown date',
+                        duration: durationStr,
+                        sessionId: '#' + sessionId,
+                        status: sessionResponse.status || 'Unknown',
+                        metrics: {
+                            focusScore: sessionResponse.focus_score || null,
+                            emotion: "focused",
+                            materials: artifactsData.length,
+                            artifacts: artifactsData.length
+                        }
+                    });
+                } else {
+                    // Fallback if session not found
+                    setSessionData({
+                        title: 'Session Not Found',
+                        date: 'Unknown',
+                        duration: '0m',
+                        sessionId: '#' + sessionId,
+                        status: 'Unknown',
+                        metrics: {
+                            focusScore: null,
+                            emotion: "unknown",
+                            materials: artifactsData.length,
+                            artifacts: artifactsData.length
+                        }
+                    });
+                }
             } catch (error) {
                 console.error('Error fetching session data:', error);
             } finally {
@@ -213,8 +253,24 @@ export default function SessionDetail() {
         setIsTyping(true);
 
         try {
+            // Build session context from raw session data
+            const sessionContext = rawSession ? {
+                session_id: rawSession.id,
+                session_title: rawSession.title,
+                start_time: rawSession.start_time,
+                end_time: rawSession.end_time,
+                duration: rawSession.duration,
+                status: rawSession.status,
+                created_at: rawSession.created_at,
+                focus_score: rawSession.focus_score
+            } : undefined;
+
             // Call gen-ai API directly (bypasses backend)
-            const response = await genaiApi.chat(messageToSend, 'global');
+            const response = await genaiApi.chat(
+                messageToSend, 
+                sessionId || 'global',
+                sessionContext
+            );
             
             const aiResponse: ChatMessage = {
                 id: (Date.now() + 1).toString(),

@@ -297,16 +297,21 @@ class ChatService:
             logger.warning(f"Failed to get RAG context: {e}", exc_info=True)
             return "", [], 0.0
     
-    def _build_messages_array(self, current_message: str) -> tuple[List[Dict[str, str]], List[tuple[str, float]], float, float]:
+    def _build_messages_array(self, current_message: str, session_context: Optional[Dict[str, Any]] = None) -> tuple[List[Dict[str, str]], List[tuple[str, float]], float, float]:
         """
         Build messages array for LLM API call
         
         Structure:
         1. System prompt
-        2. RAG context (from persistant_docs)
-        3. Chat summary (long-term conversation memory)
-        4. Recent conversation history (last N exchanges from config)
-        5. Current message
+        2. Session context (if provided)
+        3. RAG context (from persistant_docs)
+        4. Chat summary (long-term conversation memory)
+        5. Recent conversation history (last N exchanges from config)
+        6. Current message
+        
+        Args:
+            current_message: Current user message
+            session_context: Optional session context dict with session_id, session_title
         
         Returns:
             Tuple of (messages array, RAG results for debugging, summary generation time, query optimization time)
@@ -319,7 +324,19 @@ class ChatService:
         if self.system_prompt:
             messages.append({"role": "system", "content": self.system_prompt})
         
-        # 2. RAG context (session notes)
+        # 2. Session context (if provided)
+        if session_context:
+            context_parts = []
+            if session_context.get('session_id'):
+                context_parts.append(f"Session ID: {session_context['session_id']}")
+            if session_context.get('session_title'):
+                context_parts.append(f"Session: {session_context['session_title']}")
+            
+            if context_parts:
+                context_text = "\n".join(context_parts)
+                messages.append({"role": "system", "content": context_text})
+        
+        # 3. RAG context (session notes)
         rag_context, rag_results, query_optimization_time = self._get_rag_context(current_message)
         if rag_context:
             messages.append({"role": "system", "content": rag_context})
@@ -512,17 +529,19 @@ class ChatService:
         
         return cleaned
     
-    def chat(self, message: str) -> Dict[str, Any]:
+    def chat(self, message: str, session_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Process chat message with three-layer context
         
         Uses:
+        - Session context (session_id, session_title)
         - RAG context from persistant_docs (session notes)
         - Chat summary (long-term conversation memory)
         - Recent conversation history (last N exchanges)
         
         Args:
             message: User message
+            session_context: Optional session context dict with session_id, session_title
             
         Returns:
             Dictionary with answer, response_time, conversation_length, timing breakdown, and RAG results
@@ -541,7 +560,7 @@ class ChatService:
         # Build messages array with all context layers
         # Track RAG search, query optimization, and summary generation separately
         rag_start = time.time()
-        messages, rag_results, summary_gen_time, query_optimization_time = self._build_messages_array(message)
+        messages, rag_results, summary_gen_time, query_optimization_time = self._build_messages_array(message, session_context)
         rag_time = time.time() - rag_start
         
         # Separate RAG search time from query optimization and summary generation time

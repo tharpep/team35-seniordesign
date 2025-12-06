@@ -367,6 +367,12 @@ const generateMaterial = async (req, res) => {
     const artifactTopic = topic || "Newton's laws of motion";
     const itemCount = num_items || 1;
 
+    // Build session context
+    const sessionContext = {
+      session_id: session.id,
+      session_title: session.title || 'Untitled Session'
+    };
+
     // Map type to gen-ai endpoint
     const endpointMap = {
       'flashcard': '/flashcards',
@@ -379,12 +385,14 @@ const generateMaterial = async (req, res) => {
 
     console.log(`[Artifact Generation] Calling gen-ai: ${genaiUrl}`);
     console.log(`[Artifact Generation] Topic: ${artifactTopic}, Items: ${itemCount}`);
+    console.log(`[Artifact Generation] Session Context:`, sessionContext);
 
     // Call gen-ai API
     const axios = require('axios');
     const genaiResponse = await axios.post(genaiUrl, {
       topic: artifactTopic,
-      num_items: itemCount
+      num_items: itemCount,
+      session_context: sessionContext
     }, {
       timeout: 60000 // 60 second timeout for generation
     });
