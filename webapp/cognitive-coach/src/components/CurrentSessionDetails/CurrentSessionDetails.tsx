@@ -1,7 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './CurrentSessionDetails.css';
 import FocusAnalytics from '../FocusAnalytics/FocusAnalytics';
 import StudyArtifacts from '../StudyArtifacts/StudyArtifacts';
+import { genaiApi } from '../../services/genaiApi';
+
+interface ChatMessage {
+    id: string;
+    type: 'user' | 'ai';
+    text: string;
+    timestamp: string;
+}
 
 interface CurrentSessionDetailsProps {
     sessionId?: number;
@@ -13,13 +21,75 @@ interface CurrentSessionDetailsProps {
 export default function CurrentSessionDetails({ artifacts = [], focusScore = 0, onArtifactClick }: CurrentSessionDetailsProps) {
     const [isExpanded, setIsExpanded] = useState(true);
     const [chatMessage, setChatMessage] = useState('');
+    const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
+        {
+            id: '1',
+            type: 'ai',
+            text: "Hi! I can help answer questions about your current session. Ask me anything about the topics you're covering!",
+            timestamp: 'Just now'
+        }
+    ]);
+    const [isTyping, setIsTyping] = useState(false);
+    const chatMessagesRef = useRef<HTMLDivElement>(null);
 
-    const handleSendMessage = (e: React.FormEvent) => {
+    // Auto-scroll to bottom when new messages are added
+    useEffect(() => {
+        if (chatMessagesRef.current) {
+            chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
+        }
+    }, [chatHistory, isTyping]);
+
+    // Clear chat session when component unmounts
+    useEffect(() => {
+        return () => {
+            genaiApi.clearChatSession('global').catch(error => {
+                console.warn('Failed to clear chat session on unmount:', error);
+            });
+        };
+    }, []);
+
+    const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (chatMessage.trim()) {
-            // TODO: Implement AI chat integration
-            console.log('Sending message:', chatMessage);
-            setChatMessage('');
+        if (!chatMessage.trim()) return;
+
+        const userMessage: ChatMessage = {
+            id: Date.now().toString(),
+            type: 'user',
+            text: chatMessage,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        setChatHistory(prev => [...prev, userMessage]);
+        const messageToSend = chatMessage;
+        setChatMessage('');
+        setIsTyping(true);
+
+        try {
+            // Call gen-ai API directly (bypasses backend)
+            const response = await genaiApi.chat(messageToSend, 'global');
+            
+            const aiResponse: ChatMessage = {
+                id: (Date.now() + 1).toString(),
+                type: 'ai',
+                text: response.answer,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            setChatHistory(prev => [...prev, aiResponse]);
+        } catch (error: any) {
+            console.error('Chat error:', error);
+            
+            // Show error message to user
+            const errorMessage: ChatMessage = {
+                id: (Date.now() + 1).toString(),
+                type: 'ai',
+                text: error.message || 'Sorry, I encountered an error. Please try again.',
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            setChatHistory(prev => [...prev, errorMessage]);
+        } finally {
+            setIsTyping(false);
         }
     };
 
@@ -66,9 +136,23 @@ export default function CurrentSessionDetails({ artifacts = [], focusScore = 0, 
                                 Ask AI About This Session
                             </h2>
                             <div className="ai-chat-mini">
-                                <p className="ai-intro-text">
-                                    Ask questions about your current study session, get clarifications, or request practice problems.
-                                </p>
+                                <div className="chat-messages-mini" ref={chatMessagesRef}>
+                                    {chatHistory.map((message) => (
+                                        <div key={message.id} className={`chat-message-mini ${message.type}-message-mini`}>
+                                            <div className="message-text-mini">{message.text}</div>
+                                            <div className="message-time-mini">{message.timestamp}</div>
+                                        </div>
+                                    ))}
+                                    {isTyping && (
+                                        <div className="chat-message-mini ai-message-mini">
+                                            <div className="message-text-mini typing-indicator-mini">
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                                 <form onSubmit={handleSendMessage} className="chat-input-form">
                                     <input
                                         type="text"
@@ -76,11 +160,12 @@ export default function CurrentSessionDetails({ artifacts = [], focusScore = 0, 
                                         onChange={(e) => setChatMessage(e.target.value)}
                                         placeholder="Ask a question..."
                                         className="chat-input"
+                                        disabled={isTyping}
                                     />
                                     <button 
                                         type="submit" 
                                         className="send-button"
-                                        disabled={!chatMessage.trim()}
+                                        disabled={!chatMessage.trim() || isTyping}
                                     >
                                         <span className="material-icons-round">send</span>
                                     </button>
@@ -89,12 +174,14 @@ export default function CurrentSessionDetails({ artifacts = [], focusScore = 0, 
                                     <button 
                                         className="suggestion-btn-mini"
                                         onClick={() => setChatMessage("Explain the key concept")}
+                                        disabled={isTyping}
                                     >
                                         Explain key concept
                                     </button>
                                     <button 
                                         className="suggestion-btn-mini"
                                         onClick={() => setChatMessage("Create a practice problem")}
+                                        disabled={isTyping}
                                     >
                                         Practice problem
                                     </button>
