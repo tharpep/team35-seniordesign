@@ -367,10 +367,53 @@ const generateMaterial = async (req, res) => {
     const artifactTopic = topic || "Newton's laws of motion";
     const itemCount = num_items || 1;
 
+    // Map type to database type for querying existing artifacts
+    const queryTypeMapping = {
+      'flashcard': 'flashcard',
+      'mcq': 'multiple_choice',
+      'insights': 'insights'
+    };
+    const queryDbType = queryTypeMapping[type] || type;
+
+    // Query existing artifacts of the same type to avoid duplicates
+    const existingArtifacts = await getAll(
+      `SELECT content FROM study_artifacts 
+       WHERE session_id = ? AND type = ? 
+       ORDER BY created_at DESC 
+       LIMIT 5`,
+      [session_id, queryDbType]
+    );
+
+    // Extract previews from existing artifacts
+    const existingPreviews = [];
+    for (const artifact of existingArtifacts) {
+      try {
+        const content = JSON.parse(artifact.content);
+        if (type === 'flashcard' && content.cards && content.cards.length > 0) {
+          existingPreviews.push(content.cards[0].front);
+        } else if (type === 'mcq' && content.questions && content.questions.length > 0) {
+          existingPreviews.push(content.questions[0].stem);
+        } else if (type === 'insights' && content.insights && content.insights.length > 0) {
+          const insight = content.insights[0];
+          existingPreviews.push(insight.title || insight.takeaway);
+        }
+      } catch (e) {
+        // Skip invalid JSON
+        console.warn('[Artifact Generation] Failed to parse existing artifact:', e);
+      }
+    }
+
+    // Log existing artifacts for debugging
+    console.log(`[Artifact Generation] Found ${existingPreviews.length} existing ${type} artifacts for session ${session_id}`);
+    if (existingPreviews.length > 0) {
+      console.log(`[Artifact Generation] Existing artifact previews:`, existingPreviews);
+    }
+
     // Build session context
     const sessionContext = {
       session_id: session.id,
-      session_title: session.title || 'Untitled Session'
+      session_title: session.title || 'Untitled Session',
+      existing_artifacts: existingPreviews
     };
 
     // Map type to gen-ai endpoint

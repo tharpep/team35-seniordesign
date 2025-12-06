@@ -47,16 +47,43 @@ class FlashcardGenerator(BaseArtifactGenerator):
         """
         start_time = time.time()
         
+        # Build variation instruction FIRST (before loading template)
+        # This ensures it's prominent in the prompt
+        variation_instruction = "CRITICAL REQUIREMENT - You MUST create a UNIQUE flashcard that is DIFFERENT from all previous flashcards.\n\n"
+        
+        # Add existing artifacts list if available
+        if session_context and session_context.get('existing_artifacts'):
+            existing = session_context['existing_artifacts']
+            if existing:
+                variation_instruction += "EXISTING FLASHCARDS TO AVOID DUPLICATING:\n"
+                for i, preview in enumerate(existing, 1):
+                    variation_instruction += f"{i}. {preview}\n"
+                variation_instruction += "\n"
+        
+        variation_instruction += """FLASHCARD-SPECIFIC REQUIREMENTS:
+- Create a question/prompt that tests a DIFFERENT specific aspect, subtopic, or application than existing flashcards
+- If existing flashcards ask general questions, create something that tests ONE specific detail, formula, or concept in depth
+- If existing flashcards are general, create something specific (test understanding of a particular law, formula, or application)
+- If existing flashcards are specific, create something about relationships, comparisons, or broader conceptual understanding
+- Use different question framing: instead of "What is X?" try "How does X work?", "Why does X happen?", "When is X used?", or "What happens when X?"
+- Focus on different cognitive levels: if existing test recall, test application or analysis
+- Explore unique angles: practical applications, real-world examples, mathematical relationships, cause-and-effect, problem-solving scenarios
+
+"""
+        
         # Load flashcard generation prompt template
         from src.utils.prompt_loader import load_prompt_template
-        prompt = load_prompt_template(
+        base_prompt = load_prompt_template(
             "artifact_flashcard_template.txt",
             num_items=num_items,
             topic=topic
         )
-        if not prompt:
+        if not base_prompt:
             # Fallback if template file missing
-            prompt = f'Create {num_items} flashcard about "{topic}". Respond with ONLY valid JSON matching the flashcard schema.'
+            base_prompt = f'Create {num_items} flashcard about "{topic}". Respond with ONLY valid JSON matching the flashcard schema.'
+        
+        # Prepend variation instruction to the prompt (not append)
+        prompt = variation_instruction + base_prompt
         
         # Append session context to prompt if available
         if session_context:

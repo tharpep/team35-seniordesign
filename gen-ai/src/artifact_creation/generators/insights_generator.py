@@ -47,16 +47,43 @@ class InsightsGenerator(BaseArtifactGenerator):
         """
         start_time = time.time()
         
+        # Build variation instruction FIRST (before loading template)
+        # This ensures it's prominent in the prompt
+        variation_instruction = "CRITICAL REQUIREMENT - You MUST create a UNIQUE insight that is DIFFERENT from all previous insights.\n\n"
+        
+        # Add existing artifacts list if available
+        if session_context and session_context.get('existing_artifacts'):
+            existing = session_context['existing_artifacts']
+            if existing:
+                variation_instruction += "EXISTING INSIGHTS TO AVOID DUPLICATING:\n"
+                for i, preview in enumerate(existing, 1):
+                    variation_instruction += f"{i}. {preview}\n"
+                variation_instruction += "\n"
+        
+        variation_instruction += """INSIGHT-SPECIFIC REQUIREMENTS:
+- Create an insight that highlights a DIFFERENT specific aspect, subtopic, or application than existing insights
+- If existing insights cover general concepts, create something that highlights ONE specific detail, relationship, or implication in depth
+- If existing insights are general, create something specific (highlight a particular application, connection, or deeper understanding)
+- If existing insights are specific, create something about relationships, connections, or broader implications
+- Focus on different insight types: if existing explain what, create insights about why, how, when, or what-if scenarios
+- Explore unique angles: connections to other concepts, real-world implications, historical significance, practical applications, common misconceptions, deeper understanding, or unexpected relationships
+- Provide actionable takeaways that complement but don't repeat existing insights
+
+"""
+        
         # Load insights generation prompt template
         from src.utils.prompt_loader import load_prompt_template
-        prompt = load_prompt_template(
+        base_prompt = load_prompt_template(
             "artifact_insights_template.txt",
             num_items=num_items,
             topic=topic
         )
-        if not prompt:
+        if not base_prompt:
             # Fallback if template file missing
-            prompt = f'Create {num_items} key insight about "{topic}". Respond with ONLY valid JSON matching the insights schema.'
+            base_prompt = f'Create {num_items} key insight about "{topic}". Respond with ONLY valid JSON matching the insights schema.'
+        
+        # Prepend variation instruction to the prompt (not append)
+        prompt = variation_instruction + base_prompt
         
         # Append session context to prompt if available
         if session_context:
