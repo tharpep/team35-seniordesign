@@ -51,15 +51,15 @@ export default function CurrentSessionDetails({ sessionId, artifacts = [], focus
 
     const handleGenerateArtifact = async (type: 'flashcard' | 'mcq' | 'insights') => {
         if (!sessionId) {
+            console.error('Cannot generate artifact: No session ID found');
             alert('Error: No session ID found. Cannot generate artifact.');
             return;
         }
         
         try {
             await api.generateArtifact(String(sessionId), type);
-            // Note: Artifacts refresh would need to be handled by parent component
-            // since artifacts are passed as props
-            alert(`${type} generated successfully!`);
+            // Artifacts will appear automatically via socket events (material-created)
+            // No need for success alert - the artifact will show up in the list
         } catch (error: any) {
             console.error('Generate artifact error:', error);
             alert(error.message || 'Failed to generate artifact');
