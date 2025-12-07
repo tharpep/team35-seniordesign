@@ -241,6 +241,7 @@ export default function Dashboard() {
                 {/* Current Session Details Section - Only show when session is active or paused */}
                 {(currentSessionState === 'active' || currentSessionState === 'paused') && (
                     <CurrentSessionDetails 
+                        sessionId={currentSessionId}
                         artifacts={currentSessionArtifacts}
                         focusScore={85}
                     />
