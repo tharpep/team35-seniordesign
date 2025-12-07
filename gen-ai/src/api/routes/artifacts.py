@@ -39,7 +39,8 @@ async def generate_flashcards(
         artifact = await asyncio.to_thread(
             generator.generate,
             request.topic,
-            request.num_items
+            request.num_items,
+            request.session_context
         )
         
         logger.info(f"Flashcards generated successfully (latency: {artifact.get('metrics', {}).get('latency_ms', 0)}ms)")
@@ -75,7 +76,8 @@ async def generate_mcq(
         artifact = await asyncio.to_thread(
             generator.generate,
             request.topic,
-            request.num_items
+            request.num_items,
+            request.session_context
         )
         
         logger.info(f"MCQ generated successfully (latency: {artifact.get('metrics', {}).get('latency_ms', 0)}ms)")
@@ -111,7 +113,8 @@ async def generate_insights(
         artifact = await asyncio.to_thread(
             generator.generate,
             request.topic,
-            request.num_items
+            request.num_items,
+            request.session_context
         )
         
         logger.info(f"Insights generated successfully (latency: {artifact.get('metrics', {}).get('latency_ms', 0)}ms)")

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Cognitive Coach - Startup Script (Mac/Linux)
-# This script starts both the backend and frontend servers
+# This script starts the backend, frontend, and gen-ai API servers
 
 echo "================================="
 echo "🚀 Starting Cognitive Coach"
@@ -20,6 +20,7 @@ check_port() {
 echo "Checking ports..."
 check_port 3001
 check_port 5173
+check_port 8000
 echo ""
 
 # Get the directory where the script is located
@@ -47,7 +48,20 @@ xterm -e "cd '$SCRIPT_DIR/cognitive-coach' && echo '🎨 Frontend Server' && npm
 (cd "$SCRIPT_DIR/cognitive-coach" && npm run dev &)
 
 # Wait for frontend to start
-sleep 3
+sleep 2
+
+# Start Gen-AI API server
+echo "================================="
+echo "🤖 Starting Gen-AI API Server"
+echo "================================="
+GENAI_DIR="$SCRIPT_DIR/../gen-ai"
+osascript -e "tell app \"Terminal\" to do script \"cd '$GENAI_DIR' && echo '🤖 Gen-AI API Server' && python run start\"" 2>/dev/null || \
+gnome-terminal -- bash -c "cd '$GENAI_DIR' && echo '🤖 Gen-AI API Server' && python run start; exec bash" 2>/dev/null || \
+xterm -e "cd '$GENAI_DIR' && echo '🤖 Gen-AI API Server' && python run start" 2>/dev/null || \
+(cd "$GENAI_DIR" && python run start &)
+
+# Wait for gen-ai to start
+sleep 2
 
 # Open the web browser
 echo ""
@@ -73,6 +87,7 @@ echo "================================="
 echo ""
 echo "Backend:  http://localhost:3001"
 echo "Frontend: http://localhost:5173"
+echo "Gen-AI:   http://localhost:8000"
 echo ""
 echo "New terminal windows have opened."
 echo "Close those windows to stop the servers."

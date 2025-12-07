@@ -6,7 +6,7 @@ Generates key insights and takeaways from retrieved context using RAG
 import json
 import time
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 # Add project root to path for imports
 import sys
@@ -33,29 +33,69 @@ class InsightsGenerator(BaseArtifactGenerator):
         
         super().__init__(rag_system, str(template_path))
     
-    def generate(self, topic: str, num_items: int = 1) -> Dict[str, Any]:
+    def generate(self, topic: str, num_items: int = 1, session_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Generate insights for the given topic
         
         Args:
             topic: Topic to generate insights about
             num_items: Number of insights to generate (default 1)
+            session_context: Optional session context dict with session_id, session_title
             
         Returns:
             Dictionary containing the generated insights
         """
         start_time = time.time()
         
+        # Build variation instruction FIRST (before loading template)
+        # This ensures it's prominent in the prompt
+        variation_instruction = "CRITICAL REQUIREMENT - You MUST create a UNIQUE insight that is DIFFERENT from all previous insights.\n\n"
+        
+        # Add existing artifacts list if available
+        if session_context and session_context.get('existing_artifacts'):
+            existing = session_context['existing_artifacts']
+            if existing:
+                variation_instruction += "EXISTING INSIGHTS TO AVOID DUPLICATING:\n"
+                for i, preview in enumerate(existing, 1):
+                    variation_instruction += f"{i}. {preview}\n"
+                variation_instruction += "\n"
+        
+        variation_instruction += """INSIGHT-SPECIFIC REQUIREMENTS:
+- Create an insight that highlights a DIFFERENT specific aspect, subtopic, or application than existing insights
+- If existing insights cover general concepts, create something that highlights ONE specific detail, relationship, or implication in depth
+- If existing insights are general, create something specific (highlight a particular application, connection, or deeper understanding)
+- If existing insights are specific, create something about relationships, connections, or broader implications
+- Focus on different insight types: if existing explain what, create insights about why, how, when, or what-if scenarios
+- Explore unique angles: connections to other concepts, real-world implications, historical significance, practical applications, common misconceptions, deeper understanding, or unexpected relationships
+- Provide actionable takeaways that complement but don't repeat existing insights
+
+"""
+        
         # Load insights generation prompt template
         from src.utils.prompt_loader import load_prompt_template
-        prompt = load_prompt_template(
+        base_prompt = load_prompt_template(
             "artifact_insights_template.txt",
             num_items=num_items,
             topic=topic
         )
-        if not prompt:
+        if not base_prompt:
             # Fallback if template file missing
-            prompt = f'Create {num_items} key insight about "{topic}". Respond with ONLY valid JSON matching the insights schema.'
+            base_prompt = f'Create {num_items} key insight about "{topic}". Respond with ONLY valid JSON matching the insights schema.'
+        
+        # Prepend variation instruction to the prompt (not append)
+        prompt = variation_instruction + base_prompt
+        
+        # Append session context to prompt if available
+        if session_context:
+            context_parts = []
+            if session_context.get('session_id'):
+                context_parts.append(f"Session ID: {session_context['session_id']}")
+            if session_context.get('session_title'):
+                context_parts.append(f"Session: {session_context['session_title']}")
+            
+            if context_parts:
+                context_text = "\n\nSession Context:\n" + "\n".join(context_parts)
+                prompt = prompt + context_text
         
         # Use existing RAG system with artifact token limit
         result = self.rag.query(prompt, max_tokens=self.rag.config.max_tokens)

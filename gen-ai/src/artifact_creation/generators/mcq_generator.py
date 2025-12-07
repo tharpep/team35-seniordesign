@@ -6,7 +6,7 @@ Generates multiple-choice questions from retrieved context using RAG
 import json
 import time
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 # Add project root to path for imports
 import sys
@@ -33,29 +33,70 @@ class MCQGenerator(BaseArtifactGenerator):
         
         super().__init__(rag_system, str(template_path))
     
-    def generate(self, topic: str, num_items: int = 1) -> Dict[str, Any]:
+    def generate(self, topic: str, num_items: int = 1, session_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Generate MCQ questions for the given topic
         
         Args:
             topic: Topic to generate MCQs about
             num_items: Number of MCQ questions to generate (default 1)
+            session_context: Optional session context dict with session_id, session_title
             
         Returns:
             Dictionary containing the generated MCQ questions
         """
         start_time = time.time()
         
+        # Build variation instruction FIRST (before loading template)
+        # This ensures it's prominent in the prompt
+        variation_instruction = "CRITICAL REQUIREMENT - You MUST create a UNIQUE multiple-choice question that is DIFFERENT from all previous MCQ questions.\n\n"
+        
+        # Add existing artifacts list if available
+        if session_context and session_context.get('existing_artifacts'):
+            existing = session_context['existing_artifacts']
+            if existing:
+                variation_instruction += "EXISTING MCQ QUESTIONS TO AVOID DUPLICATING:\n"
+                for i, preview in enumerate(existing, 1):
+                    variation_instruction += f"{i}. {preview}\n"
+                variation_instruction += "\n"
+        
+        variation_instruction += """MCQ-SPECIFIC REQUIREMENTS:
+- Create a question stem that tests a DIFFERENT specific aspect, subtopic, or application than existing MCQs
+- If existing MCQs ask general questions, create something that tests ONE specific detail, calculation, or concept in depth
+- If existing MCQs are general, create something specific (test understanding of a particular law, formula, or application scenario)
+- If existing MCQs are specific, create something about relationships, comparisons, or broader conceptual understanding
+- Use different question types: instead of "What is X?" try "Which scenario demonstrates X?", "What would happen if X?", "Calculate X given Y", or "Which statement about X is correct?"
+- Focus on different Bloom's taxonomy levels: if existing test knowledge, test comprehension, application, or analysis
+- Create plausible distractors that test common misconceptions or related but incorrect concepts
+- Explore unique angles: problem-solving scenarios, calculation-based questions, scenario analysis, comparative questions, cause-and-effect relationships
+
+"""
+        
         # Load MCQ generation prompt template
         from src.utils.prompt_loader import load_prompt_template
-        prompt = load_prompt_template(
+        base_prompt = load_prompt_template(
             "artifact_mcq_template.txt",
             num_items=num_items,
             topic=topic
         )
-        if not prompt:
+        if not base_prompt:
             # Fallback if template file missing
-            prompt = f'Create {num_items} multiple-choice question about "{topic}". Respond with ONLY valid JSON matching the MCQ schema.'
+            base_prompt = f'Create {num_items} multiple-choice question about "{topic}". Respond with ONLY valid JSON matching the MCQ schema.'
+        
+        # Prepend variation instruction to the prompt (not append)
+        prompt = variation_instruction + base_prompt
+        
+        # Append session context to prompt if available
+        if session_context:
+            context_parts = []
+            if session_context.get('session_id'):
+                context_parts.append(f"Session ID: {session_context['session_id']}")
+            if session_context.get('session_title'):
+                context_parts.append(f"Session: {session_context['session_title']}")
+            
+            if context_parts:
+                context_text = "\n\nSession Context:\n" + "\n".join(context_parts)
+                prompt = prompt + context_text
         
         # Use existing RAG system with artifact token limit
         result = self.rag.query(prompt, max_tokens=self.rag.config.max_tokens)
