@@ -130,36 +130,21 @@ export default function StudyArtifacts({ artifacts, onArtifactClick, sessionId, 
                         <button 
                             onClick={() => handleGenerate('flashcard')}
                             disabled={isGenerating}
-                            style={{ 
-                                padding: '0.5rem 1rem', 
-                                fontSize: '0.9rem',
-                                cursor: isGenerating ? 'not-allowed' : 'pointer',
-                                opacity: isGenerating ? 0.6 : 1
-                            }}
+                            className="secondary-button"
                         >
                             {isGenerating ? 'Generating...' : 'Generate Flashcard'}
                         </button>
                         <button 
                             onClick={() => handleGenerate('mcq')}
                             disabled={isGenerating}
-                            style={{ 
-                                padding: '0.5rem 1rem', 
-                                fontSize: '0.9rem',
-                                cursor: isGenerating ? 'not-allowed' : 'pointer',
-                                opacity: isGenerating ? 0.6 : 1
-                            }}
+                            className="secondary-button"
                         >
                             {isGenerating ? 'Generating...' : 'Generate MCQ'}
                         </button>
                         <button 
                             onClick={() => handleGenerate('insights')}
                             disabled={isGenerating}
-                            style={{ 
-                                padding: '0.5rem 1rem', 
-                                fontSize: '0.9rem',
-                                cursor: isGenerating ? 'not-allowed' : 'pointer',
-                                opacity: isGenerating ? 0.6 : 1
-                            }}
+                            className="secondary-button"
                         >
                             {isGenerating ? 'Generating...' : 'Generate Insights'}
                         </button>
@@ -183,36 +168,21 @@ export default function StudyArtifacts({ artifacts, onArtifactClick, sessionId, 
                     <button 
                         onClick={() => handleGenerate('flashcard')}
                         disabled={isGenerating}
-                        style={{ 
-                            padding: '0.5rem 1rem', 
-                            fontSize: '0.9rem',
-                            cursor: isGenerating ? 'not-allowed' : 'pointer',
-                            opacity: isGenerating ? 0.6 : 1
-                        }}
+                        className="secondary-button"
                     >
                         {isGenerating ? 'Generating...' : 'Generate Flashcard'}
                     </button>
                     <button 
                         onClick={() => handleGenerate('mcq')}
                         disabled={isGenerating}
-                        style={{ 
-                            padding: '0.5rem 1rem', 
-                            fontSize: '0.9rem',
-                            cursor: isGenerating ? 'not-allowed' : 'pointer',
-                            opacity: isGenerating ? 0.6 : 1
-                        }}
+                        className="secondary-button"
                     >
                         {isGenerating ? 'Generating...' : 'Generate MCQ'}
                     </button>
                     <button 
                         onClick={() => handleGenerate('insights')}
                         disabled={isGenerating}
-                        style={{ 
-                            padding: '0.5rem 1rem', 
-                            fontSize: '0.9rem',
-                            cursor: isGenerating ? 'not-allowed' : 'pointer',
-                            opacity: isGenerating ? 0.6 : 1
-                        }}
+                        className="secondary-button"
                     >
                         {isGenerating ? 'Generating...' : 'Generate Insights'}
                     </button>
