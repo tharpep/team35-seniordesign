@@ -372,6 +372,78 @@ const uploadFrame = async (req, res) => {
   }
 };
 
+// Append markdown context to session
+const appendContext = async (req, res) => {
+  try {
+    const { id: sessionId } = req.params;
+    const userId = req.session.userId;
+    const { markdown, source } = req.body;
+
+    console.log(`[appendContext] Session: ${sessionId}, Source: ${source || 'unknown'}, Markdown length: ${markdown?.length || 0}`);
+
+    // Validate input
+    if (!markdown || typeof markdown !== 'string') {
+      return res.status(400).json({
+        error: 'Bad request',
+        message: 'markdown field is required and must be a string'
+      });
+    }
+
+    // Verify session belongs to user
+    const session = await getOne(
+      'SELECT * FROM sessions WHERE id = ? AND user_id = ?',
+      [sessionId, userId]
+    );
+
+    if (!session) {
+      console.error(`[appendContext] Session ${sessionId} not found for user ${userId}`);
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'Session not found'
+      });
+    }
+
+    // Get current context
+    const currentContext = session.context || '';
+
+    // Append new markdown with separator and optional source info
+    const timestamp = new Date().toISOString();
+    const sourceLabel = source ? ` [${source}]` : '';
+    const separator = currentContext ? '\n\n---\n\n' : '';
+    const newContext = currentContext + separator + `<!-- ${timestamp}${sourceLabel} -->\n${markdown}`;
+
+    // Update session context
+    await runQuery(
+      'UPDATE sessions SET context = ? WHERE id = ?',
+      [newContext, sessionId]
+    );
+
+    console.log(`✓ Context appended successfully - New total length: ${newContext.length}`);
+
+    // Emit socket event for context update
+    if (req.app.get('io')) {
+      req.app.get('io').to(`session-${sessionId}`).emit('context-updated', {
+        sessionId: sessionId,
+        contextLength: newContext.length,
+        source: source || 'unknown'
+      });
+    }
+
+    res.json({
+      message: 'Context appended successfully',
+      contextLength: newContext.length,
+      appended: markdown.length
+    });
+
+  } catch (error) {
+    console.error('[appendContext] Error:', error);
+    res.status(500).json({
+      error: 'Server error',
+      message: 'Could not append context'
+    });
+  }
+};
+
 module.exports = {
   getAllSessions,
   getIncompleteSession,
@@ -379,5 +451,6 @@ module.exports = {
   createSession,
   updateSession,
   deleteSession,
-  uploadFrame
+  uploadFrame,
+  appendContext
 };

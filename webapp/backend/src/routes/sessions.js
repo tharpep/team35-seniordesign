@@ -11,7 +11,8 @@ const {
   createSession,
   updateSession,
   deleteSession,
-  uploadFrame
+  uploadFrame,
+  appendContext
 } = require('../controllers/sessionController');
 const {
   getMaterialsBySession
@@ -88,6 +89,9 @@ router.delete('/:id', deleteSession);
 
 // POST /api/sessions/:id/frames - Upload captured frame
 router.post('/:id/frames', upload.single('frame'), uploadFrame);
+
+// POST /api/sessions/:id/context - Append markdown context to session
+router.post('/:id/context', appendContext);
 
 // GET /api/sessions/:sessionId/materials - Get all materials for a session
 router.get('/:sessionId/materials', getMaterialsBySession);

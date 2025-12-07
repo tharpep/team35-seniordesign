@@ -1,0 +1,8 @@
+# Working PaddleOCR setup from Oct 16
+# PaddleOCR 2.x is much lighter - doesn't load UVDoc, PP-LCNet models
+paddleocr==2.10.0
+paddlepaddle
+opencv-python
+pillow
+numpy
+requests

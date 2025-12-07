@@ -1,0 +1,23 @@
+{
+  "run_id": "run_20251029_213315_3fc7bb5e",
+  "total_pages": 1,
+  "total_words": 255,
+  "total_tables": 3,
+  "total_equations": 8,
+  "flagged_pages": 0,
+  "average_page_confidence_mean": 0.9808642268180847,
+  "average_page_confidence_min": 0.8141735792160034,
+  "processing_time_seconds": 35.7596230506897,
+  "confidence_histogram": {
+    "0.9-1.0": 32,
+    "0.8-0.9": 2,
+    "0.0-0.8": 0
+  },
+  "timing_breakdown": {
+    "initialization": 0.4791092872619629,
+    "ocr_processing": 28.283287048339844
+  },
+  "input_path": "dataset/physics_level2.png",
+  "output_path": "dataset/output/run_20251029_213315_3fc7bb5e",
+  "language": "en"
+}

@@ -1,0 +1,238 @@
+{
+  "filename": "table_eg",
+  "total_equations": 8,
+  "equations": [
+    {
+      "type": "equation",
+      "raw_text": "3 different eggs (0.1 cm3)",
+      "normalized": {
+        "latex": "3 different eggs (0.1 cm^{3})",
+        "format": "latex"
+      },
+      "confidence": 0.9801933765411377,
+      "bbox": [
+        [
+          742,
+          108
+        ],
+        [
+          1184,
+          108
+        ],
+        [
+          1184,
+          144
+        ],
+        [
+          742,
+          144
+        ]
+      ],
+      "low_confidence": false,
+      "is_standalone": true
+    },
+    {
+      "type": "equation",
+      "raw_text": "100  0.08cm3",
+      "normalized": {
+        "latex": "100 0.08cm^{3}",
+        "format": "latex"
+      },
+      "confidence": 0.9933317303657532,
+      "bbox": [
+        [
+          604,
+          1312
+        ],
+        [
+          819,
+          1312
+        ],
+        [
+          819,
+          1342
+        ],
+        [
+          604,
+          1342
+        ]
+      ],
+      "low_confidence": false,
+      "is_standalone": true
+    },
+    {
+      "type": "equation",
+      "raw_text": "50  0.5cm3",
+      "normalized": {
+        "latex": "50 0.5cm^{3}",
+        "format": "latex"
+      },
+      "confidence": 0.9903097152709961,
+      "bbox": [
+        [
+          621,
+          1461
+        ],
+        [
+          799,
+          1458
+        ],
+        [
+          800,
+          1496
+        ],
+        [
+          621,
+          1498
+        ]
+      ],
+      "low_confidence": false,
+      "is_standalone": true
+    },
+    {
+      "type": "equation",
+      "raw_text": "18.5  0.1cm3",
+      "normalized": {
+        "latex": "18.5 0.1cm^{3}",
+        "format": "latex"
+      },
+      "confidence": 0.9946302771568298,
+      "bbox": [
+        [
+          602,
+          1617
+        ],
+        [
+          819,
+          1617
+        ],
+        [
+          819,
+          1652
+        ],
+        [
+          602,
+          1652
+        ]
+      ],
+      "low_confidence": false,
+      "is_standalone": true
+    },
+    {
+      "type": "equation",
+      "raw_text": "17.9  0.1cm3",
+      "normalized": {
+        "latex": "17.9 0.1cm^{3}",
+        "format": "latex"
+      },
+      "confidence": 0.9980685710906982,
+      "bbox": [
+        [
+          602,
+          1681
+        ],
+        [
+          819,
+          1681
+        ],
+        [
+          819,
+          1717
+        ],
+        [
+          602,
+          1717
+        ]
+      ],
+      "low_confidence": false,
+      "is_standalone": true
+    },
+    {
+      "type": "equation",
+      "raw_text": "18.1  0.1cm3",
+      "normalized": {
+        "latex": "18.1 0.1cm^{3}",
+        "format": "latex"
+      },
+      "confidence": 0.9902291893959045,
+      "bbox": [
+        [
+          602,
+          1744
+        ],
+        [
+          819,
+          1744
+        ],
+        [
+          819,
+          1779
+        ],
+        [
+          602,
+          1779
+        ]
+      ],
+      "low_confidence": false,
+      "is_standalone": true
+    },
+    {
+      "type": "equation",
+      "raw_text": "17.7  0.1cm3",
+      "normalized": {
+        "latex": "17.7 0.1cm^{3}",
+        "format": "latex"
+      },
+      "confidence": 0.9980826377868652,
+      "bbox": [
+        [
+          602,
+          1808
+        ],
+        [
+          819,
+          1808
+        ],
+        [
+          819,
+          1844
+        ],
+        [
+          602,
+          1844
+        ]
+      ],
+      "low_confidence": false,
+      "is_standalone": true
+    },
+    {
+      "type": "equation",
+      "raw_text": "17.3  0.1cm3",
+      "normalized": {
+        "latex": "17.3 0.1cm^{3}",
+        "format": "latex"
+      },
+      "confidence": 0.9843204617500305,
+      "bbox": [
+        [
+          602,
+          1871
+        ],
+        [
+          819,
+          1871
+        ],
+        [
+          819,
+          1906
+        ],
+        [
+          602,
+          1906
+        ]
+      ],
+      "low_confidence": false,
+      "is_standalone": true
+    }
+  ]
+}

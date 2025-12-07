@@ -1,0 +1,93 @@
+{
+  "filename": "IMG_1883-2_resized",
+  "total_equations": 3,
+  "equations": [
+    {
+      "type": "equation",
+      "raw_text": "$1,000 and$2,000.N7N's annual maximum is",
+      "normalized": {
+        "latex": "$1,000 and$2,000.N^{7}N's annual maximum is",
+        "format": "latex"
+      },
+      "confidence": 0.921049952507019,
+      "bbox": [
+        [
+          98,
+          1210
+        ],
+        [
+          633,
+          1210
+        ],
+        [
+          633,
+          1237
+        ],
+        [
+          98,
+          1237
+        ]
+      ],
+      "low_confidence": false,
+      "is_standalone": false
+    },
+    {
+      "type": "equation",
+      "raw_text": "www.ntnamericas.com/careers",
+      "normalized": {
+        "latex": "www.ntnamericas.\\dfrac{com}{careers}",
+        "format": "latex"
+      },
+      "confidence": 0.9976814985275269,
+      "bbox": [
+        [
+          767,
+          1650
+        ],
+        [
+          1212,
+          1650
+        ],
+        [
+          1212,
+          1677
+        ],
+        [
+          767,
+          1677
+        ]
+      ],
+      "low_confidence": true,
+      "is_standalone": false
+    },
+    {
+      "type": "equation",
+      "raw_text": "www.ntnamericas.com/careers",
+      "normalized": {
+        "latex": "www.ntnamericas.\\dfrac{com}{careers}",
+        "format": "latex"
+      },
+      "confidence": 0.9974422454833984,
+      "bbox": [
+        [
+          38,
+          1827
+        ],
+        [
+          445,
+          1825
+        ],
+        [
+          445,
+          1852
+        ],
+        [
+          38,
+          1854
+        ]
+      ],
+      "low_confidence": true,
+      "is_standalone": false
+    }
+  ]
+}

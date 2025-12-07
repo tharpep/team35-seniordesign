@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     duration INTEGER,
     status TEXT CHECK(status IN ('active', 'paused', 'completed')) DEFAULT 'completed',
     focus_score INTEGER,
+    context TEXT DEFAULT '',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
