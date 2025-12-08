@@ -18,14 +18,30 @@ from config import get_rag_config
 # Load environment variables from .env file
 def load_env_file():
     """Load environment variables from .env file"""
-    env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env')
-    if os.path.exists(env_path):
-        with open(env_path, 'r') as f:
-            for line in f:
-                line = line.strip()
-                if line and not line.startswith('#') and '=' in line:
-                    key, value = line.split('=', 1)
-                    os.environ[key.strip()] = value.strip()
+    # Try multiple possible paths for .env file
+    possible_paths = [
+        # Path relative to this file (gen-ai/src/ai_providers/gateway.py -> gen-ai/.env)
+        os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env'),
+        # Path relative to current working directory
+        os.path.join(os.getcwd(), '.env'),
+        # Path relative to gen-ai directory if running from project root
+        os.path.join(os.getcwd(), 'gen-ai', '.env'),
+    ]
+    
+    for env_path in possible_paths:
+        if os.path.exists(env_path):
+            with open(env_path, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        key, value = line.split('=', 1)
+                        os.environ[key.strip()] = value.strip()
+            return  # Found and loaded .env file
+    
+    # If no .env file found, log a warning
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.warning(f"No .env file found. Tried paths: {possible_paths}")
 
 load_env_file()
 
@@ -41,6 +57,9 @@ class AIGateway:
             config: Dictionary with provider configurations
                    If None, will try to load from environment variables and config.py
         """
+        # Reload .env file in case it wasn't loaded in this process
+        load_env_file()
+        
         self.providers = {}
         self.rag_config = get_rag_config()
         self._setup_providers(config or {})
@@ -48,11 +67,17 @@ class AIGateway:
     def _setup_providers(self, config: Dict[str, Any]):
         """Setup available AI providers"""
         # Setup Purdue provider
+        purdue_key = os.getenv('PURDUE_API_KEY')
         if "purdue" in config:
             api_key = config["purdue"].get("api_key")
             self.providers["purdue"] = PurdueGenAI(api_key)
-        elif os.getenv('PURDUE_API_KEY'):
+        elif purdue_key:
             self.providers["purdue"] = PurdueGenAI()
+        else:
+            # Log debug info if key is missing
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.debug(f"PURDUE_API_KEY not found in environment. Available env vars with 'PURDUE': {[k for k in os.environ.keys() if 'PURDUE' in k.upper()]}")
         
         # Setup Local Ollama provider
         if "ollama" in config:

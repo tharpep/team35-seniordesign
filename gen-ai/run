@@ -53,57 +53,39 @@ def check_venv_health():
         print("❌ Pip not working")
         return False
     
-    # Parse requirements.txt to get all packages
-    key_packages = []
-    requirements_file = Path("requirements.txt")
-    
-    if requirements_file.exists():
-        with open(requirements_file, 'r', encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                # Skip comments and empty lines
-                if not line or line.startswith('#'):
-                    continue
-                
-                # Parse package name (handle version specifiers and extras)
-                # Examples: "fastapi>=0.104.0" -> "fastapi", "uvicorn[standard]>=0.24.0" -> "uvicorn"
-                package_name = line.split('>=')[0].split('==')[0].split('<=')[0].split('[')[0].strip()
-                
-                # Convert package name to import name (replace hyphens with underscores)
-                import_name = package_name.replace('-', '_')
-                
-                # Skip if already added
-                if (package_name, import_name) not in key_packages:
-                    key_packages.append((package_name, import_name))
-    else:
-        print("⚠️  requirements.txt not found, using default package list")
-        # Fallback to default packages if requirements.txt doesn't exist
-        key_packages = [
-            ("torch", "torch"),
-            ("transformers", "transformers"), 
-            ("sentence-transformers", "sentence_transformers"),
-            ("qdrant-client", "qdrant_client"),
-            ("pytest", "pytest"),
-            ("pytest-asyncio", "pytest_asyncio"),
-            ("httpx", "httpx"),
-            ("fastapi", "fastapi"),
-            ("uvicorn", "uvicorn"),
-            ("pydantic", "pydantic")
-        ]
+    # Only check essential packages for server startup (skip heavy optional ones)
+    # torch and transformers are large and slow to import - skip them in health check
+    # They're only needed when actually using models, not for server startup
+    essential_packages = [
+        ("fastapi", "fastapi"),
+        ("uvicorn", "uvicorn"),
+        ("pydantic", "pydantic"),
+        ("httpx", "httpx"),
+        ("sentence-transformers", "sentence_transformers"),
+        ("qdrant-client", "qdrant_client"),
+    ]
     
     missing_packages = []
     
-    for package_name, import_name in key_packages:
+    for package_name, import_name in essential_packages:
         try:
-            result = subprocess.run([python_cmd, "-c", f"import {import_name}"], 
-                                  capture_output=True, text=True, check=True)
+            # Use timeout to prevent hanging on slow imports
+            result = subprocess.run(
+                [python_cmd, "-c", f"import {import_name}"], 
+                capture_output=True, 
+                text=True, 
+                check=True,
+                timeout=10  # 10 second timeout per package
+            )
             print(f"✅ {package_name} is installed")
+        except subprocess.TimeoutExpired:
+            print(f"⚠️  {package_name} import timed out (may still be installed)")
         except subprocess.CalledProcessError:
             print(f"❌ {package_name} is missing")
             missing_packages.append(package_name)
     
     if missing_packages:
-        print(f"\n⚠️  Missing packages: {', '.join(missing_packages)}")
+        print(f"\n⚠️  Missing essential packages: {', '.join(missing_packages)}")
         return False
     
     print("✅ Virtual environment is healthy!")
@@ -376,8 +358,15 @@ def run_config():
 
 def run_start():
     """Start the FastAPI server"""
-    if not check_venv():
+    # Quick check if venv exists (no health check - that's slow)
+    venv_path = Path("venv")
+    if not venv_path.exists():
+        print("❌ Virtual environment not found!")
+        print("Run: python run setup first")
         return 1
+    
+    # Get project root (same as genai server command does)
+    project_root = Path(__file__).parent.absolute()
     
     print("=== Starting FastAPI Server ===")
     print("Server: http://127.0.0.1:8000")
@@ -390,13 +379,14 @@ def run_start():
     
     try:
         # Run uvicorn with the FastAPI app
+        # Use project_root as cwd to match Poetry's behavior
         result = subprocess.run([
             python_cmd, "-m", "uvicorn",
             "src.api.main:app",
             "--host", "127.0.0.1",
             "--port", "8000",
             "--reload"
-        ])
+        ], cwd=project_root)
         return result.returncode
     except KeyboardInterrupt:
         print("\n\n Server stopped by user")
