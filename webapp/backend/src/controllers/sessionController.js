@@ -4,6 +4,7 @@ const fsSync = require('fs');
 const path = require('path');
 const http = require('http');
 const facialProcessing = require('../services/facialProcessing');
+const ocrQueue = require('../services/ocrQueue');
 
 // Get all sessions for logged-in user with artifact counts
 const getAllSessions = async (req, res) => {
@@ -431,6 +432,16 @@ const uploadFrame = async (req, res) => {
       } catch (processingError) {
         // Log but don't fail the request if facial processing fails
         console.warn(`⚠️ Facial processing error (non-fatal): ${processingError.message}`);
+      }
+    } else if (frameType === 'screen' || frameType === 'external') {
+      // Queue screen and external frames for OCR processing
+      try {
+        console.log(`📝 Queueing ${frameType} frame for OCR processing...`);
+        ocrQueue.addToQueue(sessionId, req.file.path, frameType);
+        console.log(`✓ Frame queued for OCR`);
+      } catch (queueError) {
+        // Log but don't fail the request if queuing fails
+        console.warn(`⚠️ OCR queue error (non-fatal): ${queueError.message}`);
       }
     }
 
