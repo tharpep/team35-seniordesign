@@ -60,7 +60,8 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
     });
 
     const timerIntervalRef = useRef<number | null>(null);
-    const captureIntervalRef = useRef<number | null>(null);
+    const webcamCaptureIntervalRef = useRef<number | null>(null);
+    const screenExternalCaptureIntervalRef = useRef<number | null>(null);
     const activeStreamsRef = useRef<CameraStream[]>([]);
     const captureCountRef = useRef<number>(0);
 
@@ -262,56 +263,86 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
         };
     }, [sessionState]);
 
-    // Capture effect - runs at configured interval when session is active
+    // Webcam capture effect - runs at 5 second interval for facial processing
     useEffect(() => {
         if (sessionState === 'active' && currentSessionId) {
-            const intervalMs = (sessionSettings?.photoInterval || 2) * 1000;
-            captureIntervalRef.current = window.setInterval(async () => {
-                captureCountRef.current += 1;
-                const newCount = captureCountRef.current;
-                const timestamp = new Date().toLocaleTimeString();
-                
-                setSessionTime(currentTime => {
-                    console.log(`📸 Capture ${newCount} at ${timestamp} - Session time: ${formatTime(currentTime)} - Active streams: ${activeStreamsRef.current.map(s => s.type).join(', ')}`);
-                    return currentTime;
-                });
-                
-                // Capture and upload from all active streams
-                const uploadPromises = activeStreamsRef.current.map(async (cameraStream) => {
+            const webcamIntervalMs = 5000; // 5 seconds for webcam (facial processing)
+            webcamCaptureIntervalRef.current = window.setInterval(async () => {
+                const webcamStream = activeStreamsRef.current.find(s => s.type === 'webcam');
+                if (webcamStream) {
                     try {
-                        console.log(`⏳ Capturing from ${cameraStream.type}...`);
-                        const blob = await captureFrameFromStream(cameraStream.stream);
+                        captureCountRef.current += 1;
+                        const timestamp = new Date().toLocaleTimeString();
+                        console.log(`📸 Webcam capture at ${timestamp}`);
+                        
+                        const blob = await captureFrameFromStream(webcamStream.stream);
                         if (blob) {
-                            console.log(`⏳ Uploading ${cameraStream.type} frame (${(blob.size / 1024).toFixed(1)} KB)...`);
-                            await api.uploadFrame(currentSessionId.toString(), blob, cameraStream.type);
-                            console.log(`✓ Captured and uploaded from: ${cameraStream.type}`);
-                            return true;
-                        } else {
-                            console.warn(`⚠️ No blob captured from ${cameraStream.type}`);
+                            console.log(`⏳ Uploading webcam frame (${(blob.size / 1024).toFixed(1)} KB)...`);
+                            await api.uploadFrame(currentSessionId.toString(), blob, webcamStream.type);
+                            console.log(`✓ Captured and uploaded from: webcam`);
+                            setCaptureCount(captureCountRef.current);
                         }
-                        return false;
                     } catch (error) {
-                        console.error(`✗ Failed to capture from ${cameraStream.type}:`, error);
-                        return false;
+                        console.error(`✗ Failed to capture from webcam:`, error);
                     }
-                });
-
-                await Promise.all(uploadPromises);
-                setCaptureCount(newCount);
-            }, intervalMs);
+                }
+            }, webcamIntervalMs);
         } else {
-            if (captureIntervalRef.current) {
-                clearInterval(captureIntervalRef.current);
-                captureIntervalRef.current = null;
+            if (webcamCaptureIntervalRef.current) {
+                clearInterval(webcamCaptureIntervalRef.current);
+                webcamCaptureIntervalRef.current = null;
             }
         }
 
         return () => {
-            if (captureIntervalRef.current) {
-                clearInterval(captureIntervalRef.current);
+            if (webcamCaptureIntervalRef.current) {
+                clearInterval(webcamCaptureIntervalRef.current);
             }
         };
-    }, [sessionState, sessionSettings, currentSessionId]);
+    }, [sessionState, currentSessionId]);
+
+    // Screen and external camera capture effect - runs at 30 second interval for OCR
+    useEffect(() => {
+        if (sessionState === 'active' && currentSessionId) {
+            const screenExternalIntervalMs = 30000; // 30 seconds for screen/external (OCR processing)
+            screenExternalCaptureIntervalRef.current = window.setInterval(async () => {
+                const screenAndExternal = activeStreamsRef.current.filter(s => s.type === 'screen' || s.type === 'external');
+                if (screenAndExternal.length > 0) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    console.log(`📸 Screen/External capture at ${timestamp}`);
+                    
+                    const uploadPromises = screenAndExternal.map(async (cameraStream) => {
+                        try {
+                            const blob = await captureFrameFromStream(cameraStream.stream);
+                            if (blob) {
+                                console.log(`⏳ Uploading ${cameraStream.type} frame (${(blob.size / 1024).toFixed(1)} KB)...`);
+                                await api.uploadFrame(currentSessionId.toString(), blob, cameraStream.type);
+                                console.log(`✓ Captured and uploaded from: ${cameraStream.type}`);
+                                return true;
+                            }
+                            return false;
+                        } catch (error) {
+                            console.error(`✗ Failed to capture from ${cameraStream.type}:`, error);
+                            return false;
+                        }
+                    });
+
+                    await Promise.all(uploadPromises);
+                }
+            }, screenExternalIntervalMs);
+        } else {
+            if (screenExternalCaptureIntervalRef.current) {
+                clearInterval(screenExternalCaptureIntervalRef.current);
+                screenExternalCaptureIntervalRef.current = null;
+            }
+        }
+
+        return () => {
+            if (screenExternalCaptureIntervalRef.current) {
+                clearInterval(screenExternalCaptureIntervalRef.current);
+            }
+        };
+    }, [sessionState, currentSessionId]);
 
     // Cleanup on component unmount
     useEffect(() => {
