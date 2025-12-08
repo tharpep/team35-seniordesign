@@ -1,6 +1,8 @@
 const { getOne, getAll, runQuery } = require('../config/database');
 const fs = require('fs').promises;
+const fsSync = require('fs');
 const path = require('path');
+const http = require('http');
 
 // Get all sessions for logged-in user with artifact counts
 const getAllSessions = async (req, res) => {
@@ -275,6 +277,50 @@ const deleteSession = async (req, res) => {
       }
     }
 
+    // Delete session markdown files and directory
+    const genAiBasePath = path.join(__dirname, '../../../gen-ai/src/data/documents/sessions');
+    const sessionDir = path.join(genAiBasePath, id.toString());
+    
+    try {
+      if (fsSync.existsSync(sessionDir)) {
+        await fs.rm(sessionDir, { recursive: true, force: true });
+        console.log(`[deleteSession] Deleted session directory: ${sessionDir}`);
+      }
+    } catch (dirError) {
+      console.error(`[deleteSession] Error deleting session directory: ${dirError.message}`);
+    }
+
+    // Delete Qdrant collection via Gen-AI API (fire-and-forget)
+    try {
+      const genAiUrl = process.env.GEN_AI_URL || 'http://127.0.0.1:8000';
+      const deleteEndpoint = `${genAiUrl}/api/ingest/session/${id}`;
+      
+      const reqOptions = {
+        hostname: genAiUrl.replace(/^https?:\/\//, '').split(':')[0] || '127.0.0.1',
+        port: genAiUrl.includes(':8000') ? 8000 : (genAiUrl.match(/:(\d+)/)?.[1] || 8000),
+        path: `/api/ingest/session/${id}`,
+        method: 'DELETE'
+      };
+
+      const deleteReq = http.request(reqOptions, (deleteRes) => {
+        deleteRes.on('end', () => {
+          if (deleteRes.statusCode === 200 || deleteRes.statusCode === 404) {
+            console.log(`[deleteSession] Collection deleted for session ${id}`);
+          } else {
+            console.warn(`[deleteSession] Collection deletion returned ${deleteRes.statusCode}`);
+          }
+        });
+      });
+
+      deleteReq.on('error', (err) => {
+        console.error(`[deleteSession] Failed to delete collection: ${err.message}`);
+      });
+
+      deleteReq.end();
+    } catch (apiError) {
+      console.error(`[deleteSession] Error calling Gen-AI API: ${apiError.message}`);
+    }
+
     // Delete from database (cascade will delete frames and materials)
     await runQuery('DELETE FROM sessions WHERE id = ?', [id]);
 
@@ -403,35 +449,89 @@ const appendContext = async (req, res) => {
       });
     }
 
-    // Get current context
-    const currentContext = session.context || '';
-
-    // Append new markdown with separator and optional source info
+    // Write markdown file to session directory for RAG ingestion
+    // Note: We no longer store markdown in SQL sessions.context - it goes to file system and vector DB only
     const timestamp = new Date().toISOString();
-    const sourceLabel = source ? ` [${source}]` : '';
-    const separator = currentContext ? '\n\n---\n\n' : '';
-    const newContext = currentContext + separator + `<!-- ${timestamp}${sourceLabel} -->\n${markdown}`;
+    const genAiBasePath = path.join(__dirname, '../../../gen-ai/src/data/documents/sessions');
+    const sessionDir = path.join(genAiBasePath, sessionId.toString());
+    const fileName = `${timestamp.replace(/[:.]/g, '-')}_${source || 'unknown'}.md`;
+    const filePath = path.join(sessionDir, fileName);
 
-    // Update session context
-    await runQuery(
-      'UPDATE sessions SET context = ? WHERE id = ?',
-      [newContext, sessionId]
-    );
+    try {
+      // Ensure session directory exists
+      if (!fsSync.existsSync(sessionDir)) {
+        fsSync.mkdirSync(sessionDir, { recursive: true });
+        console.log(`[appendContext] Created session directory: ${sessionDir}`);
+      }
 
-    console.log(`✓ Context appended successfully - New total length: ${newContext.length}`);
+      // Write markdown file
+      await fs.writeFile(filePath, markdown, 'utf8');
+      console.log(`[appendContext] Wrote markdown file: ${filePath}`);
+
+      // Trigger Gen-AI ingestion (fire-and-forget, don't await)
+      const genAiUrl = process.env.GEN_AI_URL || 'http://127.0.0.1:8000';
+      const ingestEndpoint = `${genAiUrl}/api/ingest/session_file`;
+      
+      // Use relative path from gen-ai directory
+      const relativePath = path.relative(
+        path.join(__dirname, '../../../gen-ai'),
+        filePath
+      ).replace(/\\/g, '/'); // Normalize path separators
+
+      const ingestPayload = JSON.stringify({
+        session_id: sessionId.toString(),
+        file_path: relativePath
+      });
+
+      // Fire-and-forget HTTP request
+      const reqOptions = {
+        hostname: genAiUrl.replace(/^https?:\/\//, '').split(':')[0] || '127.0.0.1',
+        port: genAiUrl.includes(':8000') ? 8000 : (genAiUrl.match(/:(\d+)/)?.[1] || 8000),
+        path: '/api/ingest/session_file',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(ingestPayload)
+        }
+      };
+
+      const ingestReq = http.request(reqOptions, (ingestRes) => {
+        let data = '';
+        ingestRes.on('data', (chunk) => { data += chunk; });
+        ingestRes.on('end', () => {
+          if (ingestRes.statusCode === 200) {
+            console.log(`[appendContext] Ingestion queued successfully for session ${sessionId}`);
+          } else {
+            console.warn(`[appendContext] Ingestion request returned ${ingestRes.statusCode}: ${data}`);
+          }
+        });
+      });
+
+      ingestReq.on('error', (err) => {
+        console.error(`[appendContext] Failed to trigger ingestion: ${err.message}`);
+        // Don't fail the request - ingestion can happen later
+      });
+
+      ingestReq.write(ingestPayload);
+      ingestReq.end();
+
+    } catch (fileError) {
+      console.error(`[appendContext] Error writing file or triggering ingestion: ${fileError.message}`);
+      // Don't fail the request - ingestion can happen later
+    }
+
+    console.log(`✓ Markdown file written and ingestion queued for session ${sessionId}`);
 
     // Emit socket event for context update
     if (req.app.get('io')) {
       req.app.get('io').to(`session-${sessionId}`).emit('context-updated', {
         sessionId: sessionId,
-        contextLength: newContext.length,
         source: source || 'unknown'
       });
     }
 
     res.json({
-      message: 'Context appended successfully',
-      contextLength: newContext.length,
+      message: 'Markdown file written and ingestion queued successfully',
       appended: markdown.length
     });
 

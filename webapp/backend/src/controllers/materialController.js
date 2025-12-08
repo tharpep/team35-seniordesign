@@ -363,8 +363,13 @@ const generateMaterial = async (req, res) => {
       });
     }
 
-    // Default topic and num_items
-    const artifactTopic = topic || "Newton's laws of motion";
+    // Determine topic: use provided topic, or check sessions.context, or let Gen-AI extract it
+    let artifactTopic = topic;
+    if (!artifactTopic) {
+      // Check if we have a stored topic in sessions.context (must be non-empty string)
+      const storedTopic = session.context && session.context.trim() ? session.context.trim() : null;
+      artifactTopic = storedTopic; // null means Gen-AI will extract it
+    }
     const itemCount = num_items || 1;
 
     // Map type to database type for querying existing artifacts
@@ -441,6 +446,23 @@ const generateMaterial = async (req, res) => {
     });
 
     const artifact = genaiResponse.data;
+
+    // Store extracted topic in sessions.context if it was extracted and context is empty
+    if (artifact && artifact.extracted_topic) {
+      const hasStoredTopic = session.context && session.context.trim();
+      if (!hasStoredTopic) {
+        try {
+          await runQuery(
+            'UPDATE sessions SET context = ? WHERE id = ?',
+            [artifact.extracted_topic, session_id]
+          );
+          console.log(`[Artifact Generation] Stored extracted topic in sessions.context: ${artifact.extracted_topic}`);
+        } catch (dbError) {
+          console.error(`[Artifact Generation] Failed to store extracted topic: ${dbError.message}`);
+          // Don't fail the request - topic storage is secondary
+        }
+      }
+    }
 
     if (!artifact || !artifact.artifact_type) {
       return res.status(500).json({ 

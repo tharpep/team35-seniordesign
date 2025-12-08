@@ -75,3 +75,18 @@ Contains HTML and CSS mockups for the web application, including:
    ```bash
    npm run dev
    ```
+
+### Gen-AI
+1. Navigate to the `gen-ai` directory:
+   ```bash
+   cd gen-ai
+   ```
+2. Set up the virtual environment and install dependencies:
+   ```bash
+   python run setup
+   ```
+3. Start the FastAPI server:
+   ```bash
+   python run start
+   ```
+   The server will start at `http://127.0.0.1:8000`. Keep this terminal running.
