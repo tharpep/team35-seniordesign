@@ -368,6 +368,12 @@ wandb/
 !data/sample_data/
 datasets/
 
+# Session-specific runtime data (generated from user activity)
+# Session markdown files - created when img2study sends OCR results
+gen-ai/src/data/documents/sessions/**/*.md
+# Session Qdrant collections - created when files are ingested
+gen-ai/src/data/qdrant_db/collection/session_docs_*/
+
 # Generated documentation
 docs/build/
 docs/_build/

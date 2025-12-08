@@ -33,19 +33,25 @@ class FlashcardGenerator(BaseArtifactGenerator):
         
         super().__init__(rag_system, str(template_path))
     
-    def generate(self, topic: str, num_items: int = 1, session_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def generate(self, topic: Optional[str] = None, num_items: int = 1, session_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Generate flashcards for the given topic
         
         Args:
-            topic: Topic to generate flashcards about
+            topic: Topic to generate flashcards about (None to extract from RAG)
             num_items: Number of flashcards to generate (default 1)
             session_context: Optional session context dict with session_id, session_title
             
         Returns:
-            Dictionary containing the generated flashcards
+            Dictionary containing the generated flashcards (includes extracted_topic if topic was None)
         """
         start_time = time.time()
+        
+        # Extract topic from RAG if not provided
+        extracted_topic = None
+        if topic is None:
+            extracted_topic = self._extract_topic_from_rag(session_context)
+            topic = extracted_topic
         
         # Build variation instruction FIRST (before loading template)
         # This ensures it's prominent in the prompt
@@ -97,8 +103,13 @@ class FlashcardGenerator(BaseArtifactGenerator):
                 context_text = "\n\nSession Context:\n" + "\n".join(context_parts)
                 prompt = prompt + context_text
         
+        # Determine collection name from session context
+        collection_name = None
+        if session_context and session_context.get('session_id'):
+            collection_name = f"session_docs_{session_context['session_id']}"
+        
         # Use existing RAG system with artifact token limit
-        result = self.rag.query(prompt, max_tokens=self.rag.config.max_tokens)
+        result = self.rag.query(prompt, max_tokens=self.rag.config.max_tokens, collection_name=collection_name)
         
         # Handle tuple return format
         if isinstance(result, tuple):
@@ -107,6 +118,25 @@ class FlashcardGenerator(BaseArtifactGenerator):
             answer = result
             context_docs = []
             context_scores = []
+        
+        # Check if we got a "no documents" message - this means collection is empty or doesn't exist
+        if answer and ("No documents" in answer or "not found" in answer.lower() or "still be ingesting" in answer.lower()):
+            # Return a user-friendly error artifact
+            return {
+                "artifact_type": "flashcards",
+                "version": "1.0",
+                "error": "insufficient_context",
+                "message": answer,
+                "topic": topic,
+                "cards": [],
+                "provenance": {},
+                "metrics": {
+                    "tokens_in": len(prompt) // 4,
+                    "tokens_out": 0,
+                    "latency_ms": round((time.time() - start_time) * 1000, 2),
+                    "retrieval_scores": []
+                }
+            }
         
         # Try to parse JSON with cleanup
         try:
@@ -135,6 +165,10 @@ class FlashcardGenerator(BaseArtifactGenerator):
             "latency_ms": round((time.time() - start_time) * 1000, 2),
             "retrieval_scores": context_scores
         }
+        
+        # Add extracted_topic if topic was extracted from RAG
+        if extracted_topic is not None:
+            artifact["extracted_topic"] = extracted_topic
         
         return artifact
     

@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional
 
 class ArtifactRequest(BaseModel):
     """Request model for artifact generation"""
-    topic: str
+    topic: Optional[str] = None  # Optional - if None, will be extracted from session RAG context
     num_items: int = 1
     session_context: Optional[Dict[str, Any]] = None  # Session context: session_id, session_title
 

@@ -89,6 +89,16 @@ class VectorStore:
             List of (text, score) tuples
         """
         try:
+            # Check if collection exists first
+            try:
+                collection_info = self.client.get_collection(collection_name)
+                # Check if collection has any points
+                if collection_info.points_count == 0:
+                    return []
+            except Exception:
+                # Collection doesn't exist
+                return []
+            
             search_results = self.client.query_points(
                 collection_name=collection_name,
                 query=query_vector,

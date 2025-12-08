@@ -29,10 +29,11 @@ class ChatService:
     Production chat service with stateful conversation
     
     Features:
-    - Three-layer context: RAG (persistant_docs) + in-memory summary + recent messages
+    - Three-layer context: RAG (persistant_docs or session-specific collections) + in-memory summary + recent messages
     - Messages array format for LLM API (stateful chat)
     - Performance optimization: cached summary with smart regeneration
     - System prompt integration
+    - Session-based RAG: Uses session_docs_{session_id} collection when session_context is provided
     """
     
     def __init__(self, system_prompt: Optional[str] = None, vector_store=None, rag_system=None):
@@ -197,23 +198,38 @@ class ChatService:
             logger.warning(f"Failed to generate optimized query: {e}, using original question")
             return user_question
     
-    def _get_rag_context(self, question: str) -> tuple[str, List[tuple[str, float]], float]:
+    def _get_rag_context(self, question: str, session_context: Optional[Dict[str, Any]] = None) -> tuple[str, List[tuple[str, float]], float]:
         """
-        Retrieve RAG context from persistant_docs (session notes/OCR data)
+        Retrieve RAG context from persistant_docs or session-specific collection (session notes/OCR data)
         
         Uses hybrid approach:
         1. Try original query first (fast, no LLM call)
         2. If low confidence or vague question, generate optimized query and retry
         
+        Args:
+            question: User question
+            session_context: Optional session context dict with session_id to determine collection
+        
         Returns:
             Tuple of (formatted context string, raw results list, query_optimization_time)
         """
         try:
+            # Determine collection name from session context
+            collection_name = None
+            if session_context and session_context.get('session_id'):
+                collection_name = f"session_docs_{session_context['session_id']}"
+                logger.debug(f"Using session collection: {collection_name}")
+            
             # Check if collection has documents
-            stats = self.rag_system.get_stats()
-            doc_count = stats.get("document_count", 0)
+            target_collection = collection_name or self.rag_system.collection_name
+            stats = self.rag_system.vector_store.get_collection_stats(target_collection)
+            doc_count = stats.get("points_count", 0)
+            
             if doc_count == 0:
-                logger.warning(f"RAG collection '{self.rag_system.collection_name}' has no documents. Documents need to be ingested first.")
+                if collection_name:
+                    logger.warning(f"Session collection '{target_collection}' has no documents yet. Documents may still be ingesting.")
+                else:
+                    logger.warning(f"RAG collection '{target_collection}' has no documents. Documents need to be ingested first.")
                 return "", [], 0.0
             
             # Early exit for greetings and casual conversation (no RAG needed, saves time)
@@ -224,7 +240,7 @@ class ChatService:
                 return "", [], 0.0
             
             # Step 1: Try original query first (fast, no LLM call)
-            results = self.rag_system.search(question, limit=self.config.top_k)
+            results = self.rag_system.search(question, limit=self.config.top_k, collection_name=collection_name)
             top_score = results[0][1] if results else 0.0
             
             # Step 2: Check if we need to optimize the query
@@ -245,14 +261,14 @@ class ChatService:
                 
                 # Retry search with optimized query
                 if search_query != question:
-                    results = self.rag_system.search(search_query, limit=self.config.top_k)
+                    results = self.rag_system.search(search_query, limit=self.config.top_k, collection_name=collection_name)
                     new_top_score = results[0][1] if results else 0.0
                     logger.info(f"Optimized query search: original_score={top_score:.4f}, optimized_score={new_top_score:.4f}")
                 else:
                     logger.debug(f"Optimized query same as original, using original results")
             
             if not results:
-                logger.debug(f"RAG search returned no results for query: {search_query[:50]}... (collection has {doc_count} documents)")
+                logger.debug(f"RAG search returned no results for query: {search_query[:50]}... (collection '{target_collection}' has {doc_count} documents)")
                 return "", [], query_optimization_time
             
             # Log all results for debugging
@@ -304,7 +320,7 @@ class ChatService:
         Structure:
         1. System prompt
         2. Session context (if provided)
-        3. RAG context (from persistant_docs)
+        3. RAG context (from persistant_docs or session-specific collection if session_id provided)
         4. Chat summary (long-term conversation memory)
         5. Recent conversation history (last N exchanges from config)
         6. Current message
@@ -337,7 +353,7 @@ class ChatService:
                 messages.append({"role": "system", "content": context_text})
         
         # 3. RAG context (session notes)
-        rag_context, rag_results, query_optimization_time = self._get_rag_context(current_message)
+        rag_context, rag_results, query_optimization_time = self._get_rag_context(current_message, session_context)
         if rag_context:
             messages.append({"role": "system", "content": rag_context})
         
