@@ -101,14 +101,46 @@
     color: #202124;
 }
 
+/* Focus metric states */
 .metric-chip.focus {
     background: rgba(52, 168, 83, 0.1);
     color: #137333;
 }
 
+.metric-chip.focus.good {
+    background: rgba(52, 168, 83, 0.15);
+    color: #137333;
+}
+
+.metric-chip.focus.moderate {
+    background: rgba(251, 188, 4, 0.15);
+    color: #f29900;
+}
+
+.metric-chip.focus.low {
+    background: rgba(217, 48, 37, 0.15);
+    color: #c5221f;
+}
+
+/* Emotion metric states */
 .metric-chip.emotion {
     background: rgba(26, 115, 232, 0.1);
     color: #1a73e8;
+}
+
+.metric-chip.emotion.positive {
+    background: rgba(52, 168, 83, 0.15);
+    color: #137333;
+}
+
+.metric-chip.emotion.neutral {
+    background: rgba(26, 115, 232, 0.15);
+    color: #1a73e8;
+}
+
+.metric-chip.emotion.warning {
+    background: rgba(251, 188, 4, 0.15);
+    color: #f29900;
 }
 
 .metric-chip.stress {
@@ -120,14 +152,41 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
+    transition: background-color 0.3s ease;
 }
 
+/* Focus icon states */
 .metric-icon.focus {
     background: #34a853;
 }
 
+.metric-icon.focus.good {
+    background: #34a853;
+}
+
+.metric-icon.focus.moderate {
+    background: #fbbc04;
+}
+
+.metric-icon.focus.low {
+    background: #d93025;
+}
+
+/* Emotion icon states */
 .metric-icon.emotion {
     background: #1a73e8;
+}
+
+.metric-icon.emotion.positive {
+    background: #34a853;
+}
+
+.metric-icon.emotion.neutral {
+    background: #1a73e8;
+}
+
+.metric-icon.emotion.warning {
+    background: #fbbc04;
 }
 
 .metric-icon.stress {

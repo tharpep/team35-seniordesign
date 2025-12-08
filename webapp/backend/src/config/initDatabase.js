@@ -57,6 +57,7 @@ const initializeDatabase = () => {
         console.log('  - sessions');
         console.log('  - captured_frames');
         console.log('  - study_artifacts');
+        console.log('  - facial_metrics');
         console.log('  - session_fatigue_flags');
         console.log('  - session_distraction_events');
         console.log('');
