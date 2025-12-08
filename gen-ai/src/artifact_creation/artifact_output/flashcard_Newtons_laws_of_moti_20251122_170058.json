@@ -1,0 +1,58 @@
+{
+  "artifact_type": "flashcards",
+  "version": "1.0",
+  "cards": [
+    {
+      "id": "fc_001",
+      "front": "What are Newton's three laws of motion?",
+      "back": "1. An object at rest stays at rest and an object in motion stays in motion with the same speed and direction unless acted upon by a net force.\n2. The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.\n3. For every action, there is an equal and opposite reaction.",
+      "tags": [
+        "physics",
+        "Newton's laws"
+      ],
+      "difficulty": 2,
+      "source_refs": [
+        "N1"
+      ]
+    }
+  ],
+  "provenance": {
+    "N1": {
+      "note_id": "note_001",
+      "similarity": 0.326,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N2": {
+      "note_id": "note_002",
+      "similarity": 0.326,
+      "preview": "# Study Session Context ## Current Study Session Information ### Session Details - **Date**: Decembe..."
+    },
+    "N3": {
+      "note_id": "note_003",
+      "similarity": 0.267,
+      "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+    },
+    "N4": {
+      "note_id": "note_004",
+      "similarity": 0.267,
+      "preview": "ice OOP design patterns and inheritance 4. Review physics formulas and problem-solving strategies 5...."
+    },
+    "N5": {
+      "note_id": "note_005",
+      "similarity": 0.226,
+      "preview": "on**: Lagrange interpolation, Newton interpolation, spline interpolation ## Mathematical Application..."
+    }
+  },
+  "metrics": {
+    "tokens_in": 115,
+    "tokens_out": 153,
+    "latency_ms": 3646.7,
+    "retrieval_scores": [
+      0.3263943637517775,
+      0.3263943637517775,
+      0.26727875439091253,
+      0.26727875439091253,
+      0.22620468407942115
+    ]
+  }
+}

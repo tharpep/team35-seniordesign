@@ -1,0 +1,3489 @@
+{
+  "filename": "bio_test",
+  "page_index": 0,
+  "width": 1878,
+  "height": 902,
+  "blocks": [
+    {
+      "id": "text_bio_test_block_0",
+      "type": "text",
+      "bbox": [
+        0,
+        0,
+        1878,
+        902
+      ],
+      "confidence": 0.9936690120136037,
+      "lines": [
+        {
+          "text": "Cells are too small for you to be able to see. Although there are exceptions, a typical eukaryotic cell is 10 to 100 micrometers (m) in diameter, and most",
+          "confidence": 0.9923779368400574,
+          "bbox": [
+            [
+              18,
+              38
+            ],
+            [
+              1743,
+              38
+            ],
+            [
+              1743,
+              64
+            ],
+            [
+              18,
+              64
+            ]
+          ],
+          "words": [
+            {
+              "text": "Cells",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                18,
+                38,
+                86,
+                64
+              ]
+            },
+            {
+              "text": "are",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                120,
+                38,
+                162,
+                64
+              ]
+            },
+            {
+              "text": "too",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                196,
+                38,
+                237,
+                64
+              ]
+            },
+            {
+              "text": "small",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                272,
+                38,
+                340,
+                64
+              ]
+            },
+            {
+              "text": "for",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                375,
+                38,
+                416,
+                64
+              ]
+            },
+            {
+              "text": "you",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                450,
+                38,
+                491,
+                64
+              ]
+            },
+            {
+              "text": "to",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                526,
+                38,
+                553,
+                64
+              ]
+            },
+            {
+              "text": "be",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                588,
+                38,
+                615,
+                64
+              ]
+            },
+            {
+              "text": "able",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                649,
+                38,
+                704,
+                64
+              ]
+            },
+            {
+              "text": "to",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                739,
+                38,
+                766,
+                64
+              ]
+            },
+            {
+              "text": "see.",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                801,
+                38,
+                855,
+                64
+              ]
+            },
+            {
+              "text": "Although",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                890,
+                38,
+                999,
+                64
+              ]
+            },
+            {
+              "text": "there",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                1034,
+                38,
+                1102,
+                64
+              ]
+            },
+            {
+              "text": "are",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                1137,
+                38,
+                1178,
+                64
+              ]
+            },
+            {
+              "text": "exceptions,",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                1212,
+                38,
+                1363,
+                64
+              ]
+            },
+            {
+              "text": "a",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                1398,
+                38,
+                1411,
+                64
+              ]
+            },
+            {
+              "text": "typical",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                1446,
+                38,
+                1542,
+                64
+              ]
+            },
+            {
+              "text": "eukaryotic",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                1576,
+                38,
+                1713,
+                64
+              ]
+            },
+            {
+              "text": "cell",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                1747,
+                38,
+                1802,
+                64
+              ]
+            },
+            {
+              "text": "is",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                1837,
+                38,
+                1864,
+                64
+              ]
+            },
+            {
+              "text": "10",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                1899,
+                38,
+                1926,
+                64
+              ]
+            },
+            {
+              "text": "to",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                1960,
+                38,
+                1988,
+                64
+              ]
+            },
+            {
+              "text": "100",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                2022,
+                38,
+                2063,
+                64
+              ]
+            },
+            {
+              "text": "micrometers",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                2098,
+                38,
+                2248,
+                64
+              ]
+            },
+            {
+              "text": "(m)",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                2283,
+                38,
+                2324,
+                64
+              ]
+            },
+            {
+              "text": "in",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                2359,
+                38,
+                2386,
+                64
+              ]
+            },
+            {
+              "text": "diameter,",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                2420,
+                38,
+                2544,
+                64
+              ]
+            },
+            {
+              "text": "and",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                2578,
+                38,
+                2619,
+                64
+              ]
+            },
+            {
+              "text": "most",
+              "confidence": 0.9923779368400574,
+              "bbox": [
+                2654,
+                38,
+                2708,
+                64
+              ]
+            }
+          ]
+        },
+        {
+          "text": "prokaryotic cells are only 1 to 10 m in diameter.",
+          "confidence": 0.9837262630462646,
+          "bbox": [
+            [
+              14,
+              79
+            ],
+            [
+              575,
+              76
+            ],
+            [
+              575,
+              105
+            ],
+            [
+              14,
+              107
+            ]
+          ],
+          "words": [
+            {
+              "text": "prokaryotic",
+              "confidence": 0.9837262630462646,
+              "bbox": [
+                14,
+                76,
+                168,
+                107
+              ]
+            },
+            {
+              "text": "cells",
+              "confidence": 0.9837262630462646,
+              "bbox": [
+                179,
+                76,
+                249,
+                107
+              ]
+            },
+            {
+              "text": "are",
+              "confidence": 0.9837262630462646,
+              "bbox": [
+                260,
+                76,
+                302,
+                107
+              ]
+            },
+            {
+              "text": "only",
+              "confidence": 0.9837262630462646,
+              "bbox": [
+                314,
+                76,
+                370,
+                107
+              ]
+            },
+            {
+              "text": "1",
+              "confidence": 0.9837262630462646,
+              "bbox": [
+                381,
+                76,
+                395,
+                107
+              ]
+            },
+            {
+              "text": "to",
+              "confidence": 0.9837262630462646,
+              "bbox": [
+                406,
+                76,
+                434,
+                107
+              ]
+            },
+            {
+              "text": "10",
+              "confidence": 0.9837262630462646,
+              "bbox": [
+                445,
+                76,
+                474,
+                107
+              ]
+            },
+            {
+              "text": "m",
+              "confidence": 0.9837262630462646,
+              "bbox": [
+                485,
+                76,
+                499,
+                107
+              ]
+            },
+            {
+              "text": "in",
+              "confidence": 0.9837262630462646,
+              "bbox": [
+                510,
+                76,
+                538,
+                107
+              ]
+            },
+            {
+              "text": "diameter.",
+              "confidence": 0.9837262630462646,
+              "bbox": [
+                549,
+                76,
+                675,
+                107
+              ]
+            }
+          ]
+        },
+        {
+          "text": "Because cells are so small, they were not discovered until the invention of the microscope in the 17th century. English natural philosopher Robert Hooke was the",
+          "confidence": 0.9955844879150391,
+          "bbox": [
+            [
+              16,
+              135
+            ],
+            [
+              1831,
+              135
+            ],
+            [
+              1831,
+              161
+            ],
+            [
+              16,
+              161
+            ]
+          ],
+          "words": [
+            {
+              "text": "Because",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                16,
+                135,
+                110,
+                161
+              ]
+            },
+            {
+              "text": "cells",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                146,
+                135,
+                213,
+                161
+              ]
+            },
+            {
+              "text": "are",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                249,
+                135,
+                290,
+                161
+              ]
+            },
+            {
+              "text": "so",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                326,
+                135,
+                353,
+                161
+              ]
+            },
+            {
+              "text": "small,",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                389,
+                135,
+                470,
+                161
+              ]
+            },
+            {
+              "text": "they",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                506,
+                135,
+                560,
+                161
+              ]
+            },
+            {
+              "text": "were",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                596,
+                135,
+                650,
+                161
+              ]
+            },
+            {
+              "text": "not",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                686,
+                135,
+                727,
+                161
+              ]
+            },
+            {
+              "text": "discovered",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                763,
+                135,
+                897,
+                161
+              ]
+            },
+            {
+              "text": "until",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                934,
+                135,
+                1001,
+                161
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                1037,
+                135,
+                1078,
+                161
+              ]
+            },
+            {
+              "text": "invention",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                1114,
+                135,
+                1235,
+                161
+              ]
+            },
+            {
+              "text": "of",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                1271,
+                135,
+                1298,
+                161
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                1334,
+                135,
+                1375,
+                161
+              ]
+            },
+            {
+              "text": "microscope",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                1411,
+                135,
+                1545,
+                161
+              ]
+            },
+            {
+              "text": "in",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                1582,
+                135,
+                1609,
+                161
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                1645,
+                135,
+                1685,
+                161
+              ]
+            },
+            {
+              "text": "17th",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                1722,
+                135,
+                1775,
+                161
+              ]
+            },
+            {
+              "text": "century.",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                1812,
+                135,
+                1919,
+                161
+              ]
+            },
+            {
+              "text": "English",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                1956,
+                135,
+                2050,
+                161
+              ]
+            },
+            {
+              "text": "natural",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                2086,
+                135,
+                2180,
+                161
+              ]
+            },
+            {
+              "text": "philosopher",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                2216,
+                135,
+                2364,
+                161
+              ]
+            },
+            {
+              "text": "Robert",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                2401,
+                135,
+                2481,
+                161
+              ]
+            },
+            {
+              "text": "Hooke",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                2518,
+                135,
+                2585,
+                161
+              ]
+            },
+            {
+              "text": "was",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                2621,
+                135,
+                2661,
+                161
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9955844879150391,
+              "bbox": [
+                2698,
+                135,
+                2738,
+                161
+              ]
+            }
+          ]
+        },
+        {
+          "text": "first to observe cells in 1665, naming the shapes he saw in cork cellulae (Latin, \"small rooms\"). They are known to us as cells. Another early microscopist, Dutch",
+          "confidence": 0.9928209185600281,
+          "bbox": [
+            [
+              16,
+              175
+            ],
+            [
+              1825,
+              175
+            ],
+            [
+              1825,
+              201
+            ],
+            [
+              16,
+              201
+            ]
+          ],
+          "words": [
+            {
+              "text": "first",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                16,
+                175,
+                83,
+                201
+              ]
+            },
+            {
+              "text": "to",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                119,
+                175,
+                145,
+                201
+              ]
+            },
+            {
+              "text": "observe",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                182,
+                175,
+                275,
+                201
+              ]
+            },
+            {
+              "text": "cells",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                312,
+                175,
+                379,
+                201
+              ]
+            },
+            {
+              "text": "in",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                415,
+                175,
+                442,
+                201
+              ]
+            },
+            {
+              "text": "1665,",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                478,
+                175,
+                545,
+                201
+              ]
+            },
+            {
+              "text": "naming",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                581,
+                175,
+                661,
+                201
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                698,
+                175,
+                738,
+                201
+              ]
+            },
+            {
+              "text": "shapes",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                774,
+                175,
+                854,
+                201
+              ]
+            },
+            {
+              "text": "he",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                891,
+                175,
+                917,
+                201
+              ]
+            },
+            {
+              "text": "saw",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                954,
+                175,
+                994,
+                201
+              ]
+            },
+            {
+              "text": "in",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                1030,
+                175,
+                1057,
+                201
+              ]
+            },
+            {
+              "text": "cork",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                1093,
+                175,
+                1146,
+                201
+              ]
+            },
+            {
+              "text": "cellulae",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                1183,
+                175,
+                1290,
+                201
+              ]
+            },
+            {
+              "text": "(Latin,",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                1326,
+                175,
+                1420,
+                201
+              ]
+            },
+            {
+              "text": "\"small",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                1456,
+                175,
+                1536,
+                201
+              ]
+            },
+            {
+              "text": "rooms\").",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                1573,
+                175,
+                1680,
+                201
+              ]
+            },
+            {
+              "text": "They",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                1716,
+                175,
+                1770,
+                201
+              ]
+            },
+            {
+              "text": "are",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                1806,
+                175,
+                1846,
+                201
+              ]
+            },
+            {
+              "text": "known",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                1882,
+                175,
+                1949,
+                201
+              ]
+            },
+            {
+              "text": "to",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                1985,
+                175,
+                2012,
+                201
+              ]
+            },
+            {
+              "text": "us",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                2048,
+                175,
+                2075,
+                201
+              ]
+            },
+            {
+              "text": "as",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                2111,
+                175,
+                2138,
+                201
+              ]
+            },
+            {
+              "text": "cells.",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                2174,
+                175,
+                2255,
+                201
+              ]
+            },
+            {
+              "text": "Another",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                2291,
+                175,
+                2385,
+                201
+              ]
+            },
+            {
+              "text": "early",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                2421,
+                175,
+                2488,
+                201
+              ]
+            },
+            {
+              "text": "microscopist,",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                2524,
+                175,
+                2698,
+                201
+              ]
+            },
+            {
+              "text": "Dutch",
+              "confidence": 0.9928209185600281,
+              "bbox": [
+                2734,
+                175,
+                2801,
+                201
+              ]
+            }
+          ]
+        },
+        {
+          "text": "Anton van Leeuwenhoek, first observed living cells, which he termed \"animalcules,\" or little animals. After these early efforts, a century and a half passed before.",
+          "confidence": 0.995045006275177,
+          "bbox": [
+            [
+              16,
+              215
+            ],
+            [
+              1827,
+              215
+            ],
+            [
+              1827,
+              242
+            ],
+            [
+              16,
+              242
+            ]
+          ],
+          "words": [
+            {
+              "text": "Anton",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                16,
+                215,
+                80,
+                242
+              ]
+            },
+            {
+              "text": "van",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                116,
+                215,
+                155,
+                242
+              ]
+            },
+            {
+              "text": "Leeuwenhoek,",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                191,
+                215,
+                347,
+                242
+              ]
+            },
+            {
+              "text": "first",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                383,
+                215,
+                448,
+                242
+              ]
+            },
+            {
+              "text": "observed",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                484,
+                215,
+                587,
+                242
+              ]
+            },
+            {
+              "text": "living",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                623,
+                215,
+                701,
+                242
+              ]
+            },
+            {
+              "text": "cells,",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                737,
+                215,
+                815,
+                242
+              ]
+            },
+            {
+              "text": "which",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                851,
+                215,
+                916,
+                242
+              ]
+            },
+            {
+              "text": "he",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                952,
+                215,
+                978,
+                242
+              ]
+            },
+            {
+              "text": "termed",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                1014,
+                215,
+                1092,
+                242
+              ]
+            },
+            {
+              "text": "\"animalcules,\"",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                1128,
+                215,
+                1309,
+                242
+              ]
+            },
+            {
+              "text": "or",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                1345,
+                215,
+                1371,
+                242
+              ]
+            },
+            {
+              "text": "little",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                1407,
+                215,
+                1485,
+                242
+              ]
+            },
+            {
+              "text": "animals.",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                1521,
+                215,
+                1625,
+                242
+              ]
+            },
+            {
+              "text": "After",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                1661,
+                215,
+                1726,
+                242
+              ]
+            },
+            {
+              "text": "these",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                1762,
+                215,
+                1826,
+                242
+              ]
+            },
+            {
+              "text": "early",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                1863,
+                215,
+                1927,
+                242
+              ]
+            },
+            {
+              "text": "efforts,",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                1964,
+                215,
+                2067,
+                242
+              ]
+            },
+            {
+              "text": "a",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                2103,
+                215,
+                2116,
+                242
+              ]
+            },
+            {
+              "text": "century",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                2152,
+                215,
+                2243,
+                242
+              ]
+            },
+            {
+              "text": "and",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                2279,
+                215,
+                2318,
+                242
+              ]
+            },
+            {
+              "text": "a",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                2354,
+                215,
+                2367,
+                242
+              ]
+            },
+            {
+              "text": "half",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                2403,
+                215,
+                2455,
+                242
+              ]
+            },
+            {
+              "text": "passed",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                2491,
+                215,
+                2569,
+                242
+              ]
+            },
+            {
+              "text": "before.",
+              "confidence": 0.995045006275177,
+              "bbox": [
+                2605,
+                215,
+                2696,
+                242
+              ]
+            }
+          ]
+        },
+        {
+          "text": "biologists fully recognized the importance of cells. In 1838, German botanist Matthias Schleiden stated that all plants \"are aggregates of fully individualized,.",
+          "confidence": 0.9903437495231628,
+          "bbox": [
+            [
+              16,
+              256
+            ],
+            [
+              1778,
+              256
+            ],
+            [
+              1778,
+              282
+            ],
+            [
+              16,
+              282
+            ]
+          ],
+          "words": [
+            {
+              "text": "biologists",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                16,
+                256,
+                141,
+                282
+              ]
+            },
+            {
+              "text": "fully",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                177,
+                256,
+                240,
+                282
+              ]
+            },
+            {
+              "text": "recognized",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                275,
+                256,
+                401,
+                282
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                436,
+                256,
+                474,
+                282
+              ]
+            },
+            {
+              "text": "importance",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                509,
+                256,
+                635,
+                282
+              ]
+            },
+            {
+              "text": "of",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                670,
+                256,
+                695,
+                282
+              ]
+            },
+            {
+              "text": "cells.",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                730,
+                256,
+                806,
+                282
+              ]
+            },
+            {
+              "text": "In",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                841,
+                256,
+                866,
+                282
+              ]
+            },
+            {
+              "text": "1838,",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                902,
+                256,
+                964,
+                282
+              ]
+            },
+            {
+              "text": "German",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                1000,
+                256,
+                1075,
+                282
+              ]
+            },
+            {
+              "text": "botanist",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                1110,
+                256,
+                1211,
+                282
+              ]
+            },
+            {
+              "text": "Matthias",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                1246,
+                256,
+                1347,
+                282
+              ]
+            },
+            {
+              "text": "Schleiden",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                1382,
+                256,
+                1496,
+                282
+              ]
+            },
+            {
+              "text": "stated",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                1531,
+                256,
+                1606,
+                282
+              ]
+            },
+            {
+              "text": "that",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                1642,
+                256,
+                1692,
+                282
+              ]
+            },
+            {
+              "text": "all",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                1727,
+                256,
+                1765,
+                282
+              ]
+            },
+            {
+              "text": "plants",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                1800,
+                256,
+                1876,
+                282
+              ]
+            },
+            {
+              "text": "\"are",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                1911,
+                256,
+                1961,
+                282
+              ]
+            },
+            {
+              "text": "aggregates",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                1996,
+                256,
+                2122,
+                282
+              ]
+            },
+            {
+              "text": "of",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                2158,
+                256,
+                2183,
+                282
+              ]
+            },
+            {
+              "text": "fully",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                2218,
+                256,
+                2281,
+                282
+              ]
+            },
+            {
+              "text": "individualized,.",
+              "confidence": 0.9903437495231628,
+              "bbox": [
+                2316,
+                256,
+                2518,
+                282
+              ]
+            }
+          ]
+        },
+        {
+          "text": "independent, separate beings, namely the cells themselves.\" In 1839, German physiologist Theodor Schwann reported that all animal tissues also consist of.",
+          "confidence": 0.9907708168029785,
+          "bbox": [
+            [
+              16,
+              296
+            ],
+            [
+              1770,
+              296
+            ],
+            [
+              1770,
+              322
+            ],
+            [
+              16,
+              322
+            ]
+          ],
+          "words": [
+            {
+              "text": "independent,",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                16,
+                296,
+                173,
+                322
+              ]
+            },
+            {
+              "text": "separate",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                208,
+                296,
+                312,
+                322
+              ]
+            },
+            {
+              "text": "beings,",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                347,
+                296,
+                439,
+                322
+              ]
+            },
+            {
+              "text": "namely",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                474,
+                296,
+                553,
+                322
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                588,
+                296,
+                627,
+                322
+              ]
+            },
+            {
+              "text": "cells",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                662,
+                296,
+                728,
+                322
+              ]
+            },
+            {
+              "text": "themselves.\"",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                763,
+                296,
+                920,
+                322
+              ]
+            },
+            {
+              "text": "In",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                955,
+                296,
+                981,
+                322
+              ]
+            },
+            {
+              "text": "1839,",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                1016,
+                296,
+                1082,
+                322
+              ]
+            },
+            {
+              "text": "German",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                1117,
+                296,
+                1195,
+                322
+              ]
+            },
+            {
+              "text": "physiologist",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                1230,
+                296,
+                1387,
+                322
+              ]
+            },
+            {
+              "text": "Theodor",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                1422,
+                296,
+                1514,
+                322
+              ]
+            },
+            {
+              "text": "Schwann",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                1549,
+                296,
+                1641,
+                322
+              ]
+            },
+            {
+              "text": "reported",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                1676,
+                296,
+                1780,
+                322
+              ]
+            },
+            {
+              "text": "that",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                1816,
+                296,
+                1868,
+                322
+              ]
+            },
+            {
+              "text": "all",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                1903,
+                296,
+                1942,
+                322
+              ]
+            },
+            {
+              "text": "animal",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                1977,
+                296,
+                2056,
+                322
+              ]
+            },
+            {
+              "text": "tissues",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                2091,
+                296,
+                2183,
+                322
+              ]
+            },
+            {
+              "text": "also",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                2218,
+                296,
+                2270,
+                322
+              ]
+            },
+            {
+              "text": "consist",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                2305,
+                296,
+                2397,
+                322
+              ]
+            },
+            {
+              "text": "of.",
+              "confidence": 0.9907708168029785,
+              "bbox": [
+                2432,
+                296,
+                2471,
+                322
+              ]
+            }
+          ]
+        },
+        {
+          "text": "individual cells. Thus, the cell theory was born.",
+          "confidence": 0.9984827637672424,
+          "bbox": [
+            [
+              14,
+              336
+            ],
+            [
+              550,
+              336
+            ],
+            [
+              550,
+              362
+            ],
+            [
+              14,
+              362
+            ]
+          ],
+          "words": [
+            {
+              "text": "individual",
+              "confidence": 0.9984827637672424,
+              "bbox": [
+                14,
+                336,
+                141,
+                362
+              ]
+            },
+            {
+              "text": "cells.",
+              "confidence": 0.9984827637672424,
+              "bbox": [
+                152,
+                336,
+                228,
+                362
+              ]
+            },
+            {
+              "text": "Thus,",
+              "confidence": 0.9984827637672424,
+              "bbox": [
+                239,
+                336,
+                303,
+                362
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9984827637672424,
+              "bbox": [
+                314,
+                336,
+                352,
+                362
+              ]
+            },
+            {
+              "text": "cell",
+              "confidence": 0.9984827637672424,
+              "bbox": [
+                363,
+                336,
+                414,
+                362
+              ]
+            },
+            {
+              "text": "theory",
+              "confidence": 0.9984827637672424,
+              "bbox": [
+                424,
+                336,
+                501,
+                362
+              ]
+            },
+            {
+              "text": "was",
+              "confidence": 0.9984827637672424,
+              "bbox": [
+                512,
+                336,
+                550,
+                362
+              ]
+            },
+            {
+              "text": "born.",
+              "confidence": 0.9984827637672424,
+              "bbox": [
+                561,
+                336,
+                625,
+                362
+              ]
+            }
+          ]
+        },
+        {
+          "text": "Cell theory is the unifying foundation of cell biology",
+          "confidence": 0.9985936284065247,
+          "bbox": [
+            [
+              16,
+              417
+            ],
+            [
+              1137,
+              421
+            ],
+            [
+              1136,
+              467
+            ],
+            [
+              16,
+              463
+            ]
+          ],
+          "words": [
+            {
+              "text": "Cell",
+              "confidence": 0.9985936284065247,
+              "bbox": [
+                16,
+                417,
+                113,
+                467
+              ]
+            },
+            {
+              "text": "theory",
+              "confidence": 0.9985936284065247,
+              "bbox": [
+                135,
+                417,
+                282,
+                467
+              ]
+            },
+            {
+              "text": "is",
+              "confidence": 0.9985936284065247,
+              "bbox": [
+                304,
+                417,
+                353,
+                467
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9985936284065247,
+              "bbox": [
+                375,
+                417,
+                448,
+                467
+              ]
+            },
+            {
+              "text": "unifying",
+              "confidence": 0.9985936284065247,
+              "bbox": [
+                471,
+                417,
+                666,
+                467
+              ]
+            },
+            {
+              "text": "foundation",
+              "confidence": 0.9985936284065247,
+              "bbox": [
+                688,
+                417,
+                932,
+                467
+              ]
+            },
+            {
+              "text": "of",
+              "confidence": 0.9985936284065247,
+              "bbox": [
+                954,
+                417,
+                1003,
+                467
+              ]
+            },
+            {
+              "text": "cell",
+              "confidence": 0.9985936284065247,
+              "bbox": [
+                1025,
+                417,
+                1123,
+                467
+              ]
+            },
+            {
+              "text": "biology",
+              "confidence": 0.9985936284065247,
+              "bbox": [
+                1145,
+                417,
+                1316,
+                467
+              ]
+            }
+          ]
+        },
+        {
+          "text": "The cell theory was proposed to explain the observation that all organisms are composed of cells. It sounds simple, but it is a far-reaching statement about the",
+          "confidence": 0.9908806085586548,
+          "bbox": [
+            [
+              18,
+              501
+            ],
+            [
+              1794,
+              501
+            ],
+            [
+              1794,
+              530
+            ],
+            [
+              18,
+              530
+            ]
+          ],
+          "words": [
+            {
+              "text": "The",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                18,
+                501,
+                57,
+                530
+              ]
+            },
+            {
+              "text": "cell",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                93,
+                501,
+                146,
+                530
+              ]
+            },
+            {
+              "text": "theory",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                181,
+                501,
+                261,
+                530
+              ]
+            },
+            {
+              "text": "was",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                296,
+                501,
+                336,
+                530
+              ]
+            },
+            {
+              "text": "proposed",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                372,
+                501,
+                478,
+                530
+              ]
+            },
+            {
+              "text": "to",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                513,
+                501,
+                540,
+                530
+              ]
+            },
+            {
+              "text": "explain",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                575,
+                501,
+                668,
+                530
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                704,
+                501,
+                743,
+                530
+              ]
+            },
+            {
+              "text": "observation",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                779,
+                501,
+                925,
+                530
+              ]
+            },
+            {
+              "text": "that",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                960,
+                501,
+                1013,
+                530
+              ]
+            },
+            {
+              "text": "all",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                1049,
+                501,
+                1088,
+                530
+              ]
+            },
+            {
+              "text": "organisms",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                1124,
+                501,
+                1243,
+                530
+              ]
+            },
+            {
+              "text": "are",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                1279,
+                501,
+                1318,
+                530
+              ]
+            },
+            {
+              "text": "composed",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                1354,
+                501,
+                1460,
+                530
+              ]
+            },
+            {
+              "text": "of",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                1496,
+                501,
+                1522,
+                530
+              ]
+            },
+            {
+              "text": "cells.",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                1558,
+                501,
+                1637,
+                530
+              ]
+            },
+            {
+              "text": "It",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                1673,
+                501,
+                1699,
+                530
+              ]
+            },
+            {
+              "text": "sounds",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                1735,
+                501,
+                1814,
+                530
+              ]
+            },
+            {
+              "text": "simple,",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                1850,
+                501,
+                1942,
+                530
+              ]
+            },
+            {
+              "text": "but",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                1978,
+                501,
+                2018,
+                530
+              ]
+            },
+            {
+              "text": "it",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                2053,
+                501,
+                2080,
+                530
+              ]
+            },
+            {
+              "text": "is",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                2115,
+                501,
+                2142,
+                530
+              ]
+            },
+            {
+              "text": "a",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                2177,
+                501,
+                2191,
+                530
+              ]
+            },
+            {
+              "text": "far-reaching",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                2226,
+                501,
+                2385,
+                530
+              ]
+            },
+            {
+              "text": "statement",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                2421,
+                501,
+                2540,
+                530
+              ]
+            },
+            {
+              "text": "about",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                2575,
+                501,
+                2642,
+                530
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9908806085586548,
+              "bbox": [
+                2677,
+                501,
+                2717,
+                530
+              ]
+            }
+          ]
+        },
+        {
+          "text": "organization of life.",
+          "confidence": 0.9965726733207703,
+          "bbox": [
+            [
+              16,
+              544
+            ],
+            [
+              235,
+              544
+            ],
+            [
+              235,
+              572
+            ],
+            [
+              16,
+              572
+            ]
+          ],
+          "words": [
+            {
+              "text": "organization",
+              "confidence": 0.9965726733207703,
+              "bbox": [
+                16,
+                544,
+                154,
+                572
+              ]
+            },
+            {
+              "text": "of",
+              "confidence": 0.9965726733207703,
+              "bbox": [
+                158,
+                544,
+                181,
+                572
+              ]
+            },
+            {
+              "text": "life.",
+              "confidence": 0.9965726733207703,
+              "bbox": [
+                186,
+                544,
+                243,
+                572
+              ]
+            }
+          ]
+        },
+        {
+          "text": "In its modern form, the cell theory includes the following three principles:",
+          "confidence": 0.9891924858093262,
+          "bbox": [
+            [
+              16,
+              600
+            ],
+            [
+              847,
+              600
+            ],
+            [
+              847,
+              628
+            ],
+            [
+              16,
+              628
+            ]
+          ],
+          "words": [
+            {
+              "text": "In",
+              "confidence": 0.9891924858093262,
+              "bbox": [
+                16,
+                600,
+                41,
+                628
+              ]
+            },
+            {
+              "text": "its",
+              "confidence": 0.9891924858093262,
+              "bbox": [
+                58,
+                600,
+                96,
+                628
+              ]
+            },
+            {
+              "text": "modern",
+              "confidence": 0.9891924858093262,
+              "bbox": [
+                113,
+                600,
+                189,
+                628
+              ]
+            },
+            {
+              "text": "form,",
+              "confidence": 0.9891924858093262,
+              "bbox": [
+                206,
+                600,
+                270,
+                628
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9891924858093262,
+              "bbox": [
+                287,
+                600,
+                325,
+                628
+              ]
+            },
+            {
+              "text": "cell",
+              "confidence": 0.9891924858093262,
+              "bbox": [
+                342,
+                600,
+                393,
+                628
+              ]
+            },
+            {
+              "text": "theory",
+              "confidence": 0.9891924858093262,
+              "bbox": [
+                409,
+                600,
+                486,
+                628
+              ]
+            },
+            {
+              "text": "includes",
+              "confidence": 0.9891924858093262,
+              "bbox": [
+                503,
+                600,
+                605,
+                628
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9891924858093262,
+              "bbox": [
+                621,
+                600,
+                660,
+                628
+              ]
+            },
+            {
+              "text": "following",
+              "confidence": 0.9891924858093262,
+              "bbox": [
+                676,
+                600,
+                792,
+                628
+              ]
+            },
+            {
+              "text": "three",
+              "confidence": 0.9891924858093262,
+              "bbox": [
+                808,
+                600,
+                872,
+                628
+              ]
+            },
+            {
+              "text": "principles:",
+              "confidence": 0.9891924858093262,
+              "bbox": [
+                889,
+                600,
+                1029,
+                628
+              ]
+            }
+          ]
+        },
+        {
+          "text": "1. All organisms are composed of one or more cells, and the life processes of metabolism and heredity occur within these cells.",
+          "confidence": 0.9985227584838867,
+          "bbox": [
+            [
+              12,
+              650
+            ],
+            [
+              1448,
+              650
+            ],
+            [
+              1448,
+              676
+            ],
+            [
+              12,
+              676
+            ]
+          ],
+          "words": [
+            {
+              "text": "1.",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                12,
+                650,
+                39,
+                676
+              ]
+            },
+            {
+              "text": "All",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                67,
+                650,
+                108,
+                676
+              ]
+            },
+            {
+              "text": "organisms",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                137,
+                650,
+                259,
+                676
+              ]
+            },
+            {
+              "text": "are",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                287,
+                650,
+                328,
+                676
+              ]
+            },
+            {
+              "text": "composed",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                357,
+                650,
+                465,
+                676
+              ]
+            },
+            {
+              "text": "of",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                494,
+                650,
+                521,
+                676
+              ]
+            },
+            {
+              "text": "one",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                550,
+                650,
+                590,
+                676
+              ]
+            },
+            {
+              "text": "or",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                619,
+                650,
+                646,
+                676
+              ]
+            },
+            {
+              "text": "more",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                675,
+                650,
+                729,
+                676
+              ]
+            },
+            {
+              "text": "cells,",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                758,
+                650,
+                839,
+                676
+              ]
+            },
+            {
+              "text": "and",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                868,
+                650,
+                908,
+                676
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                937,
+                650,
+                978,
+                676
+              ]
+            },
+            {
+              "text": "life",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                1006,
+                650,
+                1061,
+                676
+              ]
+            },
+            {
+              "text": "processes",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                1089,
+                650,
+                1211,
+                676
+              ]
+            },
+            {
+              "text": "of",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                1240,
+                650,
+                1267,
+                676
+              ]
+            },
+            {
+              "text": "metabolism",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                1296,
+                650,
+                1431,
+                676
+              ]
+            },
+            {
+              "text": "and",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                1460,
+                650,
+                1501,
+                676
+              ]
+            },
+            {
+              "text": "heredity",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                1529,
+                650,
+                1638,
+                676
+              ]
+            },
+            {
+              "text": "occur",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                1666,
+                650,
+                1734,
+                676
+              ]
+            },
+            {
+              "text": "within",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                1763,
+                650,
+                1844,
+                676
+              ]
+            },
+            {
+              "text": "these",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                1873,
+                650,
+                1941,
+                676
+              ]
+            },
+            {
+              "text": "cells.",
+              "confidence": 0.9985227584838867,
+              "bbox": [
+                1969,
+                650,
+                2051,
+                676
+              ]
+            }
+          ]
+        },
+        {
+          "text": "2. Cells are the smallest living things, the basic units of organization of all organisms.",
+          "confidence": 0.99952632188797,
+          "bbox": [
+            [
+              10,
+              699
+            ],
+            [
+              976,
+              699
+            ],
+            [
+              976,
+              727
+            ],
+            [
+              10,
+              727
+            ]
+          ],
+          "words": [
+            {
+              "text": "2.",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                10,
+                699,
+                35,
+                727
+              ]
+            },
+            {
+              "text": "Cells",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                54,
+                699,
+                118,
+                727
+              ]
+            },
+            {
+              "text": "are",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                137,
+                699,
+                175,
+                727
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                195,
+                699,
+                233,
+                727
+              ]
+            },
+            {
+              "text": "smallest",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                252,
+                699,
+                354,
+                727
+              ]
+            },
+            {
+              "text": "living",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                373,
+                699,
+                449,
+                727
+              ]
+            },
+            {
+              "text": "things,",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                469,
+                699,
+                558,
+                727
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                577,
+                699,
+                615,
+                727
+              ]
+            },
+            {
+              "text": "basic",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                634,
+                699,
+                698,
+                727
+              ]
+            },
+            {
+              "text": "units",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                717,
+                699,
+                781,
+                727
+              ]
+            },
+            {
+              "text": "of",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                800,
+                699,
+                826,
+                727
+              ]
+            },
+            {
+              "text": "organization",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                845,
+                699,
+                997,
+                727
+              ]
+            },
+            {
+              "text": "of",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                1017,
+                699,
+                1042,
+                727
+              ]
+            },
+            {
+              "text": "all",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                1061,
+                699,
+                1100,
+                727
+              ]
+            },
+            {
+              "text": "organisms.",
+              "confidence": 0.99952632188797,
+              "bbox": [
+                1119,
+                699,
+                1246,
+                727
+              ]
+            }
+          ]
+        },
+        {
+          "text": "3. Cells arise only by division of a previously existing cell.",
+          "confidence": 0.9918895363807678,
+          "bbox": [
+            [
+              12,
+              747
+            ],
+            [
+              665,
+              747
+            ],
+            [
+              665,
+              775
+            ],
+            [
+              12,
+              775
+            ]
+          ],
+          "words": [
+            {
+              "text": "3.",
+              "confidence": 0.9918895363807678,
+              "bbox": [
+                12,
+                747,
+                37,
+                775
+              ]
+            },
+            {
+              "text": "Cells",
+              "confidence": 0.9918895363807678,
+              "bbox": [
+                50,
+                747,
+                112,
+                775
+              ]
+            },
+            {
+              "text": "arise",
+              "confidence": 0.9918895363807678,
+              "bbox": [
+                126,
+                747,
+                188,
+                775
+              ]
+            },
+            {
+              "text": "only",
+              "confidence": 0.9918895363807678,
+              "bbox": [
+                201,
+                747,
+                252,
+                775
+              ]
+            },
+            {
+              "text": "by",
+              "confidence": 0.9918895363807678,
+              "bbox": [
+                265,
+                747,
+                290,
+                775
+              ]
+            },
+            {
+              "text": "division",
+              "confidence": 0.9918895363807678,
+              "bbox": [
+                303,
+                747,
+                403,
+                775
+              ]
+            },
+            {
+              "text": "of",
+              "confidence": 0.9918895363807678,
+              "bbox": [
+                416,
+                747,
+                441,
+                775
+              ]
+            },
+            {
+              "text": "a",
+              "confidence": 0.9918895363807678,
+              "bbox": [
+                455,
+                747,
+                467,
+                775
+              ]
+            },
+            {
+              "text": "previously",
+              "confidence": 0.9918895363807678,
+              "bbox": [
+                480,
+                747,
+                606,
+                775
+              ]
+            },
+            {
+              "text": "existing",
+              "confidence": 0.9918895363807678,
+              "bbox": [
+                619,
+                747,
+                719,
+                775
+              ]
+            },
+            {
+              "text": "cell.",
+              "confidence": 0.9918895363807678,
+              "bbox": [
+                732,
+                747,
+                795,
+                775
+              ]
+            }
+          ]
+        },
+        {
+          "text": "Although life likely evolved spontaneously in the environment of early Earth, biologists have concluded that no additional cells are originating spontaneously at",
+          "confidence": 0.9932053685188293,
+          "bbox": [
+            [
+              16,
+              811
+            ],
+            [
+              1815,
+              813
+            ],
+            [
+              1815,
+              842
+            ],
+            [
+              16,
+              840
+            ]
+          ],
+          "words": [
+            {
+              "text": "Although",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                16,
+                811,
+                118,
+                842
+              ]
+            },
+            {
+              "text": "life",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                154,
+                811,
+                206,
+                842
+              ]
+            },
+            {
+              "text": "likely",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                242,
+                811,
+                319,
+                842
+              ]
+            },
+            {
+              "text": "evolved",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                355,
+                811,
+                445,
+                842
+              ]
+            },
+            {
+              "text": "spontaneously",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                481,
+                811,
+                648,
+                842
+              ]
+            },
+            {
+              "text": "in",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                684,
+                811,
+                709,
+                842
+              ]
+            },
+            {
+              "text": "the",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                745,
+                811,
+                784,
+                842
+              ]
+            },
+            {
+              "text": "environment",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                820,
+                811,
+                961,
+                842
+              ]
+            },
+            {
+              "text": "of",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                997,
+                811,
+                1023,
+                842
+              ]
+            },
+            {
+              "text": "early",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                1059,
+                811,
+                1123,
+                842
+              ]
+            },
+            {
+              "text": "Earth,",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                1159,
+                811,
+                1236,
+                842
+              ]
+            },
+            {
+              "text": "biologists",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                1272,
+                811,
+                1401,
+                842
+              ]
+            },
+            {
+              "text": "have",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                1437,
+                811,
+                1488,
+                842
+              ]
+            },
+            {
+              "text": "concluded",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                1524,
+                811,
+                1640,
+                842
+              ]
+            },
+            {
+              "text": "that",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                1676,
+                811,
+                1727,
+                842
+              ]
+            },
+            {
+              "text": "no",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                1763,
+                811,
+                1789,
+                842
+              ]
+            },
+            {
+              "text": "additional",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                1825,
+                811,
+                1953,
+                842
+              ]
+            },
+            {
+              "text": "cells",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                1989,
+                811,
+                2054,
+                842
+              ]
+            },
+            {
+              "text": "are",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                2089,
+                811,
+                2128,
+                842
+              ]
+            },
+            {
+              "text": "originating",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                2164,
+                811,
+                2305,
+                842
+              ]
+            },
+            {
+              "text": "spontaneously",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                2341,
+                811,
+                2508,
+                842
+              ]
+            },
+            {
+              "text": "at",
+              "confidence": 0.9932053685188293,
+              "bbox": [
+                2544,
+                811,
+                2570,
+                842
+              ]
+            }
+          ]
+        },
+        {
+          "text": "present. Rather, life on Earth represents a continuous line of descent from those early cells.",
+          "confidence": 0.9948378801345825,
+          "bbox": [
+            [
+              14,
+              854
+            ],
+            [
+              1045,
+              852
+            ],
+            [
+              1045,
+              880
+            ],
+            [
+              14,
+              882
+            ]
+          ],
+          "words": [
+            {
+              "text": "present.",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                14,
+                852,
+                117,
+                882
+              ]
+            },
+            {
+              "text": "Rather,",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                137,
+                852,
+                227,
+                882
+              ]
+            },
+            {
+              "text": "life",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                248,
+                852,
+                300,
+                882
+              ]
+            },
+            {
+              "text": "on",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                320,
+                852,
+                346,
+                882
+              ]
+            },
+            {
+              "text": "Earth",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                367,
+                852,
+                431,
+                882
+              ]
+            },
+            {
+              "text": "represents",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                452,
+                852,
+                581,
+                882
+              ]
+            },
+            {
+              "text": "a",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                601,
+                852,
+                614,
+                882
+              ]
+            },
+            {
+              "text": "continuous",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                635,
+                852,
+                764,
+                882
+              ]
+            },
+            {
+              "text": "line",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                784,
+                852,
+                836,
+                882
+              ]
+            },
+            {
+              "text": "of",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                856,
+                852,
+                882,
+                882
+              ]
+            },
+            {
+              "text": "descent",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                903,
+                852,
+                993,
+                882
+              ]
+            },
+            {
+              "text": "from",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                1014,
+                852,
+                1065,
+                882
+              ]
+            },
+            {
+              "text": "those",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                1086,
+                852,
+                1150,
+                882
+              ]
+            },
+            {
+              "text": "early",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                1171,
+                852,
+                1235,
+                882
+              ]
+            },
+            {
+              "text": "cells.",
+              "confidence": 0.9948378801345825,
+              "bbox": [
+                1256,
+                852,
+                1333,
+                882
+              ]
+            }
+          ]
+        }
+      ],
+      "table": null
+    }
+  ],
+  "aggregates": {
+    "page_confidence_mean": 0.9936690120136037,
+    "page_confidence_min": 0.9837262630462646,
+    "word_count": 305,
+    "table_count": 2
+  },
+  "flagged": false,
+  "reason_codes": [],
+  "pii_masked": false
+}

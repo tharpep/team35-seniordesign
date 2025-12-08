@@ -33,7 +33,8 @@ async def chat(
         # Run sync chat in thread pool
         result = await asyncio.to_thread(
             chat_service.chat,
-            request.message
+            request.message,
+            request.session_context
         )
         
         logger.info(f"Chat response generated: response_time={result['response_time']:.2f}s, length={result['conversation_length']}")

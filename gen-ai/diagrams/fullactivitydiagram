@@ -1,0 +1,155 @@
+flowchart TD
+    Start([System Startup]) --> Init[Initialize App State]
+    Init --> CreateVectorStore["Create Shared VectorStore<br/>Qdrant Client"]
+    CreateVectorStore --> InitRAG["Initialize RAG System<br/>Collection: persistant_docs"]
+    InitRAG --> LoadPrompt["Load System Prompt<br/>from prompts directory"]
+    LoadPrompt --> InitGenerators["Initialize Generators<br/>Flashcard, MCQ, Insights"]
+    InitGenerators --> InitChat["Initialize ChatService<br/>with RAG System"]
+    InitChat --> Ready["System Ready<br/>FastAPI Server Running"]
+    
+    Ready --> APIRequest{API Request Type}
+    
+    APIRequest -->|GET /health| Health[Health Check Endpoint]
+    Health --> CheckStatus["Check Initialization Status<br/>RAG, Generators, Chat"]
+    CheckStatus --> ReturnHealth["Return Status:<br/>healthy/degraded/unhealthy"]
+    ReturnHealth --> EndHealth([End: Return to Client])
+    
+    APIRequest -->|POST /api/flashcards<br/>/api/mcq<br/>/api/insights| ArtifactReq["Receive ArtifactRequest<br/>topic, num_items, session_context"]
+    ArtifactReq --> GetGenerator{Get Generator<br/>via Dependency Injection}
+    GetGenerator --> FlashGen[FlashcardGenerator]
+    GetGenerator --> MCQGen[MCQGenerator]
+    GetGenerator --> InsightsGen[InsightsGenerator]
+    
+    FlashGen --> GenFlow[Generator.generate]
+    MCQGen --> GenFlow
+    InsightsGen --> GenFlow
+    
+    GenFlow --> CheckTopic{Topic Provided?}
+    CheckTopic -->|No| ExtractTopic["Extract Topic from RAG<br/>Query session collection"]
+    ExtractTopic --> TopicCheck{Valid Topic<br/>Extracted?}
+    TopicCheck -->|No| ErrorArtifact["Create Error Artifact<br/>No documents/ingesting"]
+    TopicCheck -->|Yes| UseTopic[Use Extracted Topic]
+    CheckTopic -->|Yes| UseTopic
+    
+    UseTopic --> BuildContext["Build Session Context<br/>Determine Collection Name"]
+    BuildContext --> SessionCollection{session_context<br/>provided?}
+    SessionCollection -->|Yes| UseSessionColl["Use Collection:<br/>session_docs_session_id"]
+    SessionCollection -->|No| UsePersistentColl["Use Collection:<br/>persistant_docs"]
+    
+    UseSessionColl --> RAGQuery["RAG Query:<br/>Retrieve Relevant Context"]
+    UsePersistentColl --> RAGQuery
+    
+    RAGQuery --> EmbedQuery["Encode Query with<br/>Sentence Transformer"]
+    EmbedQuery --> VectorSearch["Vector Search in Qdrant<br/>Top-K Similarity Search"]
+    VectorSearch --> GetContext["Get Context Documents<br/>with Similarity Scores"]
+    
+    GetContext --> LoadTemplate["Load Artifact Template<br/>JSON Schema"]
+    LoadTemplate --> BuildPrompt["Build Generation Prompt<br/>Template + Topic + Context"]
+    BuildPrompt --> CallAI["Call AI Gateway<br/>Ollama/Purdue API"]
+    
+    CallAI --> AIResponse{AI Response<br/>Valid?}
+    AIResponse -->|Error| ErrorArtifact
+    AIResponse -->|Success| ParseJSON[Parse JSON Response]
+    ParseJSON --> ValidateSchema["Validate Against<br/>JSON Schema"]
+    ValidateSchema --> SchemaValid{Valid?}
+    SchemaValid -->|No| FallbackArtifact["Create Fallback Artifact<br/>from Partial JSON"]
+    SchemaValid -->|Yes| AddMetadata["Add Provenance & Metrics<br/>context_docs, scores, latency"]
+    
+    FallbackArtifact --> ReturnArtifact["Return Artifact JSON"]
+    AddMetadata --> ReturnArtifact
+    ErrorArtifact --> ReturnArtifact
+    ReturnArtifact --> EndArtifact([End: Return to Client])
+    
+    APIRequest -->|POST /api/chat| ChatReq["Receive ChatRequest<br/>message, session_id, session_context"]
+    ChatReq --> GetChatService["Get ChatService<br/>via Dependency Injection"]
+    GetChatService --> ChatFlow[ChatService.chat]
+    
+    ChatFlow --> CheckVague{Is Question<br/>Vague?}
+    CheckVague -->|Yes| EnhanceQuery["Enhance Query from<br/>Conversation Context"]
+    CheckVague -->|No| UseOriginalQuery[Use Original Message]
+    EnhanceQuery --> UseOriginalQuery
+    
+    UseOriginalQuery --> DetermineRAGSource{Session Context<br/>Provided?}
+    DetermineRAGSource -->|Yes| UseSessionRAG["Query session collection<br/>for RAG Context"]
+    DetermineRAGSource -->|No| UsePersistentRAG["Query persistant_docs<br/>for RAG Context"]
+    
+    UseSessionRAG --> RAGSearch["Vector Search<br/>Top-K Documents"]
+    UsePersistentRAG --> RAGSearch
+    RAGSearch --> GetRAGContext["Get RAG Context<br/>Documents + Scores"]
+    
+    GetRAGContext --> BuildThreeLayer["Build Three-Layer Context"]
+    BuildThreeLayer --> Layer1["Layer 1: RAG Context<br/>Retrieved Documents"]
+    Layer1 --> Layer2["Layer 2: Conversation Summary<br/>Cached or Regenerate"]
+    Layer2 --> CheckSummary{Summary<br/>Cached?}
+    CheckSummary -->|Yes| UseCachedSummary[Use Cached Summary]
+    CheckSummary -->|No| GenerateSummary["Generate Summary from<br/>Conversation History"]
+    GenerateSummary --> CacheSummary[Cache Summary]
+    UseCachedSummary --> Layer3["Layer 3: Recent Messages<br/>Last N Exchanges"]
+    CacheSummary --> Layer3
+    
+    Layer3 --> BuildMessages["Build Messages Array<br/>System + Context + History + User"]
+    BuildMessages --> CallAIChat["Call AI Gateway<br/>with Messages Array"]
+    CallAIChat --> GetAnswer[Get LLM Answer]
+    GetAnswer --> UpdateHistory["Update Conversation History<br/>Add Exchange"]
+    UpdateHistory --> CheckHistoryLimit{History ><br/>max_size?}
+    CheckHistoryLimit -->|Yes| TrimHistory["Trim to Last N Messages"]
+    CheckHistoryLimit -->|No| BuildResponse["Build ChatResponse<br/>answer, timings, RAG info"]
+    TrimHistory --> RegenerateSummary["Regenerate Summary<br/>from Full History"]
+    RegenerateSummary --> BuildResponse
+    
+    BuildResponse --> ReturnChat["Return ChatResponse"]
+    ReturnChat --> EndChat([End: Return to Client])
+    
+    APIRequest -->|POST /api/ingest/session_file| IngestReq["Receive SessionFileIngestRequest<br/>session_id, file_path"]
+    IngestReq --> ValidateFile["Validate File Exists<br/>Relative Path from gen-ai root"]
+    ValidateFile --> FileExists{File<br/>Exists?}
+    FileExists -->|No| IngestError["Return 404 Error"]
+    FileExists -->|Yes| QueueTask["Queue Background Task<br/>Fire-and-Forget"]
+    
+    QueueTask --> ReturnQueued["Return Immediately<br/>status: queued"]
+    ReturnQueued --> EndIngest([End: Return to Client])
+    
+    QueueTask -.Background.-> BgTask["Background Task Starts"]
+    BgTask --> ResolvePath["Resolve Absolute File Path"]
+    ResolvePath --> DetermineCollection["Determine Collection Name<br/>session_docs_session_id"]
+    DetermineCollection --> GetVectorStore["Get or Create VectorStore<br/>Shared Instance"]
+    GetVectorStore --> CreateRAG["Create BasicRAG Instance<br/>for Session Collection"]
+    CreateRAG --> CreateIngester["Create DocumentIngester<br/>with Session RAG"]
+    CreateIngester --> ReadFile[Read Markdown File]
+    ReadFile --> Preprocess["Preprocess Text<br/>Clean and Normalize"]
+    Preprocess --> ChunkText["Chunk Text<br/>Max 1000 chars per chunk"]
+    ChunkText --> EncodeChunks["Encode Chunks to Embeddings<br/>Sentence Transformer"]
+    EncodeChunks --> CreatePoints["Create Qdrant Points<br/>with Metadata"]
+    CreatePoints --> UpsertQdrant["Upsert to Qdrant Collection<br/>session_docs_session_id"]
+    UpsertQdrant --> LogSuccess["Log Success<br/>Chunks Indexed"]
+    LogSuccess --> EndBgTask([Background Task Complete])
+    
+    APIRequest -->|DELETE /api/ingest/session/id| DeleteReq["Receive Session ID"]
+    DeleteReq --> GetCollection["Get Collection Name<br/>session_docs_id"]
+    GetCollection --> CheckCollection{Collection<br/>Exists?}
+    CheckCollection -->|No| ReturnNotFound["Return not_found"]
+    CheckCollection -->|Yes| DeleteCollection["Delete Qdrant Collection"]
+    DeleteCollection --> LogDelete[Log Deletion]
+    LogDelete --> ReturnDeleted["Return success"]
+    ReturnNotFound --> EndDelete
+    ReturnDeleted --> EndDelete([End: Return to Client])
+    
+    APIRequest -->|DELETE /api/chat/session/id| ClearReq["Receive Session ID"]
+    ClearReq --> GetChatService2["Get ChatService"]
+    GetChatService2 --> ClearHistory["Clear Conversation History<br/>Reset Summary Cache"]
+    ClearHistory --> ReturnCleared["Return SessionClearResponse"]
+    ReturnCleared --> EndClear([End: Return to Client])
+    
+    style Start fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style Ready fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style EndHealth fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style EndArtifact fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style EndChat fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style EndIngest fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style EndBgTask fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style EndDelete fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style EndClear fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style ErrorArtifact fill:#ffebee,stroke:#c62828,stroke-width:2px
+    style FallbackArtifact fill:#ffebee,stroke:#c62828,stroke-width:2px
+    style IngestError fill:#ffebee,stroke:#c62828,stroke-width:2px
+    style BgTask fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,stroke-dasharray: 5 5

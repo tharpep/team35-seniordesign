@@ -1,0 +1,23 @@
+{
+  "run_id": "run_20251016_140926_1e63b748",
+  "total_pages": 1,
+  "total_words": 192,
+  "total_tables": 0,
+  "total_equations": 8,
+  "flagged_pages": 0,
+  "average_page_confidence_mean": 0.9934319673162518,
+  "average_page_confidence_min": 0.9500648379325867,
+  "processing_time_seconds": 16.100459098815918,
+  "confidence_histogram": {
+    "0.9-1.0": 20,
+    "0.8-0.9": 0,
+    "0.0-0.8": 0
+  },
+  "timing_breakdown": {
+    "initialization": 1.198241949081421,
+    "ocr_processing": 14.902217149734497
+  },
+  "input_path": "dataset/table_eg.png",
+  "output_path": "dataset/output/run_20251016_140926_1e63b748",
+  "language": "en"
+}

@@ -12,7 +12,8 @@ const {
   updateSession,
   deleteSession,
   uploadFrame,
-  getSessionMetrics
+  getSessionMetrics,
+  appendContext
 } = require('../controllers/sessionController');
 const {
   getMaterialsBySession
@@ -39,10 +40,10 @@ const storage = multer.diskStorage({
     const frameType = resolveFrameType(req, file);
     req.resolvedFrameType = frameType;
     const uploadDir = path.join(__dirname, '../../../uploads/frames', `session_${sessionId}`, frameType);
-    
+
     // Create directory if it doesn't exist
     fs.mkdirSync(uploadDir, { recursive: true });
-    
+
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
@@ -92,6 +93,9 @@ router.post('/:id/frames', upload.single('frame'), uploadFrame);
 
 // GET /api/sessions/:id/metrics - Get facial processing metrics for a session
 router.get('/:id/metrics', getSessionMetrics);
+
+// POST /api/sessions/:id/context - Append markdown context to session
+router.post('/:id/context', appendContext);
 
 // GET /api/sessions/:sessionId/materials - Get all materials for a session
 router.get('/:sessionId/materials', getMaterialsBySession);

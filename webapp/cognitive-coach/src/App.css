@@ -225,10 +225,16 @@ body {
     gap: 6px;
 }
 
-.secondary-button:hover {
+.secondary-button:hover:not(:disabled) {
     background: #f8f9fa;
     border-color: #c4c7c5;
     box-shadow: var(--shadow-sm);
+}
+
+.secondary-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .icon-button-circular {

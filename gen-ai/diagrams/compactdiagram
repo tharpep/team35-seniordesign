@@ -1,0 +1,25 @@
+flowchart TD
+    Start([System Startup]) --> Ready["Initialize & Start<br/>VectorStore, RAG, Generators, ChatService"]
+    Ready --> Request{API Request}
+    
+    Request -->|Health| Health["Check Status → Return"]
+    Request -->|Artifacts| Artifact["Artifact Flow:<br/>Extract Topic → RAG Query →<br/>Generate → Validate → Return"]
+    Request -->|Chat| Chat["Chat Flow:<br/>Enhance Query → RAG Search →<br/>Build Context → LLM Call → Update History"]
+    Request -->|Ingest| Ingest["Ingestion:<br/>Validate → Queue Background Task<br/>Async: Process → Chunk → Embed → Store"]
+    Request -->|Delete/Clear| Session["Session Management:<br/>Delete Collection or Clear History"]
+    
+    Health --> End([End])
+    Artifact --> End
+    Chat --> End
+    Ingest --> End
+    Session --> End
+    
+    style Start fill:#b3e5fc,stroke:#0277bd,stroke-width:2px,color:#000
+    style Ready fill:#b3e5fc,stroke:#0277bd,stroke-width:2px,color:#000
+    style End fill:#b3e5fc,stroke:#0277bd,stroke-width:2px,color:#000
+    style Artifact fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style Chat fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style Ingest fill:#c8e6c9,stroke:#388e3c,stroke-width:2px,color:#000
+    style Session fill:#fff9c4,stroke:#f57f17,stroke-width:2px,color:#000
+    style Health fill:#fff9c4,stroke:#f57f17,stroke-width:2px,color:#000
+    style Request fill:#ffccbc,stroke:#e64a19,stroke-width:2px,color:#000

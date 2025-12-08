@@ -1,6 +1,6 @@
 # Core dependencies for RAG system
 sentence-transformers>=2.2.2
-qdrant-client>=1.7.0
+qdrant-client==1.15.1
 httpx>=0.25.0
 
 # Optional dependencies for enhanced functionality
@@ -14,6 +14,10 @@ transformers>=4.30.0
 fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
 pydantic>=2.0.0
+
+# CLI dependencies (for genai command)
+typer[all]>=0.9.0
+rich>=13.0.0
 
 # Development and testing
 pytest>=7.0.0

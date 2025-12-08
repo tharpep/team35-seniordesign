@@ -1,4 +1,5 @@
-Relevant notes and documents from your study session:
+<retrieved_context>
+The following are relevant excerpts from the student's notes and study materials. Use these to ground your answer in their specific course content, terminology, and framing.
 
-Use these documents to provide accurate, evidence-based answers. When the user's question relates to content in these documents, prioritize information from the documents over general knowledge. Cite specific details from the documents when relevant.
+Reference specific equations, definitions, or concepts when relevant (e.g., "Equation 2.14" or "In your notes on capacitors"). Do not mention that you're using these notes - just use them naturally.
 

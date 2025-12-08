@@ -16,7 +16,15 @@ export default function MCQContent({ popup, setPopup, artifact }: MCQContentProp
     // Parse JSON content
     let question;
     try {
-        question = JSON.parse(artifact.content);
+        const content = JSON.parse(artifact.content);
+        // Content structure: { artifact_type: "mcq", questions: [{ stem, options, ... }] }
+        // Extract the first question from the array
+        if (content.questions && content.questions.length > 0) {
+            question = content.questions[0];
+        } else {
+            console.error('MCQ artifact has no questions:', content);
+            return <div>Error loading question: No questions found</div>;
+        }
     } catch (error) {
         console.error('Error parsing MCQ content:', error);
         return <div>Error loading question</div>;

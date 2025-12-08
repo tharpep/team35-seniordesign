@@ -16,7 +16,9 @@
 
 ## Specification Demonstrations
 
-Each specification will be validated through comprehensive testing in the `subsystem_demo.py` and `api_subsystem_demo.py`:
+Each specification is validated through comprehensive testing implemented in `src/demos/subsystem_demo.py` (direct RAG) and `src/demos/api_subsystem_demo.py` (API-based). Both demos are accessible via the CLI command `genai demo` with automated or interactive modes.
+
+**Implementation Status**: Both demo systems are fully implemented and operational.
 
 - **Artifact Generation**: Generate flashcards, MCQs, and insights from ingested documents via API endpoints, validate JSON schema compliance, and measure generation success rates
 - **Factual Accuracy**: LLM-based evaluation of generated content against source documents, measuring correctness and context alignment with target of 90% accuracy
@@ -67,13 +69,16 @@ Generation (Artifacts): RAG prompt templates → flashcards/notes/quizzes in Mar
 Evaluation/Quality: RAGAS basic checks (faithfulness/answer quality) + pytest smoke tests.
 
 [Design Document 2][Finalized List - Implemented]
-- **AI Providers**: Ollama (local), Purdue GenAI API (cloud)
+- **AI Providers**: Ollama (local), Purdue GenAI API (cloud) with gateway abstraction pattern
 - **Vector Store**: Qdrant (persistent storage for note-based memory)
 - **Embeddings**: sentence-transformers/all-MiniLM-L6-v2
-- **Framework**: Python with modular architecture
-- **Testing**: pytest with async support
-- **Artifact Generation**: JSON schema validation, flashcards, MCQs, insights
-- **RAG System**: Document ingestion, context retrieval, chatbot interface
+- **Framework**: Python with modular architecture, FastAPI for async REST API
+- **CLI Interface**: Typer-based command-line interface for all operations
+- **Testing**: pytest with async support, comprehensive test suite in `src/tests/`
+- **Artifact Generation**: JSON schema validation, flashcards, MCQs, insights with provenance tracking
+- **RAG System**: Document ingestion, context retrieval, chatbot interface with persistent memory
+- **Logging**: Structured logging system with file rotation and console output
+- **Chat Service**: Stateful conversation management with three-layer context (RAG + summary + recent messages)
 
 [Design Document 2][Implemented - API Layer]
 - **API Layer**: FastAPI endpoints for middleware integration (implemented)
@@ -83,13 +88,25 @@ Evaluation/Quality: RAGAS basic checks (faithfulness/answer quality) + pytest sm
   - `/api/chat` - Interactive chat with conversation context
   - `/health` - Health check endpoint
 
+[Design Document 2][Implemented - CLI Interface]
+- **CLI System**: Comprehensive command-line interface using Typer (implemented)
+  - `genai server` - Start FastAPI server
+  - `genai ingest` - Ingest documents into RAG system
+  - `genai artifact` - Generate educational artifacts via API
+  - `genai chat` - Interactive chat with conversation context
+  - `genai query` - Interactive RAG query REPL (direct, no API)
+  - `genai demo` - Run comprehensive subsystem demo (automated/interactive)
+  - `genai test` - Run pytest test suite
+  - `genai config` - Display current configuration settings
+- **CLI Features**: All operations accessible via CLI, supports both API-based and direct RAG operations
+
 [Design Document 2][Planned for Integration]
 - Additional features to be determined based on integration requirements
 
 ## Algorithm
 
 [Design Document 2]
-The GenAI + Data subsystem operates through a five-stage pipeline that transforms captured content into intelligent educational artifacts. The process begins with data ingestion, where content captured by the hardware layer is routed through the middleware API to the document processing engine, which then stores the processed information in the vector database (Qdrant) for future retrieval. When a user interacts with the system through the FastAPI endpoints, context retrieval mechanisms generate embeddings from their queries and perform similarity searches to identify the most relevant content chunks from the stored knowledge base. The artifact generation stage combines this retrieved context with specialized prompt templates, feeds the combined input to the LLM (via Ollama or Purdue API), and validates the output to ensure proper JSON formatting for structured educational materials. Chatbot interactions follow a similar pattern, where user questions sent to `/api/chat` trigger RAG retrieval processes that generate contextual responses while simultaneously updating the persistent memory system. The API layer provides REST endpoints for all operations, enabling integration with the middleware and user interfaces. The chat service maintains conversation context within API sessions, providing stateful interactions for improved educational experiences.
+The GenAI + Data subsystem operates through a five-stage pipeline that transforms captured content into intelligent educational artifacts. The process begins with data ingestion, where content captured by the hardware layer is routed through the middleware API to the document processing engine, which then stores the processed information in the vector database (Qdrant) for future retrieval. When a user interacts with the system through the FastAPI endpoints or CLI interface, context retrieval mechanisms generate embeddings from their queries and perform similarity searches to identify the most relevant content chunks from the stored knowledge base. The artifact generation stage combines this retrieved context with specialized prompt templates, feeds the combined input to the LLM (via Ollama or Purdue API through the gateway abstraction), and validates the output to ensure proper JSON formatting for structured educational materials. Chatbot interactions follow a similar pattern, where user questions sent to `/api/chat` or via `genai chat` CLI command trigger RAG retrieval processes that generate contextual responses while simultaneously updating the persistent memory system. The system provides both REST API endpoints and a comprehensive CLI interface for all operations, enabling integration with the middleware and user interfaces. The chat service maintains conversation context within API sessions using a three-layer approach (RAG context + conversation summary + recent messages), providing stateful interactions for improved educational experiences. All operations are logged with structured logging for audit trails and performance monitoring.
 
 ## Theory of Operation
 
@@ -98,37 +115,36 @@ The subsystem operates on the principle of Retrieval-Augmented Generation (RAG),
 
 ## Specification Measurements
 
-[Design Document 3][Every specification above should be validated with measurements]
+[Design Document 3][Implemented - Results from Demo 2025-10-16]
+
+All specifications validated via `api_subsystem_demo.py` (access via `genai demo` CLI). Results from most recent successful demo:
+
+**1. Artifact Generation** ✅ PASS
+- 3 types generated: flashcards (3.25s), MCQs (3.57s), insights (1.06s)
+
+**2. Processing Latency** ✅ PASS  
+- p95 latency: 1.05s (target: <5.0s), avg: 0.97s
+
+**3. Token Management** ✅ PASS
+- Artifacts: flashcard 124, MCQ 133, insight 113 tokens (all <500 limit)
+
+**4. Schema Compliance** ✅ PASS
+- 100% compliance: all artifacts validated against fixed JSON schemas
+
+**5. System Reliability** ✅ PASS
+- Success rate: 100% (15/15 requests), drop rate: 0%, graceful degradation verified
+
+**6. Factual Accuracy** ✅ PASS
+- Achieved: 91.9% accuracy (target: 90%), LLM: 96.1%, HITL: 87.8%
 
 ## Standards
 
-[Design Document 1][Expected]
+[Design Document 3][Implemented]
 
-IEEE 7003 – Algorithmic bias considerations
+The subsystem implements the following standards:
 
-IEEE 7010 – Well-being metrics for ethical AI
-
-ISO/IEC 22989 – AI concepts and terminology
-
-ISO/IEC 23894 – AI risk management
-
-ISO/IEC 23053 – Framework for AI systems using machine learning
-
-ISO/IEC 42001 – AI management system standard
-
-NIST AI RMF 1.0 – Risk management framework for AI
-
-ISO/IEC 27001 – Information security
-
-[Design Document 3][Finalized]
-- **IEEE 7003** – Algorithmic bias considerations for educational AI
-- **IEEE 7010** – Well-being metrics for student learning outcomes
-- **ISO/IEC 22989** – AI concepts and terminology standardization
-- **ISO/IEC 23894** – AI risk management for educational systems
-- **ISO/IEC 23053** – Framework for ML systems in education
-- **ISO/IEC 42001** – AI management system for academic institutions
-- **NIST AI RMF 1.0** – Risk management framework for educational AI
-- **ISO/IEC 27001** – Information security for student data protection
-- **FERPA** – Family Educational Rights and Privacy Act compliance
-- **COPPA** – Children's Online Privacy Protection Act (if applicable)
-- **WCAG 2.1** – Web Content Accessibility Guidelines for inclusive design 
+- **ISO/IEC 22989** – AI concepts and terminology: System uses standardized AI/ML terminology (RAG, embeddings, vector similarity, LLM) throughout codebase and documentation
+- **ISO/IEC 23053** – Framework for ML systems: RAG-based ML pipeline with document ingestion, embedding generation, vector search, and LLM generation follows ML system framework principles
+- **FERPA** – Family Educational Rights and Privacy Act compliance: User data access controls, data retention policies, and privacy protection for student educational records
+- **ISO/IEC 27001** – Information security basics: Password hashing (bcrypt), input validation, secure error handling, and security event logging
+- **ISO/IEC 23894** – AI risk management: Risk documentation for AI system risks (hallucination, bias, data privacy), mitigation strategies (RAG for accuracy, provenance tracking), and graceful degradation handling 

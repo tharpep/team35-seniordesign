@@ -1,0 +1,126 @@
+{
+  "filename": "eq_physics",
+  "total_equations": 4,
+  "equations": [
+    {
+      "type": "equation",
+      "raw_text": "p =vi",
+      "normalized": {
+        "latex": "p = vi",
+        "format": "latex"
+      },
+      "confidence": 0.9492365717887878,
+      "bbox": [
+        [
+          748,
+          213
+        ],
+        [
+          844,
+          206
+        ],
+        [
+          846,
+          236
+        ],
+        [
+          750,
+          243
+        ]
+      ],
+      "low_confidence": false,
+      "eq_number": "2.12",
+      "is_standalone": true
+    },
+    {
+      "type": "equation",
+      "raw_text": "p =vi =",
+      "normalized": {
+        "latex": "p = vi =",
+        "format": "latex"
+      },
+      "confidence": 0.9688819646835327,
+      "bbox": [
+        [
+          679,
+          454
+        ],
+        [
+          783,
+          448
+        ],
+        [
+          785,
+          480
+        ],
+        [
+          681,
+          486
+        ]
+      ],
+      "low_confidence": false,
+      "eq_number": "2.13",
+      "is_standalone": true
+    },
+    {
+      "type": "equation",
+      "raw_text": "p=vi=(iR)i,",
+      "normalized": {
+        "latex": "p = vi = (iR)i,",
+        "format": "latex"
+      },
+      "confidence": 0.9550524652004242,
+      "bbox": [
+        [
+          688,
+          791
+        ],
+        [
+          902,
+          787
+        ],
+        [
+          903,
+          825
+        ],
+        [
+          689,
+          829
+        ]
+      ],
+      "low_confidence": true,
+      "eq_number": "2.15",
+      "is_standalone": true
+    },
+    {
+      "type": "equation",
+      "raw_text": "p = i2R.",
+      "normalized": {
+        "latex": "p = i^{2}R.",
+        "format": "latex"
+      },
+      "confidence": 0.9327403008937836,
+      "bbox": [
+        [
+          738,
+          906
+        ],
+        [
+          858,
+          906
+        ],
+        [
+          858,
+          945
+        ],
+        [
+          738,
+          945
+        ]
+      ],
+      "low_confidence": true,
+      "eq_number": "2.16",
+      "is_standalone": true
+    }
+  ]
+}

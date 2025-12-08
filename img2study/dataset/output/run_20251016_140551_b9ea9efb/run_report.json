@@ -1,0 +1,23 @@
+{
+  "run_id": "run_20251016_140551_b9ea9efb",
+  "total_pages": 1,
+  "total_words": 109,
+  "total_tables": 0,
+  "total_equations": 4,
+  "flagged_pages": 0,
+  "average_page_confidence_mean": 0.9648645889191401,
+  "average_page_confidence_min": 0.9307116866111755,
+  "processing_time_seconds": 8.787012815475464,
+  "confidence_histogram": {
+    "0.9-1.0": 7,
+    "0.8-0.9": 3,
+    "0.0-0.8": 0
+  },
+  "timing_breakdown": {
+    "initialization": 0.6445949077606201,
+    "ocr_processing": 8.142417907714844
+  },
+  "input_path": "dataset/eq_physics.png",
+  "output_path": "dataset/output/run_20251016_140551_b9ea9efb",
+  "language": "en"
+}

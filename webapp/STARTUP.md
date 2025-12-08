@@ -54,11 +54,13 @@ chmod +x start.sh
 
 ## What the scripts do:
 
-1. Check if ports 3001 (backend) and 5173 (frontend) are already in use
+1. Check if ports 3001 (backend), 5173 (frontend), and 8000 (gen-ai) are already in use
 2. Start the backend server on port 3001
 3. Wait 2 seconds for backend initialization
 4. Start the frontend server on port 5173
-5. Open new terminal windows for each server
+5. Wait 2 seconds for frontend initialization
+6. Start the Gen-AI API server on port 8000
+7. Open new terminal windows for each server
 
 ## Stopping the servers:
 
@@ -80,7 +82,15 @@ cd cognitive-coach
 npm run dev
 ```
 
+**Gen-AI API:**
+```bash
+cd ../gen-ai
+python run start
+```
+
 ## URLs:
 
 - **Backend API:** http://localhost:3001/api
 - **Frontend:** http://localhost:5173
+- **Gen-AI API:** http://localhost:8000
+- **Gen-AI Docs:** http://localhost:8000/docs

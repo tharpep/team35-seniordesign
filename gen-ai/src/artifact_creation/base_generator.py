@@ -7,7 +7,7 @@ import json
 import time
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 # Add project root to path for imports
 import sys
@@ -45,17 +45,91 @@ class BaseArtifactGenerator(ABC):
         except Exception as e:
             raise Exception(f"Failed to load JSON file {file_path}: {str(e)}")
     
+    def _extract_topic_from_rag(self, session_context: Optional[Dict[str, Any]] = None) -> str:
+        """
+        Extract topic from session RAG context when topic is not provided
+        
+        Args:
+            session_context: Optional session context dict with session_id, session_title
+            
+        Returns:
+            Extracted topic string (1-2 sentences, max ~150 chars)
+            
+        Raises:
+            ValueError: If the session collection has no documents or is still ingesting
+        """
+        try:
+            # Determine collection name from session context
+            collection_name = None
+            if session_context and session_context.get('session_id'):
+                collection_name = f"session_docs_{session_context['session_id']}"
+            
+            # Query RAG to extract main topics
+            extraction_prompt = "What are the main topics or concepts covered in these notes? Provide a concise 1-2 sentence summary (max 150 characters) that captures the primary subject matter."
+            
+            result = self.rag.query(extraction_prompt, max_tokens=100, collection_name=collection_name)
+            
+            # Handle tuple return format
+            if isinstance(result, tuple):
+                answer, _, _ = result
+            else:
+                answer = result
+            
+            # Check if RAG returned an error message indicating no documents or ingestion in progress
+            error_indicators = [
+                "No documents have been ingested",
+                "Session collection not found",
+                "Documents may still be ingesting",
+                "No documents found in the knowledge base",
+                "Collection not found",
+                "No relevant documents found"
+            ]
+            
+            answer_lower = answer.lower() if answer else ""
+            for indicator in error_indicators:
+                if indicator.lower() in answer_lower:
+                    # Raise ValueError with the specific error message
+                    raise ValueError(answer)
+            
+            # Clean up the response - remove any extra text, keep only the topic summary
+            topic = answer.strip()
+            
+            # If topic is empty or just whitespace, raise error
+            if not topic:
+                raise ValueError("No topic could be extracted from the session documents. Documents may still be ingesting.")
+            
+            # Limit to ~150 characters if longer
+            if len(topic) > 150:
+                # Try to find a good sentence break
+                sentences = topic.split('.')
+                if len(sentences) > 1:
+                    topic = '. '.join(sentences[:2]).strip()
+                    if topic and not topic.endswith('.'):
+                        topic += '.'
+                else:
+                    topic = topic[:147] + '...'
+            
+            return topic
+            
+        except ValueError:
+            # Re-raise ValueError (these are the "no documents" errors we want to propagate)
+            raise
+        except Exception as e:
+            # Fallback for other unexpected errors
+            raise ValueError(f"Failed to extract topic from session documents: {str(e)}")
+    
     @abstractmethod
-    def generate(self, topic: str, num_items: int = 1) -> Dict[str, Any]:
+    def generate(self, topic: Optional[str], num_items: int = 1, session_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Generate artifacts for the given topic
         
         Args:
-            topic: Topic to generate artifacts about
+            topic: Topic to generate artifacts about (None to extract from RAG)
             num_items: Number of items to generate (default 1)
+            session_context: Optional session context dict with session_id, session_title
             
         Returns:
-            Dictionary containing the generated artifact
+            Dictionary containing the generated artifact (includes extracted_topic if topic was None)
         """
         pass
     

@@ -1,6 +1,8 @@
 const { getOne, getAll, runQuery } = require('../config/database');
 const fs = require('fs').promises;
+const fsSync = require('fs');
 const path = require('path');
+const http = require('http');
 const facialProcessing = require('../services/facialProcessing');
 
 // Get all sessions for logged-in user with artifact counts
@@ -9,8 +11,8 @@ const getAllSessions = async (req, res) => {
     const userId = req.session.userId;
 
     const sessions = await getAll(
-      `SELECT * FROM sessions 
-       WHERE user_id = ? 
+      `SELECT * FROM sessions
+       WHERE user_id = ?
        ORDER BY created_at DESC`,
       [userId]
     );
@@ -19,9 +21,9 @@ const getAllSessions = async (req, res) => {
     const sessionsWithCounts = await Promise.all(
       sessions.map(async (session) => {
         const counts = await getAll(
-          `SELECT type, COUNT(*) as count 
-           FROM study_artifacts 
-           WHERE session_id = ? 
+          `SELECT type, COUNT(*) as count
+           FROM study_artifacts
+           WHERE session_id = ?
            GROUP BY type`,
           [session.id]
         );
@@ -53,7 +55,7 @@ const getAllSessions = async (req, res) => {
 
   } catch (error) {
     console.error('Get sessions error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Server error',
       message: 'Could not retrieve sessions'
     });
@@ -64,13 +66,13 @@ const getAllSessions = async (req, res) => {
 const getIncompleteSession = async (req, res) => {
   try {
     const userId = req.session.userId;
-    
+
     console.log('[getIncompleteSession] Fetching for user:', userId);
 
     const session = await getOne(
-      `SELECT * FROM sessions 
+      `SELECT * FROM sessions
        WHERE user_id = ? AND status IN ('active', 'paused')
-       ORDER BY created_at DESC 
+       ORDER BY created_at DESC
        LIMIT 1`,
       [userId]
     );
@@ -90,7 +92,7 @@ const getIncompleteSession = async (req, res) => {
 
     console.log('[getIncompleteSession] Artifact count:', artifacts.length);
 
-    res.json({ 
+    res.json({
       session: {
         ...session,
         artifact_count: artifacts.length
@@ -99,7 +101,7 @@ const getIncompleteSession = async (req, res) => {
 
   } catch (error) {
     console.error('Get incomplete session error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Server error',
       message: 'Could not retrieve incomplete session'
     });
@@ -118,7 +120,7 @@ const getSessionById = async (req, res) => {
     );
 
     if (!session) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'Not found',
         message: 'Session not found'
       });
@@ -128,7 +130,7 @@ const getSessionById = async (req, res) => {
 
   } catch (error) {
     console.error('Get session error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Server error',
       message: 'Could not retrieve session'
     });
@@ -143,14 +145,14 @@ const createSession = async (req, res) => {
 
     // First, mark any existing incomplete sessions as completed
     await runQuery(
-      `UPDATE sessions 
-       SET status = 'completed' 
+      `UPDATE sessions
+       SET status = 'completed'
        WHERE user_id = ? AND status IN ('active', 'paused')`,
       [userId]
     );
 
     const result = await runQuery(
-      `INSERT INTO sessions (user_id, title, start_time, status) 
+      `INSERT INTO sessions (user_id, title, start_time, status)
        VALUES (?, ?, datetime('now'), 'active')`,
       [userId, title || 'Untitled Session']
     );
@@ -162,14 +164,14 @@ const createSession = async (req, res) => {
       req.app.get('io').emit('session-created', { session: newSession });
     }
 
-    res.status(201).json({ 
+    res.status(201).json({
       session: newSession,
       message: 'Session created successfully'
     });
 
   } catch (error) {
     console.error('Create session error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Server error',
       message: 'Could not create session'
     });
@@ -190,7 +192,7 @@ const updateSession = async (req, res) => {
     );
 
     if (!session) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'Not found',
         message: 'Session not found'
       });
@@ -209,7 +211,7 @@ const updateSession = async (req, res) => {
     }
 
     if (setStatements.length === 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Bad request',
         message: 'No valid fields to update'
       });
@@ -226,20 +228,20 @@ const updateSession = async (req, res) => {
 
     // Emit socket event for session update
     if (req.app.get('io')) {
-      req.app.get('io').to(`session-${id}`).emit('session-updated', { 
+      req.app.get('io').to(`session-${id}`).emit('session-updated', {
         sessionId: id,
-        updates: updatedSession 
+        updates: updatedSession
       });
     }
 
-    res.json({ 
+    res.json({
       session: updatedSession,
       message: 'Session updated successfully'
     });
 
   } catch (error) {
     console.error('Update session error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Server error',
       message: 'Could not update session'
     });
@@ -259,7 +261,7 @@ const deleteSession = async (req, res) => {
     );
 
     if (!session) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'Not found',
         message: 'Session not found'
       });
@@ -267,13 +269,56 @@ const deleteSession = async (req, res) => {
 
     // Delete associated frames
     const frames = await getAll('SELECT file_path FROM captured_frames WHERE session_id = ?', [id]);
-    
+
     for (const frame of frames) {
       try {
         await fs.unlink(frame.file_path);
       } catch (err) {
         console.error(`Could not delete frame file: ${frame.file_path}`, err);
       }
+    }
+
+    // Delete session markdown files and directory
+    const genAiBasePath = path.join(__dirname, '../../../gen-ai/src/data/documents/sessions');
+    const sessionDir = path.join(genAiBasePath, id.toString());
+
+    try {
+      if (fsSync.existsSync(sessionDir)) {
+        await fs.rm(sessionDir, { recursive: true, force: true });
+        console.log(`[deleteSession] Deleted session directory: ${sessionDir}`);
+      }
+    } catch (dirError) {
+      console.error(`[deleteSession] Error deleting session directory: ${dirError.message}`);
+    }
+
+    // Delete Qdrant collection via Gen-AI API (fire-and-forget)
+    try {
+      const genAiUrl = process.env.GEN_AI_URL || 'http://127.0.0.1:8000';
+
+      const reqOptions = {
+        hostname: genAiUrl.replace(/^https?:\/\//, '').split(':')[0] || '127.0.0.1',
+        port: genAiUrl.includes(':8000') ? 8000 : (genAiUrl.match(/:(\d+)/)?.[1] || 8000),
+        path: `/api/ingest/session/${id}`,
+        method: 'DELETE'
+      };
+
+      const deleteReq = http.request(reqOptions, (deleteRes) => {
+        deleteRes.on('end', () => {
+          if (deleteRes.statusCode === 200 || deleteRes.statusCode === 404) {
+            console.log(`[deleteSession] Collection deleted for session ${id}`);
+          } else {
+            console.warn(`[deleteSession] Collection deletion returned ${deleteRes.statusCode}`);
+          }
+        });
+      });
+
+      deleteReq.on('error', (err) => {
+        console.error(`[deleteSession] Failed to delete collection: ${err.message}`);
+      });
+
+      deleteReq.end();
+    } catch (apiError) {
+      console.error(`[deleteSession] Error calling Gen-AI API: ${apiError.message}`);
     }
 
     // Delete from database (cascade will delete frames and materials)
@@ -283,7 +328,7 @@ const deleteSession = async (req, res) => {
 
   } catch (error) {
     console.error('Delete session error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Server error',
       message: 'Could not delete session'
     });
@@ -462,6 +507,131 @@ const getSessionMetrics = async (req, res) => {
   }
 };
 
+// Append markdown context to session
+const appendContext = async (req, res) => {
+  try {
+    const { id: sessionId } = req.params;
+    const userId = req.session.userId;
+    const { markdown, source } = req.body;
+
+    console.log(`[appendContext] Session: ${sessionId}, Source: ${source || 'unknown'}, Markdown length: ${markdown?.length || 0}`);
+
+    // Validate input
+    if (!markdown || typeof markdown !== 'string') {
+      return res.status(400).json({
+        error: 'Bad request',
+        message: 'markdown field is required and must be a string'
+      });
+    }
+
+    // Verify session belongs to user
+    const session = await getOne(
+      'SELECT * FROM sessions WHERE id = ? AND user_id = ?',
+      [sessionId, userId]
+    );
+
+    if (!session) {
+      console.error(`[appendContext] Session ${sessionId} not found for user ${userId}`);
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'Session not found'
+      });
+    }
+
+    // Write markdown file to session directory for RAG ingestion
+    // Note: We no longer store markdown in SQL sessions.context - it goes to file system and vector DB only
+    const timestamp = new Date().toISOString();
+    const genAiBasePath = path.join(__dirname, '../../../gen-ai/src/data/documents/sessions');
+    const sessionDir = path.join(genAiBasePath, sessionId.toString());
+    const fileName = `${timestamp.replace(/[:.]/g, '-')}_${source || 'unknown'}.md`;
+    const filePath = path.join(sessionDir, fileName);
+
+    try {
+      // Ensure session directory exists
+      if (!fsSync.existsSync(sessionDir)) {
+        fsSync.mkdirSync(sessionDir, { recursive: true });
+        console.log(`[appendContext] Created session directory: ${sessionDir}`);
+      }
+
+      // Write markdown file
+      await fs.writeFile(filePath, markdown, 'utf8');
+      console.log(`[appendContext] Wrote markdown file: ${filePath}`);
+
+      // Trigger Gen-AI ingestion (fire-and-forget, don't await)
+      const genAiUrl = process.env.GEN_AI_URL || 'http://127.0.0.1:8000';
+
+      // Use relative path from gen-ai directory
+      const relativePath = path.relative(
+        path.join(__dirname, '../../../gen-ai'),
+        filePath
+      ).replace(/\\/g, '/'); // Normalize path separators
+
+      const ingestPayload = JSON.stringify({
+        session_id: sessionId.toString(),
+        file_path: relativePath
+      });
+
+      // Fire-and-forget HTTP request
+      const reqOptions = {
+        hostname: genAiUrl.replace(/^https?:\/\//, '').split(':')[0] || '127.0.0.1',
+        port: genAiUrl.includes(':8000') ? 8000 : (genAiUrl.match(/:(\d+)/)?.[1] || 8000),
+        path: '/api/ingest/session_file',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(ingestPayload)
+        }
+      };
+
+      const ingestReq = http.request(reqOptions, (ingestRes) => {
+        let data = '';
+        ingestRes.on('data', (chunk) => { data += chunk; });
+        ingestRes.on('end', () => {
+          if (ingestRes.statusCode === 200) {
+            console.log(`[appendContext] Ingestion queued successfully for session ${sessionId}`);
+          } else {
+            console.warn(`[appendContext] Ingestion request returned ${ingestRes.statusCode}: ${data}`);
+          }
+        });
+      });
+
+      ingestReq.on('error', (err) => {
+        console.error(`[appendContext] Failed to trigger ingestion: ${err.message}`);
+        // Don't fail the request - ingestion can happen later
+      });
+
+      ingestReq.write(ingestPayload);
+      ingestReq.end();
+
+    } catch (fileError) {
+      console.error(`[appendContext] Error writing file or triggering ingestion: ${fileError.message}`);
+      // Don't fail the request - ingestion can happen later
+    }
+
+    console.log(`✓ Markdown file written and ingestion queued for session ${sessionId}`);
+
+    // Emit socket event for context update
+    if (req.app.get('io')) {
+      req.app.get('io').to(`session-${sessionId}`).emit('context-updated', {
+        sessionId: sessionId,
+        source: source || 'unknown'
+      });
+    }
+
+    res.json({
+      message: 'Markdown file written and ingestion queued successfully',
+      appended: markdown.length
+    });
+
+  } catch (error) {
+    console.error('[appendContext] Error:', error);
+    res.status(500).json({
+      error: 'Server error',
+      message: 'Could not append context'
+    });
+  }
+};
+
 module.exports = {
   getAllSessions,
   getIncompleteSession,
@@ -470,5 +640,6 @@ module.exports = {
   updateSession,
   deleteSession,
   uploadFrame,
-  getSessionMetrics
+  getSessionMetrics,
+  appendContext
 };

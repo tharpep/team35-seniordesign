@@ -6,7 +6,8 @@ const {
   createMaterial,
   updateMaterial,
   deleteMaterial,
-  injectArtifact
+  injectArtifact,
+  generateMaterial
 } = require('../controllers/materialController');
 
 // Artifact injection endpoint (no auth - for gen-ai service)
@@ -17,6 +18,9 @@ router.post('/inject', injectArtifact);
 router.use(requireAuth);
 
 // NOTE: getMaterialsBySession is now in sessions.js at /api/sessions/:sessionId/materials
+
+// POST /api/materials/generate - Generate artifact via gen-ai and inject into database
+router.post('/generate', generateMaterial);
 
 // POST /api/materials - Create new material (for testing/manual insertion)
 router.post('/', createMaterial);

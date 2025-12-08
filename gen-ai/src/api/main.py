@@ -5,9 +5,10 @@ Artifact generation and chat API with startup/shutdown lifecycle
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from src.api.dependencies import initialize_app, shutdown_app
-from src.api.routes import health, artifacts, chat
+from src.api.routes import health, artifacts, chat, ingest
 from logging_config import setup_logging, get_logger
 
 # Setup logging
@@ -43,10 +44,26 @@ app = FastAPI(
 )
 
 
+# Configure CORS middleware
+# Allow requests from frontend (Vite dev server on 5173) and backend (port 8001)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",  # Vite dev server (React frontend)
+        "http://localhost:3000",  # Alternative frontend port
+        "http://localhost:8001",  # Node.js backend
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, DELETE, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
+
+
 # Include routers
 app.include_router(health.router)
 app.include_router(artifacts.router)
 app.include_router(chat.router)
+app.include_router(ingest.router)
 
 
 # Root endpoint
@@ -66,6 +83,10 @@ async def root():
             "chat": {
                 "message": "POST /api/chat",
                 "clear_session": "DELETE /api/chat/session/{session_id}"
+            },
+            "ingestion": {
+                "session_file": "POST /api/ingest/session_file",
+                "delete_session": "DELETE /api/ingest/session/{session_id}"
             }
         },
         "docs": {

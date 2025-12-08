@@ -16,7 +16,15 @@ export default function FlashcardContent({ popup, setPopup, artifact }: Flashcar
     // Parse JSON content
     let card;
     try {
-        card = JSON.parse(artifact.content);
+        const content = JSON.parse(artifact.content);
+        // Content structure: { artifact_type: "flashcards", cards: [{ front, back, ... }] }
+        // Extract the first card from the array
+        if (content.cards && content.cards.length > 0) {
+            card = content.cards[0];
+        } else {
+            console.error('Flashcard artifact has no cards:', content);
+            return <div>Error loading flashcard: No cards found</div>;
+        }
     } catch (error) {
         console.error('Error parsing flashcard content:', error);
         return <div>Error loading flashcard</div>;

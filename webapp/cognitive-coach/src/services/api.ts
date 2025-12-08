@@ -29,6 +29,17 @@ export const api = {
     }
   },
 
+  // Get single session by ID
+  getSession: async (sessionId: string): Promise<any | null> => {
+    try {
+      const response = await axios.get(`${API_BASE}/sessions/${sessionId}`);
+      return response.data.session || null;
+    } catch (error) {
+      console.error('Error fetching session:', error);
+      return null;
+    }
+  },
+
   // Get incomplete session (active or paused)
   getIncompleteSession: async (): Promise<any | null> => {
     try {
@@ -134,6 +145,48 @@ export const api = {
     } catch (error: any) {
       console.error('Registration error:', error);
       throw new Error(error.response?.data?.message || 'Registration failed');
+    }
+  },
+
+  // Generate artifact via gen-ai and inject into database
+  generateArtifact: async (
+    sessionId: string,
+    type: 'flashcard' | 'mcq' | 'insights',
+    topic?: string
+  ): Promise<any> => {
+    try {
+      if (!sessionId) {
+        throw new Error('Session ID is required');
+      }
+
+      const response = await axios.post(`${API_BASE}/materials/generate`, {
+        session_id: sessionId,
+        type: type,
+        topic: topic || undefined, // Let backend handle topic extraction if not provided
+        num_items: 1
+      });
+      return response.data.material;
+    } catch (error: any) {
+      console.error('Error generating artifact:', error);
+      
+      // Provide more specific error messages
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      
+      if (error.response?.data?.error) {
+        throw new Error(error.response.data.error);
+      }
+      
+      if (error.code === 'ECONNREFUSED' || error.message?.includes('ECONNREFUSED')) {
+        throw new Error('Backend server is not available. Please ensure the backend is running on port 3001.');
+      }
+      
+      if (error.message) {
+        throw new Error(error.message);
+      }
+      
+      throw new Error('Failed to generate artifact. Please check the console for details.');
     }
   }
 };

@@ -6,7 +6,7 @@ Generates key insights and takeaways from retrieved context using RAG
 import json
 import time
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 # Add project root to path for imports
 import sys
@@ -33,32 +33,102 @@ class InsightsGenerator(BaseArtifactGenerator):
         
         super().__init__(rag_system, str(template_path))
     
-    def generate(self, topic: str, num_items: int = 1) -> Dict[str, Any]:
+    def generate(self, topic: Optional[str] = None, num_items: int = 1, session_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Generate insights for the given topic
         
         Args:
-            topic: Topic to generate insights about
+            topic: Topic to generate insights about (None to extract from RAG)
             num_items: Number of insights to generate (default 1)
+            session_context: Optional session context dict with session_id, session_title
             
         Returns:
-            Dictionary containing the generated insights
+            Dictionary containing the generated insights (includes extracted_topic if topic was None)
         """
         start_time = time.time()
         
+        # Extract topic from RAG if not provided
+        extracted_topic = None
+        if topic is None:
+            try:
+                extracted_topic = self._extract_topic_from_rag(session_context)
+                topic = extracted_topic
+            except ValueError as e:
+                # RAG returned error (no documents, still ingesting, etc.)
+                # Return a user-friendly error artifact
+                return {
+                    "artifact_type": "insights",
+                    "version": "1.0",
+                    "error": "insufficient_context",
+                    "message": str(e),
+                    "topic": "",
+                    "insights": [],
+                    "provenance": {},
+                    "metrics": {
+                        "tokens_in": 0,
+                        "tokens_out": 0,
+                        "latency_ms": round((time.time() - start_time) * 1000, 2),
+                        "retrieval_scores": []
+                    }
+                }
+        
+        # Build variation instruction FIRST (before loading template)
+        # This ensures it's prominent in the prompt
+        variation_instruction = "CRITICAL REQUIREMENT - You MUST create a UNIQUE insight that is DIFFERENT from all previous insights.\n\n"
+        
+        # Add existing artifacts list if available
+        if session_context and session_context.get('existing_artifacts'):
+            existing = session_context['existing_artifacts']
+            if existing:
+                variation_instruction += "EXISTING INSIGHTS TO AVOID DUPLICATING:\n"
+                for i, preview in enumerate(existing, 1):
+                    variation_instruction += f"{i}. {preview}\n"
+                variation_instruction += "\n"
+        
+        variation_instruction += """INSIGHT-SPECIFIC REQUIREMENTS:
+- Create an insight that highlights a DIFFERENT specific aspect, subtopic, or application than existing insights
+- If existing insights cover general concepts, create something that highlights ONE specific detail, relationship, or implication in depth
+- If existing insights are general, create something specific (highlight a particular application, connection, or deeper understanding)
+- If existing insights are specific, create something about relationships, connections, or broader implications
+- Focus on different insight types: if existing explain what, create insights about why, how, when, or what-if scenarios
+- Explore unique angles: connections to other concepts, real-world implications, historical significance, practical applications, common misconceptions, deeper understanding, or unexpected relationships
+- Provide actionable takeaways that complement but don't repeat existing insights
+
+"""
+        
         # Load insights generation prompt template
         from src.utils.prompt_loader import load_prompt_template
-        prompt = load_prompt_template(
+        base_prompt = load_prompt_template(
             "artifact_insights_template.txt",
             num_items=num_items,
             topic=topic
         )
-        if not prompt:
+        if not base_prompt:
             # Fallback if template file missing
-            prompt = f'Create {num_items} key insight about "{topic}". Respond with ONLY valid JSON matching the insights schema.'
+            base_prompt = f'Create {num_items} key insight about "{topic}". Respond with ONLY valid JSON matching the insights schema.'
+        
+        # Prepend variation instruction to the prompt (not append)
+        prompt = variation_instruction + base_prompt
+        
+        # Append session context to prompt if available
+        if session_context:
+            context_parts = []
+            if session_context.get('session_id'):
+                context_parts.append(f"Session ID: {session_context['session_id']}")
+            if session_context.get('session_title'):
+                context_parts.append(f"Session: {session_context['session_title']}")
+            
+            if context_parts:
+                context_text = "\n\nSession Context:\n" + "\n".join(context_parts)
+                prompt = prompt + context_text
+        
+        # Determine collection name from session context
+        collection_name = None
+        if session_context and session_context.get('session_id'):
+            collection_name = f"session_docs_{session_context['session_id']}"
         
         # Use existing RAG system with artifact token limit
-        result = self.rag.query(prompt, max_tokens=self.rag.config.max_tokens)
+        result = self.rag.query(prompt, max_tokens=self.rag.config.max_tokens, collection_name=collection_name)
         
         # Handle tuple return format
         if isinstance(result, tuple):
@@ -67,6 +137,25 @@ class InsightsGenerator(BaseArtifactGenerator):
             answer = result
             context_docs = []
             context_scores = []
+        
+        # Check if we got a "no documents" message - this means collection is empty or doesn't exist
+        if answer and ("No documents" in answer or "not found" in answer.lower() or "still be ingesting" in answer.lower()):
+            # Return a user-friendly error artifact
+            return {
+                "artifact_type": "insights",
+                "version": "1.0",
+                "error": "insufficient_context",
+                "message": answer,
+                "topic": topic,
+                "insights": [],
+                "provenance": {},
+                "metrics": {
+                    "tokens_in": len(prompt) // 4,
+                    "tokens_out": 0,
+                    "latency_ms": round((time.time() - start_time) * 1000, 2),
+                    "retrieval_scores": []
+                }
+            }
         
         # Try to parse JSON with cleanup
         try:
@@ -95,6 +184,10 @@ class InsightsGenerator(BaseArtifactGenerator):
             "latency_ms": round((time.time() - start_time) * 1000, 2),
             "retrieval_scores": context_scores
         }
+        
+        # Add extracted_topic if topic was extracted from RAG
+        if extracted_topic is not None:
+            artifact["extracted_topic"] = extracted_topic
         
         return artifact
     
