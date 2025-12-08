@@ -9,12 +9,20 @@ interface CameraSelections {
     external: string | null;
 }
 
+interface CameraEnabled {
+    screen: boolean;
+    webcam: boolean;
+    external: boolean;
+}
+
 interface ConfigurePopupProps {
     isOpen: boolean;
     onClose: () => void;
     onSettingsChange?: (settings: { photoInterval: number }) => void;
     cameraSelections: CameraSelections;
     onCameraSelectionChange?: (selection: CameraSelections) => void;
+    cameraEnabled: CameraEnabled;
+    onCameraEnabledChange?: (enabled: CameraEnabled) => void;
 }
 
 interface VideoDevice {
@@ -25,11 +33,19 @@ interface VideoDevice {
 type PreviewType = 'screen' | 'webcam' | 'external';
 type ConfigSection = 'camera' | 'settings';
 
-export default function ConfigurePopup({ isOpen, onClose, onSettingsChange, cameraSelections, onCameraSelectionChange }: ConfigurePopupProps) {
+export default function ConfigurePopup({ isOpen, onClose, onSettingsChange, cameraSelections, onCameraSelectionChange, cameraEnabled, onCameraEnabledChange }: ConfigurePopupProps) {
     const [selectedSection, setSelectedSection] = useState<ConfigSection>('camera');
     const [selectedPreview, setSelectedPreview] = useState<PreviewType>('screen');
     const [videoDevices, setVideoDevices] = useState<VideoDevice[]>([]);
     const [photoInterval, setPhotoInterval] = useState<number>(2); // Default 2 seconds
+
+    const handleToggleCamera = (type: 'screen' | 'webcam' | 'external') => {
+        if (!onCameraEnabledChange) return;
+        onCameraEnabledChange({
+            ...cameraEnabled,
+            [type]: !cameraEnabled[type]
+        });
+    };
 
     const ensureDeviceSelections = useCallback((devices: VideoDevice[]) => {
         if (!onCameraSelectionChange || devices.length === 0) {
@@ -170,32 +186,63 @@ export default function ConfigurePopup({ isOpen, onClose, onSettingsChange, came
                         <div className="camera-section">
                         <div className="preview-selector">
                             <div className="button-group">
-                                <button 
-                                    className={`preview-button ${selectedPreview === 'screen' ? 'active' : ''}`}
-                                    onClick={() => changeSelectedPreview('screen')}
-                                >
-                                    <span className="material-icons-round">screen_share</span>
-                                    Screen Recording
-                                </button>
-                                <button 
-                                    className={`preview-button ${selectedPreview === 'webcam' ? 'active' : ''}`}
-                                    onClick={() => changeSelectedPreview('webcam')}
-                                >
-                                    <span className="material-icons-round">videocam</span>
-                                    Webcam
-                                </button>
-                                <button 
-                                    className={`preview-button ${selectedPreview === 'external' ? 'active' : ''}`}
-                                    onClick={() => changeSelectedPreview('external')}
-                                >
-                                    <span className="material-icons-round">camera_alt</span>
-                                    External Camera
-                                    {videoDevices.length > 1 && (
-                                        <small style={{ display: 'block', fontSize: '0.8em', opacity: 0.8 }}>
-                                            {videoDevices.length} cameras detected
-                                        </small>
-                                    )}
-                                </button>
+                                <div className="preview-button-wrapper">
+                                    <button 
+                                        className={`preview-button ${selectedPreview === 'screen' ? 'active' : ''}`}
+                                        onClick={() => changeSelectedPreview('screen')}
+                                    >
+                                        <span className="material-icons-round">screen_share</span>
+                                        Screen Recording
+                                    </button>
+                                    <label className="camera-toggle">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={cameraEnabled.screen} 
+                                            onChange={() => handleToggleCamera('screen')}
+                                        />
+                                        <span className="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div className="preview-button-wrapper">
+                                    <button 
+                                        className={`preview-button ${selectedPreview === 'webcam' ? 'active' : ''}`}
+                                        onClick={() => changeSelectedPreview('webcam')}
+                                    >
+                                        <span className="material-icons-round">videocam</span>
+                                        Webcam
+                                    </button>
+                                    <label className="camera-toggle">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={cameraEnabled.webcam} 
+                                            onChange={() => handleToggleCamera('webcam')}
+                                        />
+                                        <span className="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div className="preview-button-wrapper">
+                                    <button 
+                                        className={`preview-button ${selectedPreview === 'external' ? 'active' : ''}`}
+                                        onClick={() => changeSelectedPreview('external')}
+                                    >
+                                        <span className="material-icons-round">camera_alt</span>
+                                        External Camera
+                                        {videoDevices.length > 1 && (
+                                            <small style={{ display: 'block', fontSize: '0.8em', opacity: 0.8 }}>
+                                                {videoDevices.length} cameras detected
+                                            </small>
+                                        )}
+                                    </button>
+                                    <label className="camera-toggle">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={cameraEnabled.external} 
+                                            onChange={() => handleToggleCamera('external')}
+                                            disabled={videoDevices.length < 2}
+                                        />
+                                        <span className="toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         

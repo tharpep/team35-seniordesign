@@ -493,6 +493,75 @@
     line-height: 1.4;
 }
 
+/* Camera Toggle Styles */
+.preview-button-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: 1px solid #dadce0;
+}
+
+.preview-button-wrapper:last-child {
+    border-right: none;
+}
+
+.camera-toggle {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    margin: 8px 0 12px 0;
+}
+
+.camera-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #dadce0;
+    transition: 0.3s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.camera-toggle input:checked + .toggle-slider {
+    background-color: #1a73e8;
+}
+
+.camera-toggle input:focus + .toggle-slider {
+    box-shadow: 0 0 1px #1a73e8;
+}
+
+.camera-toggle input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+}
+
+.camera-toggle input:disabled + .toggle-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* Responsive adjustments for settings */
 @media (max-width: 640px) {
     .main-section-tabs {
