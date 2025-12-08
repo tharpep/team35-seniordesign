@@ -347,6 +347,7 @@ credentials.json
 
 # AI/ML specific
 models/
+!gen-ai/src/api/models/
 *.pkl
 *.joblib
 *.h5
