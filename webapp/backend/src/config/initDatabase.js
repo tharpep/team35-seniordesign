@@ -4,7 +4,8 @@ const path = require('path');
 
 /**
  * Run database migrations
- * - Checks for missing columns and adds them
+ * - Checks for missing columns and tables
+ * - Adds them if missing
  * - Safe to run multiple times (idempotent)
  */
 const runMigrations = (dbPath) => {
@@ -15,34 +16,151 @@ const runMigrations = (dbPath) => {
       }
     });
 
-    // Check if context column exists in sessions table
-    db.all("PRAGMA table_info(sessions)", (err, rows) => {
-      if (err) {
-        db.close();
-        return reject(new Error(`Failed to check sessions table: ${err.message}`));
-      }
+    const migrations = [];
 
-      const hasContext = rows.some(row => row.name === 'context');
-
-      if (!hasContext) {
-        console.log('⚙️  Running migration: Adding context column to sessions table...');
-        db.run("ALTER TABLE sessions ADD COLUMN context TEXT DEFAULT ''", (err) => {
-          if (err) {
-            console.error('❌ Migration failed:', err.message);
-            db.close();
-            return reject(err);
-          }
-
-          console.log('✓ Migration completed: context column added\n');
-          db.close();
-          resolve({ migrated: true });
-        });
-      } else {
-        console.log('✓ All migrations up to date\n');
-        db.close();
-        resolve({ migrated: false });
-      }
+    // Migration 1: Add context column to sessions table
+    const checkContextColumn = new Promise((res, rej) => {
+      db.all("PRAGMA table_info(sessions)", (err, rows) => {
+        if (err) return rej(err);
+        const hasContext = rows.some(row => row.name === 'context');
+        if (!hasContext) {
+          console.log('⚙️  Running migration: Adding context column to sessions table...');
+          db.run("ALTER TABLE sessions ADD COLUMN context TEXT DEFAULT ''", (err) => {
+            if (err) return rej(err);
+            console.log('✓ Migration completed: context column added');
+            res({ migrated: true });
+          });
+        } else {
+          res({ migrated: false });
+        }
+      });
     });
+
+    // Migration 2: Add facial_metrics table if missing
+    const checkFacialMetricsTable = new Promise((res, rej) => {
+      db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='facial_metrics'", (err, row) => {
+        if (err) return rej(err);
+        if (!row) {
+          console.log('⚙️  Running migration: Creating facial_metrics table...');
+          const createTableSQL = `
+            CREATE TABLE facial_metrics (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              session_id INTEGER NOT NULL,
+              frame_id TEXT,
+              timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+              face_detected INTEGER DEFAULT 0,
+              detection_confidence REAL,
+              focus_score REAL,
+              focus_confidence REAL,
+              gaze_horizontal REAL,
+              gaze_vertical REAL,
+              blink_rate REAL,
+              head_yaw REAL,
+              head_pitch REAL,
+              emotion TEXT,
+              emotion_confidence REAL,
+              emotion_probabilities TEXT,
+              frame_quality REAL,
+              lighting_estimate REAL,
+              sharpness REAL,
+              total_latency_ms REAL,
+              quality_warning TEXT,
+              low_confidence_warning INTEGER DEFAULT 0,
+              FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+            );
+            CREATE INDEX idx_facial_metrics_session ON facial_metrics(session_id);
+            CREATE INDEX idx_facial_metrics_timestamp ON facial_metrics(session_id, timestamp);
+          `;
+          db.exec(createTableSQL, (err) => {
+            if (err) return rej(err);
+            console.log('✓ Migration completed: facial_metrics table created');
+            res({ migrated: true });
+          });
+        } else {
+          res({ migrated: false });
+        }
+      });
+    });
+
+    // Migration 3: Add session_fatigue_flags table if missing
+    const checkFatigueFlagsTable = new Promise((res, rej) => {
+      db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='session_fatigue_flags'", (err, row) => {
+        if (err) return rej(err);
+        if (!row) {
+          console.log('⚙️  Running migration: Creating session_fatigue_flags table...');
+          const createTableSQL = `
+            CREATE TABLE session_fatigue_flags (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              session_id INTEGER NOT NULL,
+              timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+              fatigue_level REAL,
+              blink_rate REAL,
+              eye_openness REAL,
+              data TEXT,
+              FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+            )`;
+          db.run(createTableSQL, (err) => {
+            if (err) return rej(err);
+            console.log('✓ Migration completed: session_fatigue_flags table created');
+            res({ migrated: true });
+          });
+        } else {
+          res({ migrated: false });
+        }
+      });
+    });
+
+    // Migration 4: Add session_distraction_events table if missing
+    const checkDistractionEventsTable = new Promise((res, rej) => {
+      db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='session_distraction_events'", (err, row) => {
+        if (err) return rej(err);
+        if (!row) {
+          console.log('⚙️  Running migration: Creating session_distraction_events table...');
+          const createTableSQL = `
+            CREATE TABLE session_distraction_events (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              session_id INTEGER NOT NULL,
+              timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+              distraction_type TEXT,
+              focus_score REAL,
+              gaze_deviation REAL,
+              duration_seconds REAL,
+              data TEXT,
+              FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+            )`;
+          db.run(createTableSQL, (err) => {
+            if (err) return rej(err);
+            console.log('✓ Migration completed: session_distraction_events table created');
+            res({ migrated: true });
+          });
+        } else {
+          res({ migrated: false });
+        }
+      });
+    });
+
+    // Run all migrations
+    Promise.all([
+      checkContextColumn,
+      checkFacialMetricsTable,
+      checkFatigueFlagsTable,
+      checkDistractionEventsTable
+    ])
+      .then((results) => {
+        const anyMigrated = results.some(r => r.migrated);
+        if (!anyMigrated) {
+          console.log('✓ All migrations up to date\n');
+        } else {
+          console.log('✓ All migrations completed\n');
+        }
+        db.close();
+        resolve({ migrated: anyMigrated });
+      })
+      .catch((err) => {
+        console.error('❌ Migration failed:', err.message);
+        db.close();
+        reject(err);
+      });
   });
 };
 
