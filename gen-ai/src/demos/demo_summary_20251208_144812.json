@@ -1,0 +1,412 @@
+{
+  "demo_timestamp": "20251208_144812",
+  "total_specifications": 7,
+  "successful_specifications": 6,
+  "success_rate": 0.8571428571428571,
+  "results": {
+    "Artifact Generation": {
+      "specification": "Artifact Generation",
+      "target": "3+ artifact types",
+      "achieved": 3,
+      "success": true,
+      "artifact_types": [
+        "insights",
+        "mcq",
+        "flashcards"
+      ],
+      "generation_times": {
+        "flashcard": 2.5159003734588623,
+        "mcq": 2.8027892112731934,
+        "insight": 0.7680966854095459
+      },
+      "artifacts": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "cards": [
+            {
+              "id": "fc_002",
+              "front": "What happens when an object experiences a net force according to Newton's second law of motion?",
+              "back": "The acceleration of the object is directly proportional to the applied force and inversely proportional to its mass. This relationship is given by F = ma.",
+              "tags": [
+                "Newton's Laws of Motion",
+                "Second Law"
+              ],
+              "difficulty": 2,
+              "source_refs": [
+                "N1"
+              ],
+              "hints": []
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.07,
+              "preview": "was very large, so large that it approaches infinity? Also. what happens if the resistance is zero? ..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": -0.022,
+              "preview": "$$ v(t)=\\alpha i(t) . \\tag{2.6} $$ The proportionality constant a is the resistance of the wire as d..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 419,
+            "tokens_out": 130,
+            "latency_ms": 2515.89,
+            "retrieval_scores": [
+              0.07013372655009692,
+              -0.021906882262053114
+            ]
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "questions": [
+            {
+              "id": "mcq_NewtonsLaws_001",
+              "stem": "In a physics experiment, an object is thrown vertically upward with an initial velocity of 20 m/s. Which of the following statements about the motion of this object is CORRECT?",
+              "options": [
+                "The maximum height reached by the object will be 40 meters.",
+                "The time taken for the object to reach its maximum height will be 2 seconds.",
+                "According to Newton's second law, the acceleration of the object at the maximum height will be zero.",
+                "During its flight, the net force acting on the object is always equal to its weight."
+              ],
+              "answer_index": 2,
+              "rationale": "At the maximum height, the object experiences zero gravitational force (upward) and zero air resistance (downward), so the net force (and thus acceleration) is zero.",
+              "bloom_level": "understand",
+              "source_refs": [
+                "N2"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.05,
+              "preview": "was very large, so large that it approaches infinity? Also. what happens if the resistance is zero? ..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": -0.059,
+              "preview": "$$ v(t)=\\alpha i(t) . \\tag{2.6} $$ The proportionality constant a is the resistance of the wire as d..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 434,
+            "tokens_out": 235,
+            "latency_ms": 2802.78,
+            "retrieval_scores": [
+              0.04996513248320369,
+              -0.05941824038565805
+            ]
+          }
+        },
+        "insight": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "Newton's Laws and their Universal Impact on Motion",
+              "takeaway": "Newton's laws of motion not only provide a foundation for understanding the behavior of objects in motion, but also have profound implications in various fields such as physics, engineering, robotics, and even astronomy."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.039,
+              "preview": "was very large, so large that it approaches infinity? Also. what happens if the resistance is zero? ..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": -0.004,
+              "preview": "$$ v(t)=\\alpha i(t) . \\tag{2.6} $$ The proportionality constant a is the resistance of the wire as d..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 397,
+            "tokens_out": 105,
+            "latency_ms": 768.09,
+            "retrieval_scores": [
+              0.03887728459543721,
+              -0.0035199743182310617
+            ]
+          }
+        }
+      }
+    },
+    "Schema Compliance": {
+      "specification": "Schema Compliance",
+      "target": "Fixed JSON schema per artifact type",
+      "success": true,
+      "validation_results": {
+        "flashcard": true,
+        "mcq": true,
+        "insight": true
+      },
+      "artifacts": {
+        "flashcard": {
+          "artifact_type": "flashcards",
+          "version": "1.0",
+          "cards": [
+            {
+              "id": "fc_mlb_001",
+              "front": "What is supervised learning in machine learning?",
+              "back": "Supervised learning is a type of machine learning where the model is trained on a labeled dataset. In other words, the data contains both input variables (features) and their corresponding outputs (labels). The goal is for the model to learn the mapping function between inputs and outputs so that it can accurately predict the output for new, unseen data.",
+              "tags": [
+                "Machine Learning",
+                "Supervised Learning"
+              ],
+              "difficulty": 3,
+              "source_refs": [
+                "M1"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.014,
+              "preview": "was very large, so large that it approaches infinity? Also. what happens if the resistance is zero? ..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": -0.062,
+              "preview": "$$ v(t)=\\alpha i(t) . \\tag{2.6} $$ The proportionality constant a is the resistance of the wire as d..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 419,
+            "tokens_out": 165,
+            "latency_ms": 1072.16,
+            "retrieval_scores": [
+              0.014468754368730786,
+              -0.06207505310703245
+            ]
+          }
+        },
+        "mcq": {
+          "artifact_type": "mcq",
+          "version": "1.0",
+          "questions": [
+            {
+              "id": "mlb-001",
+              "stem": "Consider a scenario where you have a dataset with noise and outliers. To preprocess the data before training a machine learning model, which of the following steps would be most appropriate?",
+              "options": [
+                "a) Removing all outliers and noisy data points",
+                "b) Increasing the amount of noise to make it more representative",
+                "c) Replacing all data points with their mean value",
+                "d) Ignoring data preprocessing altogether as machine learning algorithms are designed to handle noise"
+              ],
+              "answer_index": 0,
+              "rationale": "Removing outliers and noisy data points can help improve the performance of many machine learning models by reducing the impact of irrelevant or misleading data. The other options could lead to poor model performance due to lack of information or unrealistic assumptions.",
+              "bloom_level": "understand",
+              "source_refs": [
+                "N2"
+              ]
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": 0.013,
+              "preview": "was very large, so large that it approaches infinity? Also. what happens if the resistance is zero? ..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": -0.086,
+              "preview": "$$ v(t)=\\alpha i(t) . \\tag{2.6} $$ The proportionality constant a is the resistance of the wire as d..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 434,
+            "tokens_out": 248,
+            "latency_ms": 1460.91,
+            "retrieval_scores": [
+              0.013263842770669908,
+              -0.08603095196393978
+            ]
+          }
+        },
+        "insight": {
+          "artifact_type": "insights",
+          "version": "1.0",
+          "insights": [
+            {
+              "id": "ins_001",
+              "title": "Potential of Machine Learning in Predictive Maintenance",
+              "takeaway": "Machine learning can revolutionize predictive maintenance by analyzing patterns in machine data to predict failures, reduce downtime, and optimize maintenance strategies."
+            }
+          ],
+          "provenance": {
+            "N1": {
+              "note_id": "note_001",
+              "similarity": -0.034,
+              "preview": "was very large, so large that it approaches infinity? Also. what happens if the resistance is zero? ..."
+            },
+            "N2": {
+              "note_id": "note_002",
+              "similarity": -0.061,
+              "preview": "$$ v(t)=\\alpha i(t) . \\tag{2.6} $$ The proportionality constant a is the resistance of the wire as d..."
+            }
+          },
+          "metrics": {
+            "tokens_in": 397,
+            "tokens_out": 93,
+            "latency_ms": 695.25,
+            "retrieval_scores": [
+              -0.03366619899481689,
+              -0.060912516753365446
+            ]
+          }
+        }
+      }
+    },
+    "Token Management": {
+      "specification": "Token Management",
+      "target": "<500 tokens per artifact, <300 per chat (tolerance: +50 tokens)",
+      "success": true,
+      "artifact_tokens": {
+        "flashcard": {
+          "tokens": 151,
+          "limit": 500,
+          "tolerance_limit": 550,
+          "within_limit": true,
+          "within_tolerance": true
+        },
+        "mcq": {
+          "tokens": 137,
+          "limit": 500,
+          "tolerance_limit": 550,
+          "within_limit": true,
+          "within_tolerance": true
+        },
+        "insight": {
+          "tokens": 86,
+          "limit": 500,
+          "tolerance_limit": 550,
+          "within_limit": true,
+          "within_tolerance": true
+        }
+      },
+      "chat_tokens": [
+        {
+          "query": "What is inheritance?",
+          "tokens": 208,
+          "limit": 300,
+          "tolerance_limit": 350,
+          "within_limit": true,
+          "within_tolerance": true
+        },
+        {
+          "query": "Explain polymorphism",
+          "tokens": 344,
+          "limit": 300,
+          "tolerance_limit": 350,
+          "within_limit": false,
+          "within_tolerance": true
+        },
+        {
+          "query": "How does encapsulation work?",
+          "tokens": 149,
+          "limit": 300,
+          "tolerance_limit": 350,
+          "within_limit": true,
+          "within_tolerance": true
+        }
+      ]
+    },
+    "Processing Latency": {
+      "specification": "Processing Latency",
+      "target": "<5.0s at 95th percentile",
+      "achieved": 1.558685541152954,
+      "success": true,
+      "avg_latency": 1.1224463701248169,
+      "p95_latency": 1.558685541152954,
+      "max_latency": 1.558685541152954,
+      "min_latency": 0.6048991680145264,
+      "response_times": [
+        1.131389856338501,
+        1.4749467372894287,
+        1.3389530181884766,
+        0.630042552947998,
+        1.3717708587646484,
+        0.6684858798980713,
+        1.558685541152954,
+        1.5571072101593018,
+        0.6048991680145264,
+        0.8881828784942627
+      ]
+    },
+    "Factual Accuracy": {
+      "specification": "Factual Accuracy",
+      "target": "90% accuracy",
+      "achieved_accuracy": 0.838888888888889,
+      "success": false,
+      "llm_accuracy": 0.8,
+      "hitl_accuracy": 0.8777777777777779,
+      "individual_scores": {
+        "llm_scores": [
+          0.9,
+          0.8,
+          0.8,
+          0.8,
+          1.0,
+          0.9,
+          1.0,
+          1.0,
+          0.0
+        ],
+        "hitl_scores": [
+          0.8500000000000001,
+          0.8500000000000001,
+          0.8500000000000001,
+          0.9000000000000001,
+          1.0,
+          0.9000000000000001,
+          0.8500000000000001,
+          0.8500000000000001,
+          0.8500000000000001
+        ]
+      }
+    },
+    "System Reliability": {
+      "specification": "System Reliability",
+      "target": "98% uptime, <2% drop rate",
+      "achieved_uptime": 1.0,
+      "achieved_drop_rate": 0.0,
+      "success": true,
+      "reliability_results": {
+        "success_rate": 1.0,
+        "failure_rate": 0.0,
+        "avg_response_time": 1.312137778600057,
+        "p95_response_time": 1.312137778600057,
+        "total_requests": 15,
+        "successful_requests": 15,
+        "failed_requests": 0
+      },
+      "degradation_results": {
+        "graceful_handling": true,
+        "response_time": 0.6647796630859375,
+        "has_response": true,
+        "response_length": 578,
+        "context_docs_retrieved": 2,
+        "avg_context_score": 0.008483726162011332
+      }
+    },
+    "Data Encryption": {
+      "specification": "Data Encryption",
+      "target": "Demonstrate encryption/decryption capability",
+      "success": true,
+      "tests": {
+        "document_encryption": true,
+        "artifact_encryption": true,
+        "api_encryption": true
+      },
+      "implementation_note": "Mock encryption using base64 for demonstration. Production would use AES-256 or similar."
+    }
+  }
+}

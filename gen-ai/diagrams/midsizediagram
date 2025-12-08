@@ -1,0 +1,69 @@
+flowchart TD
+    Start([System Startup]) --> Init["Initialize Components<br/>VectorStore, RAG, Generators, ChatService"]
+    Init --> Ready["System Ready"]
+    Ready --> Request{API Request}
+    
+    Request -->|Health| Health["Check Status → Return"]
+    Request -->|Artifacts| Artifact["Artifact Flow"]
+    Request -->|Chat| Chat["Chat Flow"]
+    Request -->|Ingest| Ingest["File Ingestion"]
+    Request -->|Delete/Clear| Session["Session Management"]
+    
+    Artifact --> TopicFlow{Topic?}
+    TopicFlow -->|No| Extract["Extract from RAG"]
+    TopicFlow -->|Yes| RAGGen["RAG Query → Generate → Validate"]
+    Extract --> RAGGen
+    RAGGen --> ReturnArtifact["Return Artifact"]
+    
+    Chat --> QueryFlow{Query Vague?}
+    QueryFlow -->|Yes| Optimize["Optimize Query"]
+    QueryFlow -->|No| RAGChat["RAG Search → Build Context"]
+    Optimize --> RAGChat
+    RAGChat --> LLM["LLM Call → Update History"]
+    LLM --> ReturnChat["Return Response"]
+    
+    Ingest --> Validate{File Exists?}
+    Validate -->|No| Error[404 Error]
+    Validate -->|Yes| Queue["Queue Background Task"]
+    Queue -.Async.-> BgProcess["Process → Chunk → Embed → Store"]
+    
+    Session --> SessionAction{Action Type}
+    SessionAction -->|Delete| DeleteColl["Delete Collection"]
+    SessionAction -->|Clear| ClearHistory["Clear History"]
+    
+    Health --> End([End])
+    ReturnArtifact --> End
+    ReturnChat --> End
+    Queue --> End
+    Error --> End
+    DeleteColl --> End
+    ClearHistory --> End
+    BgProcess --> EndBg([Background Complete])
+    
+    style Start fill:#b3e5fc,stroke:#0277bd,stroke-width:2px,color:#000
+    style Init fill:#b3e5fc,stroke:#0277bd,stroke-width:2px,color:#000
+    style Ready fill:#b3e5fc,stroke:#0277bd,stroke-width:2px,color:#000
+    style End fill:#b3e5fc,stroke:#0277bd,stroke-width:2px,color:#000
+    style EndBg fill:#c8e6c9,stroke:#388e3c,stroke-width:2px,color:#000
+    style Artifact fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style TopicFlow fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    style Extract fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style RAGGen fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style ReturnArtifact fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style Chat fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style QueryFlow fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    style Optimize fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style RAGChat fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style LLM fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style ReturnChat fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style Ingest fill:#c8e6c9,stroke:#388e3c,stroke-width:2px,color:#000
+    style Validate fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    style Error fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000
+    style Queue fill:#c8e6c9,stroke:#388e3c,stroke-width:2px,color:#000
+    style BgProcess fill:#c8e6c9,stroke:#388e3c,stroke-width:2px,color:#000,stroke-dasharray: 5 5
+    style Session fill:#fff9c4,stroke:#f57f17,stroke-width:2px,color:#000
+    style SessionAction fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    style DeleteColl fill:#fff9c4,stroke:#f57f17,stroke-width:2px,color:#000
+    style ClearHistory fill:#fff9c4,stroke:#f57f17,stroke-width:2px,color:#000
+    style Health fill:#fff9c4,stroke:#f57f17,stroke-width:2px,color:#000
+    style Request fill:#ffccbc,stroke:#e64a19,stroke-width:2px,color:#000

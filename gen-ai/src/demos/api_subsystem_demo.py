@@ -12,6 +12,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any, Tuple, Optional
 import requests
+import tiktoken
 
 # Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -121,7 +122,12 @@ Rate from 0.0 to 1.0 where:
 - 0.2 = Mostly incorrect
 - 0.0 = Completely wrong
 
-Respond with only a number between 0.0 and 1.0:"""
+CRITICAL: Respond with ONLY a decimal number between 0.0 and 1.0. Do not include any text, explanation, or additional characters. Your response must be exactly in the format: 0.XX or 1.0
+
+Example valid responses: 0.85, 0.90, 1.0, 0.75
+Example invalid responses: "The accuracy is 0.8", "0.8/1.0", "Score: 0.85"
+
+Your response (numeric only):"""
 
             response = self.api.chat(prompt)
             answer = response.get('answer', '')
@@ -236,7 +242,16 @@ class ReliabilityTester:
         
         success_rate = success_count / num_requests
         avg_response_time = statistics.mean(response_times) if response_times else 0
-        p95_response_time = statistics.quantiles(response_times, n=20)[18] if len(response_times) >= 20 else avg_response_time
+        # Calculate proper 95th percentile regardless of sample size
+        if len(response_times) >= 20:
+            p95_response_time = statistics.quantiles(response_times, n=20)[18]
+        else:
+            # For smaller samples, calculate 95th percentile properly
+            sorted_times = sorted(response_times)
+            index_95 = int(len(sorted_times) * 0.95)
+            if index_95 >= len(sorted_times):
+                index_95 = len(sorted_times) - 1
+            p95_response_time = sorted_times[index_95] if sorted_times else avg_response_time
         
         return {
             "success_rate": success_rate,
@@ -368,7 +383,7 @@ class APISubsystemDemo:
     def demo_schema_compliance(self) -> Dict[str, Any]:
         """Demo: Schema Compliance via API"""
         print("\n" + "="*60)
-        print("SPECIFICATION 2: SCHEMA COMPLIANCE (API)")
+        print("SPECIFICATION 4: SCHEMA COMPLIANCE (API)")
         print("="*60)
         print("Target: All artifacts from API conform to fixed JSON schema")
         
@@ -452,10 +467,12 @@ class APISubsystemDemo:
         ]
         
         chat_token_results = []
+        # Initialize tiktoken encoder (cl100k_base is standard for most modern models)
+        encoding = tiktoken.get_encoding("cl100k_base")
         for query in chat_queries:
             response = self.api.chat(query)
             answer = response.get('answer', '')
-            estimated_tokens = len(answer) // 4 if answer else 0
+            estimated_tokens = len(encoding.encode(answer)) if answer else 0
             within_limit = estimated_tokens <= 300
             within_tolerance = estimated_tokens <= 350  # 300 + 50 tolerance
             chat_token_results.append({
@@ -486,7 +503,7 @@ class APISubsystemDemo:
     def demo_processing_latency(self) -> Dict[str, Any]:
         """Demo: Processing Latency via API"""
         print("\n" + "="*60)
-        print("SPECIFICATION 4: PROCESSING LATENCY (API)")
+        print("SPECIFICATION 2: PROCESSING LATENCY (API)")
         print("="*60)
         print("Target: <5.0 seconds at 95th percentile via API")
         
@@ -528,7 +545,16 @@ class APISubsystemDemo:
             }
         
         avg_latency = statistics.mean(response_times)
-        p95_latency = statistics.quantiles(response_times, n=20)[18] if len(response_times) >= 20 else max(response_times)
+        # Calculate proper 95th percentile regardless of sample size
+        if len(response_times) >= 20:
+            p95_latency = statistics.quantiles(response_times, n=20)[18]
+        else:
+            # For smaller samples, calculate 95th percentile properly
+            sorted_times = sorted(response_times)
+            index_95 = int(len(sorted_times) * 0.95)
+            if index_95 >= len(sorted_times):
+                index_95 = len(sorted_times) - 1
+            p95_latency = sorted_times[index_95]
         max_latency = max(response_times)
         min_latency = min(response_times)
         
@@ -556,7 +582,7 @@ class APISubsystemDemo:
     def demo_factual_accuracy(self) -> Dict[str, Any]:
         """Demo: Factual Accuracy via API"""
         print("\n" + "="*60)
-        print("SPECIFICATION 5: FACTUAL ACCURACY (API)")
+        print("SPECIFICATION 6: FACTUAL ACCURACY (API)")
         print("="*60)
         print("Target: 90% factual accuracy with <5% hallucination rate")
         
@@ -621,7 +647,7 @@ class APISubsystemDemo:
     def demo_system_reliability(self) -> Dict[str, Any]:
         """Demo: System Reliability via API"""
         print("\n" + "="*60)
-        print("SPECIFICATION 6: SYSTEM RELIABILITY (API)")
+        print("SPECIFICATION 5: SYSTEM RELIABILITY (API)")
         print("="*60)
         print("Target: 98% uptime with <2% drop rate")
         
@@ -674,11 +700,11 @@ class APISubsystemDemo:
         
         specifications = [
             ("Artifact Generation", self.demo_artifact_generation),
-            ("Schema Compliance", self.demo_schema_compliance),
-            ("Token Management", self.demo_token_management),
             ("Processing Latency", self.demo_processing_latency),
-            ("Factual Accuracy", self.demo_factual_accuracy),
-            ("System Reliability", self.demo_system_reliability)
+            ("Token Management", self.demo_token_management),
+            ("Schema Compliance", self.demo_schema_compliance),
+            ("System Reliability", self.demo_system_reliability),
+            ("Factual Accuracy", self.demo_factual_accuracy)
         ]
         
         print("\nAvailable specifications to demo:")
@@ -729,11 +755,11 @@ class APISubsystemDemo:
         
         specifications = [
             ("Artifact Generation", self.demo_artifact_generation),
-            ("Schema Compliance", self.demo_schema_compliance),
-            ("Token Management", self.demo_token_management),
             ("Processing Latency", self.demo_processing_latency),
-            ("Factual Accuracy", self.demo_factual_accuracy),
-            ("System Reliability", self.demo_system_reliability)
+            ("Token Management", self.demo_token_management),
+            ("Schema Compliance", self.demo_schema_compliance),
+            ("System Reliability", self.demo_system_reliability),
+            ("Factual Accuracy", self.demo_factual_accuracy)
         ]
         
         print("Running all specifications automatically via API...\n")

@@ -654,94 +654,6 @@ class SubsystemDemo:
             "degradation_results": degradation_results
         }
     
-    def demo_data_encryption(self) -> Dict[str, Any]:
-        """Demo: Data Encryption (Mock Implementation)"""
-        print("\n" + "="*60)
-        print("SPECIFICATION 7: DATA ENCRYPTION")
-        print("="*60)
-        print("Target: Demonstrate encryption/decryption capability")
-        
-        import base64
-        import json
-        
-        # Simple mock encryption functions (base64 for demo purposes)
-        def mock_encrypt(text: str) -> str:
-            """Mock encryption using base64 encoding"""
-            return base64.b64encode(text.encode('utf-8')).decode('utf-8')
-        
-        def mock_decrypt(encrypted_text: str) -> str:
-            """Mock decryption using base64 decoding"""
-            return base64.b64decode(encrypted_text.encode('utf-8')).decode('utf-8')
-        
-        # Test 1: Document encryption
-        print("\n[TEST 1: Document Encryption]")
-        sample_doc = "Newton's first law states that an object at rest stays at rest unless acted upon by an external force."
-        encrypted_doc = mock_encrypt(sample_doc)
-        decrypted_doc = mock_decrypt(encrypted_doc)
-        
-        print(f"   Original: {sample_doc[:50]}...")
-        print(f"   Encrypted: {encrypted_doc[:50]}...")
-        print(f"   Decrypted: {decrypted_doc[:50]}...")
-        doc_success = sample_doc == decrypted_doc
-        print(f"   Result: {'[PASS]' if doc_success else '[FAIL]'}")
-        
-        # Test 2: Artifact encryption
-        print("\n[TEST 2: Artifact Encryption]")
-        sample_artifact = {
-            "artifact_type": "flashcards",
-            "version": "1.0",
-            "cards": [{
-                "id": "fc_001",
-                "front": "What is Newton's first law?",
-                "back": "An object at rest stays at rest unless acted upon by an external force."
-            }]
-        }
-        
-        artifact_json = json.dumps(sample_artifact, indent=2)
-        encrypted_artifact = mock_encrypt(artifact_json)
-        decrypted_artifact = mock_decrypt(encrypted_artifact)
-        restored_artifact = json.loads(decrypted_artifact)
-        
-        print(f"   Original artifact: {len(artifact_json)} characters")
-        print(f"   Encrypted artifact: {len(encrypted_artifact)} characters")
-        print(f"   Decrypted artifact: {len(decrypted_artifact)} characters")
-        artifact_success = sample_artifact == restored_artifact
-        print(f"   Result: {'[PASS]' if artifact_success else '[FAIL]'}")
-        
-        # Test 3: API communication encryption
-        print("\n[TEST 3: API Communication Encryption]")
-        api_request = "Generate a flashcard about machine learning"
-        encrypted_request = mock_encrypt(api_request)
-        decrypted_request = mock_decrypt(encrypted_request)
-        
-        print(f"   Original request: {api_request}")
-        print(f"   Encrypted request: {encrypted_request[:30]}...")
-        print(f"   Decrypted request: {decrypted_request}")
-        api_success = api_request == decrypted_request
-        print(f"   Result: {'[PASS]' if api_success else '[FAIL]'}")
-        
-        # Overall results
-        overall_success = doc_success and artifact_success and api_success
-        
-        print(f"\n[ENCRYPTION RESULTS]")
-        print(f"   Document encryption: {'[PASS]' if doc_success else '[FAIL]'}")
-        print(f"   Artifact encryption: {'[PASS]' if artifact_success else '[FAIL]'}")
-        print(f"   API encryption: {'[PASS]' if api_success else '[FAIL]'}")
-        print(f"\n[RESULT] {'PASS' if overall_success else 'FAIL'}")
-        print(f"   Encryption/Decryption: {3 if overall_success else sum([doc_success, artifact_success, api_success])}/3 tests passed")
-        
-        return {
-            "specification": "Data Encryption",
-            "target": "Demonstrate encryption/decryption capability",
-            "success": overall_success,
-            "tests": {
-                "document_encryption": doc_success,
-                "artifact_encryption": artifact_success,
-                "api_encryption": api_success
-            },
-            "implementation_note": "Mock encryption using base64 for demonstration. Production would use AES-256 or similar."
-        }
-    
     def run_interactive_demo(self):
         """Run interactive demo allowing user to choose specifications"""
         print("\n" + "="*60)
@@ -757,8 +669,7 @@ class SubsystemDemo:
             ("Token Management", self.demo_token_management),
             ("Processing Latency", self.demo_processing_latency),
             ("Factual Accuracy", self.demo_factual_accuracy),
-            ("System Reliability", self.demo_system_reliability),
-            ("Data Encryption", self.demo_data_encryption)
+            ("System Reliability", self.demo_system_reliability)
         ]
         
         print("\nAvailable specifications to demo:")
@@ -769,7 +680,7 @@ class SubsystemDemo:
         
         while True:
             try:
-                choice = input("\nSelect specification (0-7, q): ").strip().lower()
+                choice = input("\nSelect specification (0-6, q): ").strip().lower()
                 
                 if choice == 'q':
                     print("Exiting demo...")
@@ -816,8 +727,7 @@ class SubsystemDemo:
             ("Token Management", self.demo_token_management),
             ("Processing Latency", self.demo_processing_latency),
             ("Factual Accuracy", self.demo_factual_accuracy),
-            ("System Reliability", self.demo_system_reliability),
-            ("Data Encryption", self.demo_data_encryption)
+            ("System Reliability", self.demo_system_reliability)
         ]
         
         print("Running all specifications automatically...\n")
