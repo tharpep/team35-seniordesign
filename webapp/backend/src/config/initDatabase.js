@@ -3,9 +3,54 @@ const fs = require('fs');
 const path = require('path');
 
 /**
+ * Run database migrations
+ * - Checks for missing columns and adds them
+ * - Safe to run multiple times (idempotent)
+ */
+const runMigrations = (dbPath) => {
+  return new Promise((resolve, reject) => {
+    const db = new sqlite3.Database(dbPath, (err) => {
+      if (err) {
+        return reject(new Error(`Failed to connect for migrations: ${err.message}`));
+      }
+    });
+
+    // Check if context column exists in sessions table
+    db.all("PRAGMA table_info(sessions)", (err, rows) => {
+      if (err) {
+        db.close();
+        return reject(new Error(`Failed to check sessions table: ${err.message}`));
+      }
+
+      const hasContext = rows.some(row => row.name === 'context');
+
+      if (!hasContext) {
+        console.log('⚙️  Running migration: Adding context column to sessions table...');
+        db.run("ALTER TABLE sessions ADD COLUMN context TEXT DEFAULT ''", (err) => {
+          if (err) {
+            console.error('❌ Migration failed:', err.message);
+            db.close();
+            return reject(err);
+          }
+
+          console.log('✓ Migration completed: context column added\n');
+          db.close();
+          resolve({ migrated: true });
+        });
+      } else {
+        console.log('✓ All migrations up to date\n');
+        db.close();
+        resolve({ migrated: false });
+      }
+    });
+  });
+};
+
+/**
  * Automatic Database Initialization
  * - Checks if database exists AND has tables
  * - Creates schema if database is missing OR tables are missing
+ * - Runs migrations to update existing databases
  * - Never touches existing database with tables
  * - Handles race condition where database file exists but tables don't
  * - Returns promise for async/await support
@@ -84,14 +129,21 @@ const initializeDatabase = () => {
           });
         });
       } else {
-        // Tables exist, nothing to do
-        console.log('✓ Database and tables already exist, skipping initialization');
-        db.close((err) => {
+        // Tables exist, check for migrations
+        console.log('✓ Database and tables already exist\n');
+        db.close(async (err) => {
           if (err) {
             console.error('❌ Error closing database:', err.message);
             return reject(err);
           }
-          resolve({ created: false, message: 'Database already initialized' });
+          
+          try {
+            // Run migrations on existing database
+            await runMigrations(dbPath);
+            resolve({ created: false, message: 'Database already initialized' });
+          } catch (migrationError) {
+            reject(migrationError);
+          }
         });
       }
     });

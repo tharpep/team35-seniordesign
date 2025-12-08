@@ -8,7 +8,7 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-const DB_PATH = path.join(__dirname, '../../cognitive-coach.db');
+const DB_PATH = path.join(__dirname, '../studycoach.db');
 
 async function migrate() {
   return new Promise((resolve, reject) => {
