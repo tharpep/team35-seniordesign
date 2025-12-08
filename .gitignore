@@ -369,10 +369,7 @@ wandb/
 datasets/
 
 # Session-specific runtime data (generated from user activity)
-# Session markdown files - created when img2study sends OCR results
-gen-ai/src/data/documents/sessions/**/*.md
-# Session Qdrant collections - created when files are ingested
-gen-ai/src/data/qdrant_db/collection/session_docs_*/
+# Note: Exclusions for session files are placed after !**/*.md rule to ensure they take precedence
 
 # Generated documentation
 docs/build/
@@ -392,8 +389,12 @@ webapp/uploads/
 !gen-ai/run
 !**/README.md
 !**/*.md
+# Exclude session markdown files (must come after !**/*.md to override it)
+gen-ai/src/data/documents/sessions/**/*.md
 !**/*.py
 !**/*.json
 !**/*.ini
 !**/*.txt
+# Session Qdrant collections - created when files are ingested
+gen-ai/src/data/qdrant_db/collection/session_docs_*/
 

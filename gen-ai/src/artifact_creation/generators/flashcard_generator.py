@@ -50,8 +50,27 @@ class FlashcardGenerator(BaseArtifactGenerator):
         # Extract topic from RAG if not provided
         extracted_topic = None
         if topic is None:
-            extracted_topic = self._extract_topic_from_rag(session_context)
-            topic = extracted_topic
+            try:
+                extracted_topic = self._extract_topic_from_rag(session_context)
+                topic = extracted_topic
+            except ValueError as e:
+                # RAG returned error (no documents, still ingesting, etc.)
+                # Return a user-friendly error artifact
+                return {
+                    "artifact_type": "flashcards",
+                    "version": "1.0",
+                    "error": "insufficient_context",
+                    "message": str(e),
+                    "topic": "",
+                    "cards": [],
+                    "provenance": {},
+                    "metrics": {
+                        "tokens_in": 0,
+                        "tokens_out": 0,
+                        "latency_ms": round((time.time() - start_time) * 1000, 2),
+                        "retrieval_scores": []
+                    }
+                }
         
         # Build variation instruction FIRST (before loading template)
         # This ensures it's prominent in the prompt

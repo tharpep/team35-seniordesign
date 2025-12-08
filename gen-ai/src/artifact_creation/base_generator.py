@@ -54,6 +54,9 @@ class BaseArtifactGenerator(ABC):
             
         Returns:
             Extracted topic string (1-2 sentences, max ~150 chars)
+            
+        Raises:
+            ValueError: If the session collection has no documents or is still ingesting
         """
         try:
             # Determine collection name from session context
@@ -72,8 +75,28 @@ class BaseArtifactGenerator(ABC):
             else:
                 answer = result
             
+            # Check if RAG returned an error message indicating no documents or ingestion in progress
+            error_indicators = [
+                "No documents have been ingested",
+                "Session collection not found",
+                "Documents may still be ingesting",
+                "No documents found in the knowledge base",
+                "Collection not found",
+                "No relevant documents found"
+            ]
+            
+            answer_lower = answer.lower() if answer else ""
+            for indicator in error_indicators:
+                if indicator.lower() in answer_lower:
+                    # Raise ValueError with the specific error message
+                    raise ValueError(answer)
+            
             # Clean up the response - remove any extra text, keep only the topic summary
             topic = answer.strip()
+            
+            # If topic is empty or just whitespace, raise error
+            if not topic:
+                raise ValueError("No topic could be extracted from the session documents. Documents may still be ingesting.")
             
             # Limit to ~150 characters if longer
             if len(topic) > 150:
@@ -86,11 +109,14 @@ class BaseArtifactGenerator(ABC):
                 else:
                     topic = topic[:147] + '...'
             
-            return topic if topic else "the topics covered in this session"
+            return topic
             
+        except ValueError:
+            # Re-raise ValueError (these are the "no documents" errors we want to propagate)
+            raise
         except Exception as e:
-            # Fallback if extraction fails
-            return "the topics covered in this session"
+            # Fallback for other unexpected errors
+            raise ValueError(f"Failed to extract topic from session documents: {str(e)}")
     
     @abstractmethod
     def generate(self, topic: Optional[str], num_items: int = 1, session_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
