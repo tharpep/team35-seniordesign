@@ -23,23 +23,49 @@ ChartJS.register(
     Filler
 );
 
-interface FocusChartProps {
-    averageFocus: number; // 88
+interface FocusDataPoint {
+    timestamp: string;
+    focusScore: number | null;
+    faceDetected: boolean;
+    emotion: string | null;
 }
 
-export default function FocusChart({ averageFocus }: FocusChartProps) {
-    // Static mock focus score data - realistic pattern for 2h 15m session (2:30 PM - 4:45 PM)
-    const labels = [
-        '2:30', '2:35', '2:40', '2:45', '2:50', '2:55', '3:00', '3:05', '3:10', '3:15', 
-        '3:20', '3:25', '3:30', '3:35', '3:40', '3:45', '3:50', '3:55', '4:00', '4:05',
-        '4:10', '4:15', '4:20', '4:25', '4:30', '4:35', '4:40', '4:45'
-    ];
-    
-    const dataPoints = [
-        25, 32, 45, 58, 72, 85, 92, 89, 95, 88,  // Session start to high focus
-        35, 28, 42, 55, 68, 75, 82, 78, 85, 72,  // Break period to recovery
-        68, 62, 55, 48, 52, 58, 45, 38           // Focus fatigue to end
-    ];
+interface FocusChartProps {
+    averageFocus: number | null;
+    peakFocus?: number | null;
+    lowestFocus?: number | null;
+    timeSeries?: FocusDataPoint[];
+}
+
+export default function FocusChart({ averageFocus, peakFocus, lowestFocus, timeSeries }: FocusChartProps) {
+    // Format timestamp to readable time (HH:MM)
+    const formatTime = (timestamp: string) => {
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    // Use real time series data if available, otherwise show empty state
+    const hasData = timeSeries && timeSeries.length > 0;
+
+    // Filter out only null focus scores (keep 0 values - they represent no face detected)
+    const validData = hasData
+        ? timeSeries.filter(point => point.focusScore !== null && point.focusScore !== undefined)
+        : [];
+
+    const labels = validData.map(point => formatTime(point.timestamp));
+    const dataPoints = validData.map(point => point.focusScore as number);
+
+    // Calculate stats from real data or use provided props
+    const calculatedAverage = validData.length > 0
+        ? Math.round(dataPoints.reduce((a, b) => a + b, 0) / dataPoints.length)
+        : null;
+    const calculatedPeak = validData.length > 0 ? Math.max(...dataPoints) : null;
+    const calculatedLowest = validData.length > 0 ? Math.min(...dataPoints) : null;
+
+    // Use provided values or calculated ones
+    const displayAverage = averageFocus ?? calculatedAverage;
+    const displayPeak = peakFocus ?? calculatedPeak;
+    const displayLowest = lowestFocus ?? calculatedLowest;
 
     const data = {
         labels,
@@ -55,7 +81,7 @@ export default function FocusChart({ averageFocus }: FocusChartProps) {
                 pointBackgroundColor: '#4CAF50',
                 pointBorderColor: '#4CAF50',
                 pointBorderWidth: 2,
-                pointRadius: 4,
+                pointRadius: dataPoints.length > 50 ? 0 : 4, // Hide points if too many data points
                 pointHoverRadius: 6,
                 pointHoverBackgroundColor: '#4CAF50',
                 pointHoverBorderColor: '#ffffff',
@@ -146,6 +172,39 @@ export default function FocusChart({ averageFocus }: FocusChartProps) {
         }
     };
 
+    // Show empty state if no data
+    if (!hasData || validData.length === 0) {
+        return (
+            <div className="focus-chart-container">
+                <div className="chart-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ textAlign: 'center', color: '#666' }}>
+                        <span className="material-icons-round" style={{ fontSize: '48px', marginBottom: '8px', opacity: 0.5 }}>
+                            show_chart
+                        </span>
+                        <p style={{ margin: 0 }}>No focus data recorded for this session</p>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '12px', opacity: 0.7 }}>
+                            Enable webcam during your session to track focus
+                        </p>
+                    </div>
+                </div>
+                <div className="chart-summary">
+                    <div className="summary-stat">
+                        <span className="stat-label">Average Focus</span>
+                        <span className="stat-value">--</span>
+                    </div>
+                    <div className="summary-stat">
+                        <span className="stat-label">Peak Focus</span>
+                        <span className="stat-value">--</span>
+                    </div>
+                    <div className="summary-stat">
+                        <span className="stat-label">Lowest Focus</span>
+                        <span className="stat-value">--</span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="focus-chart-container">
             <div className="chart-wrapper">
@@ -154,15 +213,15 @@ export default function FocusChart({ averageFocus }: FocusChartProps) {
             <div className="chart-summary">
                 <div className="summary-stat">
                     <span className="stat-label">Average Focus</span>
-                    <span className="stat-value">{averageFocus}%</span>
+                    <span className="stat-value">{displayAverage !== null ? `${displayAverage}%` : '--'}</span>
                 </div>
                 <div className="summary-stat">
                     <span className="stat-label">Peak Focus</span>
-                    <span className="stat-value">{Math.max(...dataPoints)}%</span>
+                    <span className="stat-value">{displayPeak !== null ? `${displayPeak}%` : '--'}</span>
                 </div>
                 <div className="summary-stat">
                     <span className="stat-label">Lowest Focus</span>
-                    <span className="stat-value">{Math.min(...dataPoints)}%</span>
+                    <span className="stat-value">{displayLowest !== null ? `${displayLowest}%` : '--'}</span>
                 </div>
             </div>
         </div>

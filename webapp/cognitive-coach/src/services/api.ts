@@ -148,6 +148,17 @@ export const api = {
     }
   },
 
+  // Get facial metrics for a session (for focus analytics chart)
+  getSessionMetrics: async (sessionId: string): Promise<any> => {
+    try {
+      const response = await axios.get(`${API_BASE}/sessions/${sessionId}/metrics`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching session metrics:', error);
+      return null;
+    }
+  },
+
   // Generate artifact via gen-ai and inject into database
   generateArtifact: async (
     sessionId: string,

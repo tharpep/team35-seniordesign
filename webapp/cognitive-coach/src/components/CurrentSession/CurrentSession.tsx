@@ -1,7 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import './CurrentSession.css';
 import { api } from '../../services/api';
-import { subscribeToMaterials, unsubscribeFromMaterials } from '../../services/socket';
+import {
+    subscribeToMaterials,
+    unsubscribeFromMaterials,
+    subscribeToFacialMetrics,
+    unsubscribeFromFacialMetrics,
+    FacialMetricsPayload
+} from '../../services/socket';
 
 type SessionState = 'idle' | 'active' | 'paused';
 
@@ -25,6 +31,14 @@ interface CameraStream {
     deviceId?: string;
 }
 
+interface FacialMetricsState {
+    focusScore: number | null;
+    emotion: string | null;
+    faceDetected: boolean;
+    blinkRate: number | null;
+    lastUpdate: Date | null;
+}
+
 export default function CurrentSession({ onConfigureClick, sessionSettings, onSessionStateChange, onSessionIdChange, onArtifactsChange, webcamDeviceId, externalDeviceId }: CurrentSessionProps) {
     const [sessionState, setSessionState] = useState<SessionState>('idle');
     const [sessionTime, setSessionTime] = useState(0); // in seconds - actual operating time
@@ -35,7 +49,16 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
     const [lastResumeTime, setLastResumeTime] = useState<Date | null>(null);
     const [artifactCount, setArtifactCount] = useState(0);
     const [artifacts, setArtifacts] = useState<any[]>([]);
-    
+
+    // Facial metrics state
+    const [facialMetrics, setFacialMetrics] = useState<FacialMetricsState>({
+        focusScore: null,
+        emotion: null,
+        faceDetected: false,
+        blinkRate: null,
+        lastUpdate: null
+    });
+
     const timerIntervalRef = useRef<number | null>(null);
     const captureIntervalRef = useRef<number | null>(null);
     const activeStreamsRef = useRef<CameraStream[]>([]);
@@ -177,6 +200,47 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
             console.log(`[Artifacts] Not fetching - sessionId: ${currentSessionId}, state: ${sessionState}`);
         }
     }, [currentSessionId, sessionState, onArtifactsChange]);
+
+    // Subscribe to facial metrics when session is active
+    useEffect(() => {
+        if (currentSessionId && sessionState === 'active') {
+            console.log(`[FacialMetrics] Subscribing to metrics for session ${currentSessionId}`);
+
+            subscribeToFacialMetrics(currentSessionId.toString(), (payload: FacialMetricsPayload) => {
+                console.log('[FacialMetrics] Received:', payload);
+
+                if (payload.metrics) {
+                    setFacialMetrics({
+                        focusScore: payload.metrics.focus_score,
+                        emotion: payload.metrics.emotion,
+                        faceDetected: payload.metrics.face_detected,
+                        blinkRate: payload.metrics.blink_rate,
+                        lastUpdate: new Date()
+                    });
+                }
+
+                // Log events
+                if (payload.fatigueEvent) {
+                    console.log('[FacialMetrics] Fatigue detected:', payload.fatigueEvent);
+                }
+                if (payload.distractionEvent) {
+                    console.log('[FacialMetrics] Distraction detected:', payload.distractionEvent);
+                }
+            });
+
+            return () => {
+                unsubscribeFromFacialMetrics(currentSessionId.toString());
+                // Reset metrics when unsubscribing
+                setFacialMetrics({
+                    focusScore: null,
+                    emotion: null,
+                    faceDetected: false,
+                    blinkRate: null,
+                    lastUpdate: null
+                });
+            };
+        }
+    }, [currentSessionId, sessionState]);
 
     // Timer effect - runs every second when session is active
     useEffect(() => {
@@ -571,6 +635,40 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
         }
     };
 
+    // Helper functions for formatting facial metrics
+    const getFocusLevel = (score: number | null): string => {
+        if (score === null) return '';
+        if (score >= 0.7) return 'good';
+        if (score >= 0.4) return 'moderate';
+        return 'low';
+    };
+
+    const getFocusLabel = (score: number | null, faceDetected: boolean): string => {
+        if (!faceDetected && sessionState === 'active') return 'No Face';
+        if (score === null) return 'Waiting...';
+        if (score >= 0.7) return 'Good';
+        if (score >= 0.4) return 'Moderate';
+        return 'Low';
+    };
+
+    const getEmotionLevel = (emotion: string | null): string => {
+        if (!emotion) return '';
+        switch (emotion.toLowerCase()) {
+            case 'happy': return 'positive';
+            case 'neutral': return 'neutral';
+            case 'stressed': return 'warning';
+            case 'fatigued': return 'warning';
+            default: return '';
+        }
+    };
+
+    const formatEmotion = (emotion: string | null, faceDetected: boolean): string => {
+        if (!faceDetected && sessionState === 'active') return 'No Face';
+        if (!emotion) return 'Waiting...';
+        // Capitalize first letter
+        return emotion.charAt(0).toUpperCase() + emotion.slice(1);
+    };
+
     return (
         <div className="current-session card card-large">
             <div className="session-title">
@@ -649,13 +747,13 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
                 </div>
 
                 <div className="quick-metrics">
-                    <div className="metric-chip focus">
-                        <div className="metric-icon focus"></div>
-                        Focus: Good
+                    <div className={`metric-chip focus ${getFocusLevel(facialMetrics.focusScore)}`}>
+                        <div className={`metric-icon focus ${getFocusLevel(facialMetrics.focusScore)}`}></div>
+                        Focus: {getFocusLabel(facialMetrics.focusScore, facialMetrics.faceDetected)}
                     </div>
-                    <div className="metric-chip emotion">
-                        <div className="metric-icon emotion"></div>
-                        Emotion: Calm
+                    <div className={`metric-chip emotion ${getEmotionLevel(facialMetrics.emotion)}`}>
+                        <div className={`metric-icon emotion ${getEmotionLevel(facialMetrics.emotion)}`}></div>
+                        Emotion: {formatEmotion(facialMetrics.emotion, facialMetrics.faceDetected)}
                     </div>
                     <div className="metric-chip stress">
                         <div className="metric-icon stress"></div>

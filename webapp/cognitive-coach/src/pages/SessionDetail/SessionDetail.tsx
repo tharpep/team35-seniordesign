@@ -66,6 +66,11 @@ export default function SessionDetail() {
     const [artifacts, setArtifacts] = useState<Artifact[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [artifactCounts, setArtifactCounts] = useState({ flashcard: 0, MCQ: 0, equation: 0, total: 0 });
+    const [focusMetrics, setFocusMetrics] = useState<{
+        timeSeries: any[];
+        peakFocus: number | null;
+        lowestFocus: number | null;
+    }>({ timeSeries: [], peakFocus: null, lowestFocus: null });
 
     // Fetch user initials
     useEffect(() => {
@@ -90,14 +95,25 @@ export default function SessionDetail() {
     useEffect(() => {
         const fetchData = async () => {
             if (!sessionId) return;
-            
+
             setIsLoading(true);
             try {
-                // Fetch session data and artifacts in parallel
-                const [sessionResponse, artifactsData] = await Promise.all([
+                // Fetch session data, artifacts, and facial metrics in parallel
+                const [sessionResponse, artifactsData, metricsResponse] = await Promise.all([
                     api.getSession(sessionId),
-                    api.getMaterials(sessionId)
+                    api.getMaterials(sessionId),
+                    api.getSessionMetrics(sessionId)
                 ]);
+
+                // Process facial metrics for focus chart
+                if (metricsResponse && metricsResponse.timeSeries) {
+                    const aggregated = metricsResponse.aggregated || {};
+                    setFocusMetrics({
+                        timeSeries: metricsResponse.timeSeries,
+                        peakFocus: aggregated.max_focus_score ? Math.round(aggregated.max_focus_score * 100) : null,
+                        lowestFocus: aggregated.min_focus_score ? Math.round(aggregated.min_focus_score * 100) : null
+                    });
+                }
                 
                 // Store raw session data for passing to chat
                 if (sessionResponse) {
@@ -479,7 +495,14 @@ export default function SessionDetail() {
 
                 <div className="content-grid">
                     <div className="main-content">
-                        <FocusAnalytics focusScore={sessionData.metrics.focusScore} />
+                        <FocusAnalytics
+                            focusScore={sessionData.metrics.focusScore}
+                            peakFocus={focusMetrics.peakFocus}
+                            lowestFocus={focusMetrics.lowestFocus}
+                            timeSeries={focusMetrics.timeSeries}
+                            sessionStartTime={rawSession?.start_time}
+                            sessionDuration={rawSession?.duration}
+                        />
 
                         <StudyArtifacts 
                             artifacts={artifacts}

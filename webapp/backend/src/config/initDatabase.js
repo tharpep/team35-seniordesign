@@ -60,7 +60,7 @@ const initializeDatabase = () => {
     // Paths
     const schemaPath = path.join(__dirname, '../../../database/schema.sql');
     const dbPath = path.join(__dirname, '../../../database/studycoach.db');
-    
+
     // Create database connection (will create file if it doesn't exist)
     // This handles the race condition where database.js creates an empty file
     const db = new sqlite3.Database(dbPath, (err) => {
@@ -86,7 +86,7 @@ const initializeDatabase = () => {
         } else {
           console.log('⚙️  Database not found, creating new database...\n');
         }
-        
+
         // Read schema
         let schema;
         try {
@@ -96,7 +96,7 @@ const initializeDatabase = () => {
           console.error('❌ Error reading schema file:', err.message);
           return reject(new Error(`Failed to read schema: ${err.message}`));
         }
-        
+
         // Execute schema
         db.exec(schema, (err) => {
           if (err) {
@@ -104,27 +104,28 @@ const initializeDatabase = () => {
             db.close();
             return reject(new Error(`Failed to execute schema: ${err.message}`));
           }
-          
-          console.log('✓ Tables created successfully');
+
+          console.log('✓ Database created successfully at:', dbPath);
           console.log('✓ Tables created:');
           console.log('  - users');
           console.log('  - sessions');
           console.log('  - captured_frames');
           console.log('  - study_artifacts');
+          console.log('  - facial_metrics');
           console.log('  - session_fatigue_flags');
           console.log('  - session_distraction_events');
           console.log('');
-          
+
           db.close((err) => {
             if (err) {
               console.error('❌ Error closing database:', err.message);
               return reject(err);
             }
-            
-            resolve({ 
-              created: true, 
+
+            resolve({
+              created: true,
               message: 'Database initialized successfully',
-              path: dbPath 
+              path: dbPath
             });
           });
         });
@@ -136,7 +137,7 @@ const initializeDatabase = () => {
             console.error('❌ Error closing database:', err.message);
             return reject(err);
           }
-          
+
           try {
             // Run migrations on existing database
             await runMigrations(dbPath);

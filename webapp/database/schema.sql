@@ -46,20 +46,71 @@ CREATE TABLE IF NOT EXISTS study_artifacts (
     FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
 );
 
--- Session fatigue flags (placeholder for future implementation)
+-- Facial processing metrics (per-frame analysis results)
+CREATE TABLE IF NOT EXISTS facial_metrics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id INTEGER NOT NULL,
+    frame_id TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    -- Detection results
+    face_detected INTEGER DEFAULT 0,
+    detection_confidence REAL,
+
+    -- Focus metrics
+    focus_score REAL,
+    focus_confidence REAL,
+    gaze_horizontal REAL,
+    gaze_vertical REAL,
+    blink_rate REAL,
+    head_yaw REAL,
+    head_pitch REAL,
+
+    -- Emotion metrics
+    emotion TEXT,
+    emotion_confidence REAL,
+    emotion_probabilities TEXT, -- JSON string
+
+    -- Quality metrics
+    frame_quality REAL,
+    lighting_estimate REAL,
+    sharpness REAL,
+
+    -- Performance metrics
+    total_latency_ms REAL,
+
+    -- Warnings
+    quality_warning TEXT,
+    low_confidence_warning INTEGER DEFAULT 0,
+
+    FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+);
+
+-- Session fatigue flags (triggered when fatigue detected)
 CREATE TABLE IF NOT EXISTS session_fatigue_flags (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     session_id INTEGER NOT NULL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fatigue_level REAL,
+    blink_rate REAL,
+    eye_openness REAL,
     data TEXT,
     FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
 );
 
--- Session distraction events (placeholder for future implementation)
+-- Session distraction events (triggered when focus drops)
 CREATE TABLE IF NOT EXISTS session_distraction_events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     session_id INTEGER NOT NULL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    distraction_type TEXT,
+    focus_score REAL,
+    gaze_deviation REAL,
+    duration_seconds REAL,
     data TEXT,
     FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
 );
+
+-- Index for faster queries on session metrics
+CREATE INDEX IF NOT EXISTS idx_facial_metrics_session ON facial_metrics(session_id);
+CREATE INDEX IF NOT EXISTS idx_facial_metrics_timestamp ON facial_metrics(session_id, timestamp);
