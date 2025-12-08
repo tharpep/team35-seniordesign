@@ -30,7 +30,7 @@ interface Session {
 export default function Dashboard() {
     const [isConfigurePopupOpen, setIsConfigurePopupOpen] = useState(false);
     const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
-    const [sessionSettings, setSessionSettings] = useState({ photoInterval: 2 });
+    const [sessionSettings, setSessionSettings] = useState({ photoInterval: 5 });
     const [userInitials, setUserInitials] = useState('');
     const [sessions, setSessions] = useState<Session[]>([]);
     const [isLoadingSessions, setIsLoadingSessions] = useState(true);
