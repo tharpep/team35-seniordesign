@@ -49,16 +49,20 @@ class BasicRAG:
         if not success:
             raise Exception(f"Failed to setup collection: {self.collection_name}")
     
-    def add_documents(self, documents):
+    def add_documents(self, documents, collection_name=None):
         """
         Add documents to the vector database
         
         Args:
             documents: List of text documents to index
+            collection_name: Optional collection name override (defaults to self.collection_name)
             
         Returns:
             Number of documents added
         """
+        # Use provided collection or default
+        target_collection = collection_name or self.collection_name
+        
         # Create embeddings
         embeddings = self.retriever.encode_documents(documents)
         
@@ -66,15 +70,16 @@ class BasicRAG:
         points = self.retriever.create_points(documents, embeddings)
         
         # Add to vector store
-        return self.vector_store.add_points(self.collection_name, points)
+        return self.vector_store.add_points(target_collection, points)
     
-    def search(self, query, limit=None):
+    def search(self, query, limit=None, collection_name=None):
         """
         Search for relevant documents
         
         Args:
             query: Search query
             limit: Number of results to return (uses config default if None)
+            collection_name: Optional collection name override (defaults to self.collection_name)
             
         Returns:
             List of (text, score) tuples
@@ -82,14 +87,17 @@ class BasicRAG:
         # Use config default if limit not specified
         if limit is None:
             limit = self.config.top_k
+        
+        # Use provided collection or default
+        target_collection = collection_name or self.collection_name
             
         # Create query embedding
         query_embedding = self.retriever.encode_query(query)
         
         # Search vector store
-        return self.vector_store.search(self.collection_name, query_embedding, limit)
+        return self.vector_store.search(target_collection, query_embedding, limit)
     
-    def query(self, question, context_limit=None, max_tokens=None):
+    def query(self, question, context_limit=None, max_tokens=None, collection_name=None):
         """
         Answer a question using RAG
         
@@ -97,6 +105,7 @@ class BasicRAG:
             question: Question to answer
             context_limit: Number of documents to retrieve for context (uses config default if None)
             max_tokens: Maximum tokens for response (uses chat limit if None)
+            collection_name: Optional collection name override (defaults to self.collection_name)
             
         Returns:
             Answer string
@@ -106,10 +115,26 @@ class BasicRAG:
             context_limit = self.config.top_k
             
         # Retrieve relevant documents
-        retrieved_docs = self.search(question, limit=context_limit)
+        retrieved_docs = self.search(question, limit=context_limit, collection_name=collection_name)
         
         if not retrieved_docs:
-            return "No relevant documents found.", [], []
+            # Provide helpful message based on whether collection exists
+            target_collection = collection_name or self.collection_name
+            try:
+                stats = self.vector_store.get_collection_stats(target_collection)
+                if stats.get("points_count", 0) == 0:
+                    if collection_name and collection_name.startswith("session_docs_"):
+                        return "No documents have been ingested for this session yet. Please wait for document ingestion to complete or add more content to your session.", [], []
+                    else:
+                        return "No documents found in the knowledge base. Please ingest documents first.", [], []
+            except Exception:
+                # Collection doesn't exist
+                if collection_name and collection_name.startswith("session_docs_"):
+                    return "Session collection not found. Documents may still be ingesting. Please wait a moment and try again.", [], []
+                else:
+                    return "Collection not found. Please ensure documents have been ingested.", [], []
+            
+            return "No relevant documents found for this query.", [], []
         
         # Build RAG context from retrieved documents
         rag_context = "\n\n".join([doc for doc, _ in retrieved_docs])

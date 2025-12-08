@@ -1,8 +1,15 @@
-Create {num_items} flashcard about "{topic}".
+Generate {num_items} flashcard(s) about: "{topic}"
 
-IMPORTANT: Respond with ONLY valid JSON. No additional text, explanations, or markdown formatting.
+<requirements>
+- Front: Clear, concise question or prompt (1 sentence)
+- Back: Accurate answer (2-4 sentences max, focus on key points)
+- Tags: 2-4 relevant topic tags
+- Difficulty: 1-5 (1=basic recall, 5=expert application)
+- Hints: Optional, only if needed
+</requirements>
 
-Required JSON format:
+Respond with ONLY valid JSON, no explanations:
+
 {{
   "artifact_type": "flashcards",
   "version": "1.0",
@@ -10,7 +17,7 @@ Required JSON format:
     {{
       "id": "fc_001",
       "front": "Question here",
-      "back": "Answer here",
+      "back": "Concise answer here",
       "tags": ["topic"],
       "difficulty": 2,
       "source_refs": ["N1"],
@@ -18,6 +25,3 @@ Required JSON format:
     }}
   ]
 }}
-
-Generate the JSON now:
-

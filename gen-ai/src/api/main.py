@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from src.api.dependencies import initialize_app, shutdown_app
-from src.api.routes import health, artifacts, chat
+from src.api.routes import health, artifacts, chat, ingest
 from logging_config import setup_logging, get_logger
 
 # Setup logging
@@ -63,6 +63,7 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(artifacts.router)
 app.include_router(chat.router)
+app.include_router(ingest.router)
 
 
 # Root endpoint
@@ -82,6 +83,10 @@ async def root():
             "chat": {
                 "message": "POST /api/chat",
                 "clear_session": "DELETE /api/chat/session/{session_id}"
+            },
+            "ingestion": {
+                "session_file": "POST /api/ingest/session_file",
+                "delete_session": "DELETE /api/ingest/session/{session_id}"
             }
         },
         "docs": {

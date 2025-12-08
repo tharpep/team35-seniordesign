@@ -257,6 +257,7 @@ export default function SessionDetail() {
             const sessionContext = rawSession ? {
                 session_id: rawSession.id,
                 session_title: rawSession.title,
+                session_topic: rawSession.context, // Topic extracted from session context field
                 start_time: rawSession.start_time,
                 end_time: rawSession.end_time,
                 duration: rawSession.duration,

@@ -1,2 +1,3 @@
-Conversation summary (key facts, names, topics from earlier exchanges): {summary}
-
+<conversation_summary>
+{summary}
+</conversation_summary>

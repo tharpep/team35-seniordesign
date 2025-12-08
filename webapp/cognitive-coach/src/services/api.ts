@@ -162,7 +162,7 @@ export const api = {
       const response = await axios.post(`${API_BASE}/materials/generate`, {
         session_id: sessionId,
         type: type,
-        topic: topic || "Newton's laws of motion",
+        topic: topic || undefined, // Let backend handle topic extraction if not provided
         num_items: 1
       });
       return response.data.material;
