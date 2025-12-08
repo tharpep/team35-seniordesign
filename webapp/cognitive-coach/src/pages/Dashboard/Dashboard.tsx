@@ -107,6 +107,22 @@ export default function Dashboard() {
         fetchSessions();
     }, []);
 
+    // Re-fetch sessions when a session ends (becomes idle)
+    useEffect(() => {
+        if (currentSessionState === 'idle' && currentSessionId === null) {
+            // Session just ended, refresh the list
+            const fetchSessions = async () => {
+                try {
+                    const sessionsData = await api.getSessions();
+                    setSessions(sessionsData || []);
+                } catch (error) {
+                    console.error('Error fetching sessions:', error);
+                }
+            };
+            fetchSessions();
+        }
+    }, [currentSessionState, currentSessionId]);
+
     const handleSessionClick = (sessionId: number) => {
         window.open(`/session/${sessionId}`, '_blank');
     };
