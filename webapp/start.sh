@@ -1,6 +1,6 @@
 #!/bin/bash
 # Cognitive Coach - Startup Script (Mac/Linux)
-# This script starts the backend, frontend, and gen-ai API servers
+# This script starts the backend, frontend, gen-ai API, and facial-processing servers
 
 echo "================================="
 echo "🚀 Starting Cognitive Coach"
@@ -21,6 +21,7 @@ echo "Checking ports..."
 check_port 3001
 check_port 5173
 check_port 8000
+check_port 8001
 echo ""
 
 # Get the directory where the script is located
@@ -63,6 +64,19 @@ xterm -e "cd '$GENAI_DIR' && echo '🤖 Gen-AI API Server' && python run start" 
 # Wait for gen-ai to start
 sleep 2
 
+# Start Facial Processing API server
+echo "================================="
+echo "👁️ Starting Facial Processing Server"
+echo "================================="
+FACIAL_DIR="$SCRIPT_DIR/../facial-processing"
+osascript -e "tell app \"Terminal\" to do script \"cd '$FACIAL_DIR' && echo '👁️ Facial Processing Server' && source .venv/bin/activate && python -m src.api.server\"" 2>/dev/null || \
+gnome-terminal -- bash -c "cd '$FACIAL_DIR' && echo '👁️ Facial Processing Server' && source .venv/bin/activate && python -m src.api.server; exec bash" 2>/dev/null || \
+xterm -e "cd '$FACIAL_DIR' && echo '👁️ Facial Processing Server' && source .venv/bin/activate && python -m src.api.server" 2>/dev/null || \
+(cd "$FACIAL_DIR" && source .venv/bin/activate && python -m src.api.server &)
+
+# Wait for facial processing to start
+sleep 2
+
 # Open the web browser
 echo ""
 echo "🌐 Opening browser..."
@@ -85,9 +99,10 @@ echo "================================="
 echo "✅ Servers Starting"
 echo "================================="
 echo ""
-echo "Backend:  http://localhost:3001"
-echo "Frontend: http://localhost:5173"
-echo "Gen-AI:   http://localhost:8000"
+echo "Backend:          http://localhost:3001"
+echo "Frontend:         http://localhost:5173"
+echo "Gen-AI:           http://localhost:8000"
+echo "Facial Processing: http://localhost:8001"
 echo ""
 echo "New terminal windows have opened."
 echo "Close those windows to stop the servers."

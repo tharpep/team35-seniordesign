@@ -111,6 +111,7 @@ async def process_image(file: UploadFile = File(...), session_id: str = None):
         ProcessImageResponse with results
     """
     global total_frames_processed
+    print("hellohhhg")
 
     try:
         # Validate session_id
@@ -134,6 +135,7 @@ async def process_image(file: UploadFile = File(...), session_id: str = None):
 
         # Send to connected WebSocket clients
         await broadcast_result(session_id, result)
+        print(result)
 
         # Return response
         return ProcessImageResponse(

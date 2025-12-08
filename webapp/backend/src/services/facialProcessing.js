@@ -161,6 +161,8 @@ async function getSessionMetrics(sessionId) {
        COUNT(*) as total_frames,
        SUM(face_detected) as frames_with_face,
        AVG(CASE WHEN face_detected = 1 THEN focus_score END) as avg_focus_score,
+       MAX(CASE WHEN face_detected = 1 THEN focus_score END) as max_focus_score,
+       MIN(CASE WHEN face_detected = 1 THEN focus_score END) as min_focus_score,
        AVG(CASE WHEN face_detected = 1 THEN blink_rate END) as avg_blink_rate,
        AVG(CASE WHEN face_detected = 1 THEN detection_confidence END) as avg_detection_confidence
      FROM facial_metrics
@@ -184,6 +186,38 @@ async function getSessionMetrics(sessionId) {
       return acc;
     }, {})
   };
+}
+
+/**
+ * Get time-series focus data for chart display
+ * @param {number} sessionId - Session ID
+ * @returns {Promise<Array>} Time-series data points
+ */
+async function getFocusTimeSeries(sessionId) {
+  // Get all metrics ordered by timestamp
+  const allMetrics = await getAll(
+    `SELECT
+       timestamp,
+       focus_score,
+       face_detected,
+       emotion
+     FROM facial_metrics
+     WHERE session_id = ?
+     ORDER BY timestamp ASC`,
+    [sessionId]
+  );
+
+  // Return formatted time-series data
+  // When face is not detected, show 0% focus (user is not looking/present)
+  // When face is detected, show the actual focus score (0-100%)
+  return allMetrics.map(row => ({
+    timestamp: row.timestamp,
+    focusScore: row.face_detected
+      ? Math.round((row.focus_score ?? 0) * 100)
+      : 0, // No face = 0% focus
+    faceDetected: row.face_detected === 1,
+    emotion: row.emotion
+  }));
 }
 
 /**
@@ -283,6 +317,7 @@ module.exports = {
   storeMetrics,
   getRecentMetrics,
   getSessionMetrics,
+  getFocusTimeSeries,
   checkFatigue,
   checkDistraction,
   checkApiHealth,
