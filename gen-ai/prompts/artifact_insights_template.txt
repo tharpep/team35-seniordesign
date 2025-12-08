@@ -1,19 +1,22 @@
-Create {num_items} key insight about "{topic}".
+Generate {num_items} key insight(s) about: "{topic}"
 
-IMPORTANT: Respond with ONLY valid JSON. No additional text, explanations, or markdown formatting.
+<requirements>
+- Title: Brief, descriptive title (3-7 words)
+- Takeaway: Main insight in 1-2 concise sentences
+- Focus on: Connections, implications, or practical understanding
+- Avoid: Simple definitions or surface-level facts
+</requirements>
 
-Required JSON format:
+Respond with ONLY valid JSON, no explanations:
+
 {{
   "artifact_type": "insights",
   "version": "1.0",
   "insights": [
     {{
       "id": "ins_001",
-      "title": "Insight title",
-      "takeaway": "Main insight here"
+      "title": "Concise insight title",
+      "takeaway": "Key point in 1-2 sentences"
     }}
   ]
 }}
-
-Generate the JSON now:
-

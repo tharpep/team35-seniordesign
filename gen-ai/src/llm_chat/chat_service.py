@@ -293,8 +293,8 @@ class ChatService:
             
             if context_parts:
                 # Load RAG context prefix from prompts directory
-                prefix = load_prompt("rag_context_prefix.txt", fallback="Relevant notes and documents from your study session:\n")
-                formatted_context = prefix + "\n\n".join(context_parts)
+                prefix = load_prompt("rag_context_prefix.txt", fallback="<retrieved_context>\nRelevant notes and documents from your study session:\n")
+                formatted_context = prefix + "\n\n".join(context_parts) + "\n</retrieved_context>"
                 logger.info(f"RAG context retrieved: {len(filtered_results)} documents with scores >= {effective_threshold:.4f}")
                 return formatted_context, filtered_results, query_optimization_time
             else:
@@ -304,8 +304,8 @@ class ChatService:
                 if results:
                     top_doc, top_score = results[0]
                     logger.info(f"Using top result as fallback (score: {top_score:.4f})")
-                    prefix = load_prompt("rag_context_prefix.txt", fallback="Relevant notes and documents from your study session:\n")
-                    formatted_context = prefix + f"\n[Note 1] {top_doc}"
+                    prefix = load_prompt("rag_context_prefix.txt", fallback="<retrieved_context>\nRelevant notes and documents from your study session:\n")
+                    formatted_context = prefix + f"\n[Note 1] {top_doc}" + "\n</retrieved_context>"
                     return formatted_context, [(top_doc, top_score)], query_optimization_time
             return "", filtered_results, query_optimization_time
         except Exception as e:
@@ -327,7 +327,7 @@ class ChatService:
         
         Args:
             current_message: Current user message
-            session_context: Optional session context dict with session_id, session_title
+            session_context: Optional session context dict with session_id, session_title, session_topic
         
         Returns:
             Tuple of (messages array, RAG results for debugging, summary generation time, query optimization time)
@@ -347,7 +347,9 @@ class ChatService:
                 context_parts.append(f"Session ID: {session_context['session_id']}")
             if session_context.get('session_title'):
                 context_parts.append(f"Session: {session_context['session_title']}")
-            
+            if session_context.get('session_topic'):
+                context_parts.append(f"Topic: {session_context['session_topic']}")
+
             if context_parts:
                 context_text = "\n".join(context_parts)
                 messages.append({"role": "system", "content": context_text})
@@ -550,14 +552,14 @@ class ChatService:
         Process chat message with three-layer context
         
         Uses:
-        - Session context (session_id, session_title)
+        - Session context (session_id, session_title, session_topic)
         - RAG context from persistant_docs (session notes)
         - Chat summary (long-term conversation memory)
         - Recent conversation history (last N exchanges)
-        
+
         Args:
             message: User message
-            session_context: Optional session context dict with session_id, session_title
+            session_context: Optional session context dict with session_id, session_title, session_topic
             
         Returns:
             Dictionary with answer, response_time, conversation_length, timing breakdown, and RAG results

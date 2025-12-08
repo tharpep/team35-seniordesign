@@ -10,7 +10,7 @@ class ChatRequest(BaseModel):
     """Request model for chat endpoint"""
     message: str
     session_id: Optional[str] = None  # Optional - defaults to global session
-    session_context: Optional[Dict[str, Any]] = None  # Session context: session_id, session_title
+    session_context: Optional[Dict[str, Any]] = None  # Session context: session_id, session_title, session_topic
 
 
 class TimingBreakdown(BaseModel):

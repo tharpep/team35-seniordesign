@@ -43,18 +43,19 @@ export const genaiApi = {
   /**
    * Send a chat message to gen-ai API
    * Direct communication - bypasses backend
-   * 
+   *
    * @param message - User's chat message
    * @param sessionId - Optional session ID (defaults to 'global' for single-user system)
-   * @param sessionContext - Optional session context with session_id, session_title, start_time, end_time, duration, status, created_at, focus_score
+   * @param sessionContext - Optional session context with session_id, session_title, session_topic, start_time, end_time, duration, status, created_at, focus_score
    * @returns Chat response with answer and metadata
    */
   chat: async (
-    message: string, 
+    message: string,
     sessionId?: string,
-    sessionContext?: { 
+    sessionContext?: {
       session_id?: string | number;
       session_title?: string;
+      session_topic?: string;
       start_time?: string;
       end_time?: string;
       duration?: number;
