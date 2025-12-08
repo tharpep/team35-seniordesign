@@ -1,6 +1,7 @@
 const { getOne, getAll, runQuery } = require('../config/database');
 const fs = require('fs').promises;
 const path = require('path');
+const facialProcessing = require('../services/facialProcessing');
 
 // Get all sessions for logged-in user with artifact counts
 const getAllSessions = async (req, res) => {
@@ -289,13 +290,13 @@ const deleteSession = async (req, res) => {
   }
 };
 
-// Upload captured frame
+// Upload captured frame and process through facial API
 const uploadFrame = async (req, res) => {
   try {
     const { id: sessionId } = req.params;
     const userId = req.session.userId;
-    const frameType = req.body.type 
-      || req.resolvedFrameType 
+    const frameType = req.body.type
+      || req.resolvedFrameType
       || req.headers['x-frame-type']
       || req.query?.type
       || req.file?.originalname?.split('_')?.[0]
@@ -305,7 +306,7 @@ const uploadFrame = async (req, res) => {
 
     if (!req.file) {
       console.error('❌ No file in request');
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'No file',
         message: 'No frame file uploaded'
       });
@@ -315,7 +316,7 @@ const uploadFrame = async (req, res) => {
     const validTypes = ['webcam', 'screen', 'external'];
     if (!validTypes.includes(frameType)) {
       console.error(`❌ Invalid frame type: ${frameType}`);
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Invalid type',
         message: `Frame type must be one of: ${validTypes.join(', ')}`
       });
@@ -329,7 +330,7 @@ const uploadFrame = async (req, res) => {
 
     if (!session) {
       console.error(`❌ Session ${sessionId} not found for user ${userId}`);
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'Not found',
         message: 'Session not found'
       });
@@ -339,19 +340,71 @@ const uploadFrame = async (req, res) => {
 
     // Save frame record to database
     await runQuery(
-      `INSERT INTO captured_frames (session_id, frame_type, file_path) 
+      `INSERT INTO captured_frames (session_id, frame_type, file_path)
        VALUES (?, ?, ?)`,
       [sessionId, frameType, req.file.path]
     );
 
     console.log(`✓ Frame uploaded successfully - Type: ${frameType}, Size: ${req.file.size} bytes`);
 
-    res.json({ 
+    // Process webcam frames through facial processing API
+    let processingResult = null;
+    let fatigueEvent = null;
+    let distractionEvent = null;
+
+    if (frameType === 'webcam') {
+      try {
+        console.log(`🔍 Processing frame through facial API...`);
+        processingResult = await facialProcessing.processFrame(req.file.path, sessionId);
+
+        if (processingResult && processingResult.success) {
+          // Store metrics in database
+          await facialProcessing.storeMetrics(sessionId, processingResult);
+          console.log(`✓ Facial metrics stored - Focus: ${processingResult.result?.focus_score?.toFixed(2)}, Emotion: ${processingResult.result?.emotion}`);
+
+          // Check for fatigue and distraction events
+          fatigueEvent = await facialProcessing.checkFatigue(sessionId, processingResult);
+          distractionEvent = await facialProcessing.checkDistraction(sessionId, processingResult);
+
+          // Broadcast metrics to frontend via Socket.IO
+          const io = req.app.get('io');
+          if (io) {
+            const metricsPayload = {
+              sessionId: parseInt(sessionId),
+              timestamp: new Date().toISOString(),
+              metrics: processingResult.result,
+              fatigueEvent,
+              distractionEvent
+            };
+
+            io.to(`session-${sessionId}`).emit('facial-metrics', metricsPayload);
+            console.log(`📡 Broadcasted facial metrics to session-${sessionId}`);
+          }
+        } else {
+          console.warn(`⚠️ Facial processing returned unsuccessful: ${processingResult?.error}`);
+        }
+      } catch (processingError) {
+        // Log but don't fail the request if facial processing fails
+        console.warn(`⚠️ Facial processing error (non-fatal): ${processingError.message}`);
+      }
+    }
+
+    res.json({
       message: 'Frame uploaded successfully',
       file: {
         path: req.file.path,
         type: frameType,
         size: req.file.size
+      },
+      processing: processingResult ? {
+        success: processingResult.success,
+        focus_score: processingResult.result?.focus_score,
+        emotion: processingResult.result?.emotion,
+        face_detected: processingResult.result?.face_detected
+      } : null,
+      events: {
+        fatigue: fatigueEvent,
+        distraction: distractionEvent
       }
     });
 
@@ -364,10 +417,47 @@ const uploadFrame = async (req, res) => {
       frameType: req.body.type,
       hasFile: !!req.file
     });
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Server error',
       message: error.message || 'Could not upload frame',
       details: error.message
+    });
+  }
+};
+
+// Get facial metrics for a session
+const getSessionMetrics = async (req, res) => {
+  try {
+    const { id: sessionId } = req.params;
+    const userId = req.session.userId;
+
+    // Verify session belongs to user
+    const session = await getOne(
+      'SELECT * FROM sessions WHERE id = ? AND user_id = ?',
+      [sessionId, userId]
+    );
+
+    if (!session) {
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'Session not found'
+      });
+    }
+
+    const metrics = await facialProcessing.getSessionMetrics(sessionId);
+    const recentMetrics = await facialProcessing.getRecentMetrics(sessionId, 20);
+
+    res.json({
+      session_id: sessionId,
+      aggregated: metrics,
+      recent: recentMetrics
+    });
+
+  } catch (error) {
+    console.error('Get session metrics error:', error);
+    res.status(500).json({
+      error: 'Server error',
+      message: 'Could not retrieve metrics'
     });
   }
 };
@@ -379,5 +469,6 @@ module.exports = {
   createSession,
   updateSession,
   deleteSession,
-  uploadFrame
+  uploadFrame,
+  getSessionMetrics
 };
