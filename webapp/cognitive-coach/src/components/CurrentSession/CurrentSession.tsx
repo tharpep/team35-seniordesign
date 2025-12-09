@@ -23,6 +23,7 @@ interface CurrentSessionProps {
     onArtifactsChange?: (artifacts: any[]) => void;
     webcamDeviceId?: string | null;
     externalDeviceId?: string | null;
+    cameraEnabled?: { screen: boolean; webcam: boolean; external: boolean };
 }
 
 interface CameraStream {
@@ -39,7 +40,7 @@ interface FacialMetricsState {
     lastUpdate: Date | null;
 }
 
-export default function CurrentSession({ onConfigureClick, sessionSettings, onSessionStateChange, onSessionIdChange, onArtifactsChange, webcamDeviceId, externalDeviceId }: CurrentSessionProps) {
+export default function CurrentSession({ onConfigureClick, sessionSettings, onSessionStateChange, onSessionIdChange, onArtifactsChange, webcamDeviceId, externalDeviceId, cameraEnabled }: CurrentSessionProps) {
     const [sessionState, setSessionState] = useState<SessionState>('idle');
     const [sessionTime, setSessionTime] = useState(0); // in seconds - actual operating time
     const [captureCount, setCaptureCount] = useState(0);
@@ -268,6 +269,11 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
         if (sessionState === 'active' && currentSessionId) {
             const webcamIntervalMs = 5000; // 5 seconds for webcam (facial processing)
             webcamCaptureIntervalRef.current = window.setInterval(async () => {
+                // Check if webcam is enabled
+                if (cameraEnabled && !cameraEnabled.webcam) {
+                    return;
+                }
+                
                 const webcamStream = activeStreamsRef.current.find(s => s.type === 'webcam');
                 if (webcamStream) {
                     try {
@@ -299,14 +305,20 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
                 clearInterval(webcamCaptureIntervalRef.current);
             }
         };
-    }, [sessionState, currentSessionId]);
+    }, [sessionState, currentSessionId, cameraEnabled]);
 
     // Screen and external camera capture effect - runs at 30 second interval for OCR
     useEffect(() => {
         if (sessionState === 'active' && currentSessionId) {
             const screenExternalIntervalMs = 30000; // 30 seconds for screen/external (OCR processing)
             screenExternalCaptureIntervalRef.current = window.setInterval(async () => {
-                const screenAndExternal = activeStreamsRef.current.filter(s => s.type === 'screen' || s.type === 'external');
+                // Filter streams based on enabled status
+                const screenAndExternal = activeStreamsRef.current.filter(s => {
+                    if (s.type === 'screen' && cameraEnabled && !cameraEnabled.screen) return false;
+                    if (s.type === 'external' && cameraEnabled && !cameraEnabled.external) return false;
+                    return s.type === 'screen' || s.type === 'external';
+                });
+                
                 if (screenAndExternal.length > 0) {
                     const timestamp = new Date().toLocaleTimeString();
                     console.log(`📸 Screen/External capture at ${timestamp}`);
@@ -444,9 +456,10 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
             console.log(`🎥 Initializing camera streams...`);
             console.log(`  Webcam deviceId: ${webcamDeviceId || 'default'}`);
             console.log(`  External deviceId: ${externalDeviceId || 'none'}`);
+            console.log(`  Enabled cameras:`, cameraEnabled);
 
-            // Try to initialize webcam with user-selected device
-            if (webcamDeviceId) {
+            // Try to initialize webcam with user-selected device (only if enabled)
+            if (webcamDeviceId && (!cameraEnabled || cameraEnabled.webcam)) {
                 try {
                     const webcamConstraints: MediaStreamConstraints = {
                         video: {
@@ -463,38 +476,44 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
                 } catch (error) {
                     console.error('❌ Webcam initialization failed:', error);
                 }
-            } else {
+            } else if (!webcamDeviceId) {
                 console.warn('⚠️ No webcam device selected');
+            } else {
+                console.log('ℹ️ Webcam disabled by user');
             }
 
-            // Try to initialize screen capture
-            try {
-                const screenStream = await navigator.mediaDevices.getDisplayMedia({
-                    video: {
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 },
-                        frameRate: { ideal: 30 }
-                    },
-                    audio: false
-                });
-                
-                // Handle screen share ending
-                screenStream.getVideoTracks()[0].addEventListener('ended', () => {
-                    const index = activeStreamsRef.current.findIndex(s => s.type === 'screen');
-                    if (index !== -1) {
-                        activeStreamsRef.current.splice(index, 1);
-                    }
-                    console.log('Screen sharing ended by user');
-                });
+            // Try to initialize screen capture (only if enabled)
+            if (!cameraEnabled || cameraEnabled.screen) {
+                try {
+                    const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                        video: {
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 },
+                            frameRate: { ideal: 30 }
+                        },
+                        audio: false
+                    });
+                    
+                    // Handle screen share ending
+                    screenStream.getVideoTracks()[0].addEventListener('ended', () => {
+                        const index = activeStreamsRef.current.findIndex(s => s.type === 'screen');
+                        if (index !== -1) {
+                            activeStreamsRef.current.splice(index, 1);
+                        }
+                        console.log('Screen sharing ended by user');
+                    });
 
-                activeStreamsRef.current.push({ stream: screenStream, type: 'screen' });
-                console.log('✓ Screen capture initialized');
-            } catch (error) {
-                console.warn('Screen capture not available:', error);
+                    activeStreamsRef.current.push({ stream: screenStream, type: 'screen' });
+                    console.log('✓ Screen capture initialized');
+                } catch (error) {
+                    console.warn('Screen capture not available:', error);
+                }
+            } else {
+                console.log('ℹ️ Screen capture disabled by user');
             }
 
-            // Try to initialize external camera if selected by user
-            if (externalDeviceId) {
+            // Try to initialize external camera if selected by user (only if enabled)
+            if (externalDeviceId && (!cameraEnabled || cameraEnabled.external)) {
                 try {
                     console.log(`🔌 Attempting to initialize external camera: ${videoDevices.find(d => d.deviceId === externalDeviceId)?.label || externalDeviceId}`);
                     const externalStream = await navigator.mediaDevices.getUserMedia({
@@ -515,8 +534,10 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
                 } catch (error) {
                     console.error('❌ External camera initialization failed:', error);
                 }
-            } else {
+            } else if (!externalDeviceId) {
                 console.log('ℹ️ No external camera selected');
+            } else {
+                console.log('ℹ️ External camera disabled by user');
             }
 
             // Must have at least one stream

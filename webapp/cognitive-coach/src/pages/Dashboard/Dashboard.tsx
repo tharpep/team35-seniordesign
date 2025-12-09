@@ -42,6 +42,11 @@ export default function Dashboard() {
         webcam: null,
         external: null
     });
+    const [cameraEnabled, setCameraEnabled] = useState<{ screen: boolean; webcam: boolean; external: boolean }>({
+        screen: true,
+        webcam: true,
+        external: true
+    });
 
     // Auto-collapse/expand Previous Sessions based on current session state
     useEffect(() => {
@@ -252,6 +257,7 @@ export default function Dashboard() {
                     onArtifactsChange={setCurrentSessionArtifacts}
                     webcamDeviceId={cameraSelections.webcam}
                     externalDeviceId={cameraSelections.external}
+                    cameraEnabled={cameraEnabled}
                 />
 
                 {/* Current Session Details Section - Only show when session is active or paused */}
@@ -338,6 +344,8 @@ export default function Dashboard() {
                 onSettingsChange={handleSettingsChange}
                 cameraSelections={cameraSelections}
                 onCameraSelectionChange={setCameraSelections}
+                cameraEnabled={cameraEnabled}
+                onCameraEnabledChange={setCameraEnabled}
             />
             
             <ProfilePopup 
