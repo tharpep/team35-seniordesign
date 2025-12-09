@@ -7,8 +7,13 @@
 // Backend API base URL
 // Update this based on your environment
 export const API_BASE_URL = __DEV__ 
-  ? 'http://localhost:3001/api'  // Development (use your local IP for physical devices)
+  ? 'http://192.168.4.49:3001/api'  // Development (use your local IP for physical devices)
   : 'https://your-production-url.com/api';  // Production
+
+// Gen-AI API base URL
+export const GENAI_BASE_URL = __DEV__ 
+  ? 'http://192.168.4.49:8000/api'  // Development (use your local IP for physical devices)
+  : 'https://your-production-genai-url.com/api';  // Production
 
 // API Endpoints
 export const API_ENDPOINTS = {
@@ -27,6 +32,7 @@ export const API_ENDPOINTS = {
     UPDATE: (id: number) => `/sessions/${id}`,
     DELETE: (id: number) => `/sessions/${id}`,
     UPLOAD_FRAME: (id: number) => `/sessions/${id}/frames`,
+    METRICS: (id: number) => `/sessions/${id}/metrics`,
   },
   // Material endpoints
   MATERIALS: {
@@ -35,6 +41,7 @@ export const API_ENDPOINTS = {
     GET: (id: number) => `/materials/${id}`,
     UPDATE: (id: number) => `/materials/${id}`,
     DELETE: (id: number) => `/materials/${id}`,
+    GENERATE: '/materials/generate',
   },
   // Health check
   HEALTH: '/health',

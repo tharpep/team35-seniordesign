@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Alert, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Alert, StyleSheet, ActivityIndicator } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Typography, Card, Button } from '../../components/ui';
 import { commonStyles, tokens } from '../../styles/theme';
 import StudyArtifacts from '../../components/StudyArtifacts/StudyArtifacts';
+import { sessionService, materialsService, genaiService } from '../../services';
+import type { Material, InsightContent } from '../../services/materials.service';
+import type { Session } from '../../services/session.service';
 
 interface TimelineEvent {
   time: string;
@@ -25,31 +28,119 @@ interface ChatMessage {
 }
 
 export default function SessionDetail() {
+  const params = useLocalSearchParams();
+  const sessionId = params.id as string;
+  
   const [chatMessage, setChatMessage] = useState('');
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
     {
       id: '1',
       type: 'ai',
-      text: "Hi! I can help answer questions about your Organic Chemistry session. Ask me anything about the topics you covered, clarify concepts, or get additional practice problems!",
+      text: "Hi! I can help answer questions about your session. Ask me anything about the topics you covered, clarify concepts, or get additional practice problems!",
       timestamp: 'Just now'
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const chatMessagesRef = useRef<ScrollView>(null);
 
-  // Mock session data
-  const sessionData = {
-    title: 'Organic Chemistry Review',
-    date: 'Today, 2:30 PM - 4:45 PM', 
-    duration: '2h 15m',
-    sessionId: '#2847',
-    status: 'Completed',
-    metrics: {
-      focusScore: 88,
-      emotion: "focused",
-      artifacts: 15
-    }
-  };
+  // Data state
+  const [sessionData, setSessionData] = useState<any>(null);
+  const [rawSession, setRawSession] = useState<Session | null>(null);
+  const [artifacts, setArtifacts] = useState<Material[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [insights, setInsights] = useState<Insight[]>([]);
+
+  // Fetch session data and artifacts
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!sessionId) {
+        Alert.alert('Error', 'No session ID provided');
+        router.back();
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        // Fetch session data and artifacts in parallel
+        const [sessionResponse, artifactsResponse] = await Promise.all([
+          sessionService.getSessionById(Number(sessionId)),
+          materialsService.getMaterialsBySession(Number(sessionId))
+        ]);
+
+        // Handle session data
+        if (sessionResponse.data?.session) {
+          const session = sessionResponse.data.session;
+          setRawSession(session);
+
+          // Format session data for display
+          const startTime = session.start_time ? new Date(session.start_time) : null;
+          const endTime = session.end_time ? new Date(session.end_time) : null;
+          const durationMinutes = session.duration || 0;
+          const durationHours = Math.floor(durationMinutes / 60);
+          const durationMins = durationMinutes % 60;
+          const durationStr = durationHours > 0 
+            ? `${durationHours}h ${durationMins}m` 
+            : `${durationMins}m`;
+
+          setSessionData({
+            title: session.title || 'Untitled Session',
+            date: startTime && endTime 
+              ? `${startTime.toLocaleDateString()}, ${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+              : startTime 
+                ? `${startTime.toLocaleDateString()}, ${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                : 'Unknown date',
+            duration: durationStr,
+            sessionId: '#' + sessionId,
+            status: sessionService.getStatusDisplay(session.status),
+            metrics: {
+              focusScore: session.focus_score ? Math.round(session.focus_score) : null,
+              emotion: "focused",
+              artifacts: artifactsResponse.data?.materials?.length || 0
+            }
+          });
+        } else {
+          throw new Error('Session not found');
+        }
+
+        // Handle artifacts
+        if (artifactsResponse.data?.materials) {
+          const materials = artifactsResponse.data.materials;
+          setArtifacts(materials);
+
+          // Parse insights from materials
+          const insightMaterials = materials
+            .filter(m => m.type === 'insights')
+            .flatMap((material, artifactIndex) => {
+              try {
+                const content = materialsService.parseContent<InsightContent>(material);
+                if (typeof content !== 'string' && content.insights && Array.isArray(content.insights)) {
+                  return content.insights.map((insight, insightIndex) => ({
+                    title: insight.title,
+                    description: insight.takeaway,
+                    icon: (artifactIndex + insightIndex) === 0 ? '📈' : 
+                          (artifactIndex + insightIndex) === 1 ? '🧠' : '⚖️'
+                  }));
+                }
+                return [];
+              } catch (error) {
+                console.error('Error parsing insight:', error);
+                return [];
+              }
+            })
+            .slice(0, 3);
+
+          setInsights(insightMaterials);
+        }
+      } catch (error: any) {
+        console.error('Error fetching session data:', error);
+        Alert.alert('Error', error.message || 'Failed to load session data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [sessionId]);
 
   const timelineEvents: TimelineEvent[] = [
     { time: '2:30', title: 'Session Started', description: 'All cameras initialized' },
@@ -59,23 +150,14 @@ export default function SessionDetail() {
     { time: '4:45', title: 'Session Ended', description: 'Review completed' }
   ];
 
-  const insights: Insight[] = [
-    {
-      title: "Peak Performance Period",
-      description: "Your focus was highest during alkene reactions (95% attention), suggesting this topic aligns well with your learning style.",
-      icon: "📈"
-    },
-    {
-      title: "Learning Pattern Detected", 
-      description: "You learn best with step-by-step mechanisms. Break down complex topics into smaller, sequential parts.",
-      icon: "🧠"
-    },
-    {
-      title: "Optimal Study Duration",
-      description: "Your attention drops after 90 minutes. Consider taking breaks every hour and a half for maximum retention.",
-      icon: "⚖️"
-    }
-  ];
+  // Clear chat session when component unmounts
+  useEffect(() => {
+    return () => {
+      genaiService.clearChatSession('global').catch(error => {
+        console.warn('Failed to clear chat session on unmount:', error);
+      });
+    };
+  }, []);
 
   // Auto-scroll to bottom when new messages are added
   useEffect(() => {
@@ -84,23 +166,7 @@ export default function SessionDetail() {
     }
   }, [chatHistory, isTyping]);
 
-  // Mock AI responses based on keywords
-  const getMockAIResponse = (userMessage: string): string => {
-    const message = userMessage.toLowerCase();
-    
-    if (message.includes("markovnikov")) {
-      return "Markovnikov's rule states that in the addition of HX to an alkene, the hydrogen atom attaches to the carbon with the greater number of hydrogen atoms, while the halogen attaches to the carbon with fewer hydrogen atoms. This occurs because the reaction proceeds through the more stable carbocation intermediate.";
-    } else if (message.includes("practice problem")) {
-      return "Here's a practice problem: Draw the major product when 2-methyl-2-butene reacts with HBr. Remember to apply Markovnikov's rule! The answer would be 2-bromo-2-methylbutane, as the Br⁻ adds to the more substituted carbon.";
-    } else if (message.includes("common mistakes") || message.includes("mistakes")) {
-      return "Common mistakes in alkene reactions include: 1) Forgetting to consider carbocation stability, 2) Not applying Markovnikov's rule correctly, 3) Ignoring stereochemistry in addition reactions, and 4) Confusing syn vs anti addition mechanisms.";
-    } else if (message.includes("focus") || message.includes("attention")) {
-      return "I noticed your focus was highest during the alkene reactions section (around 3:00-3:20). This suggests you learn best when working with specific mechanisms. Try breaking down complex topics into step-by-step mechanisms like you did with those reactions!";
-    } else {
-      return "That's a great question! Based on your session, you showed strong understanding of reaction mechanisms. Could you be more specific about which aspect of organic chemistry you'd like me to explain? I can help with alkenes, stereochemistry, or any other topics you covered.";
-    }
-  };
-
+  // Real AI chat handler
   const handleSendMessage = async () => {
     if (!chatMessage.trim()) return;
 
@@ -111,23 +177,55 @@ export default function SessionDetail() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    // Add user message
     setChatHistory(prev => [...prev, userMessage]);
+    const messageToSend = chatMessage;
     setChatMessage('');
     setIsTyping(true);
 
-    // Simulate AI thinking time
-    setTimeout(() => {
+    try {
+      // Build session context from raw session data
+      const sessionContext = rawSession ? {
+        session_id: rawSession.id,
+        session_title: rawSession.title,
+        session_topic: rawSession.context || undefined,
+        start_time: rawSession.start_time,
+        end_time: rawSession.end_time || undefined,
+        duration: rawSession.duration || undefined,
+        status: rawSession.status,
+        created_at: rawSession.created_at,
+        focus_score: rawSession.focus_score
+      } : undefined;
+
+      // Call gen-ai API directly (bypasses backend)
+      const response = await genaiService.chat(
+        messageToSend,
+        sessionId || 'global',
+        sessionContext
+      );
+
       const aiResponse: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        text: getMockAIResponse(chatMessage),
+        text: response.answer,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
       setChatHistory(prev => [...prev, aiResponse]);
+    } catch (error: any) {
+      console.error('Chat error:', error);
+
+      // Show error message to user
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        text: error.message || 'Sorry, I encountered an error. Please try again.',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      setChatHistory(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleBackToDashboard = () => {
@@ -137,6 +235,32 @@ export default function SessionDetail() {
   const handleSuggestedQuestion = (question: string) => {
     setChatMessage(question);
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <View style={[commonStyles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={tokens.colors.primary} />
+        <Typography variant="bodyMedium" style={{ marginTop: tokens.spacing.md }}>
+          Loading session...
+        </Typography>
+      </View>
+    );
+  }
+
+  // Show error state if no session data
+  if (!sessionData) {
+    return (
+      <View style={[commonStyles.container, { justifyContent: 'center', alignItems: 'center', padding: tokens.spacing.xl }]}>
+        <Typography variant="headlineSmall" style={{ marginBottom: tokens.spacing.md }}>
+          Session Not Found
+        </Typography>
+        <Button variant="primary" onPress={handleBackToDashboard}>
+          Back to Dashboard
+        </Button>
+      </View>
+    );
+  }
 
   return (
     <View style={commonStyles.container}>
@@ -186,7 +310,7 @@ export default function SessionDetail() {
           <View style={styles.overviewMetrics}>
             <View style={styles.overviewMetric}>
               <Typography variant="titleLarge" style={styles.focusValue}>
-                {sessionData.metrics.focusScore}%
+                {sessionData.metrics.focusScore !== null ? `${sessionData.metrics.focusScore}%` : 'N/A'}
               </Typography>
               <Typography variant="bodySmall" color="secondary">
                 Focus Score
@@ -212,7 +336,7 @@ export default function SessionDetail() {
         </Card>
 
         {/* Study Artifacts Section */}
-        <StudyArtifacts />
+        <StudyArtifacts sessionId={sessionId} artifacts={artifacts} />
 
         {/* AI Chat Section */}
         <Card style={styles.chatSection}>
@@ -272,15 +396,15 @@ export default function SessionDetail() {
             <View style={styles.suggestedQuestions}>
               <TouchableOpacity 
                 style={styles.suggestionBtn}
-                onPress={() => handleSuggestedQuestion("Explain Markovnikov's rule")}
+                onPress={() => handleSuggestedQuestion("What topics did I cover in this session?")}
               >
                 <Typography variant="bodySmall" style={styles.suggestionText}>
-                  Explain Markovnikov's rule
+                  What topics did I cover?
                 </Typography>
               </TouchableOpacity>
               <TouchableOpacity 
                 style={styles.suggestionBtn}
-                onPress={() => handleSuggestedQuestion("Create a practice problem")}
+                onPress={() => handleSuggestedQuestion("Create a practice problem based on this session")}
               >
                 <Typography variant="bodySmall" style={styles.suggestionText}>
                   Create a practice problem
@@ -288,7 +412,7 @@ export default function SessionDetail() {
               </TouchableOpacity>
               <TouchableOpacity 
                 style={styles.suggestionBtn}
-                onPress={() => handleSuggestedQuestion("What are common mistakes?")}
+                onPress={() => handleSuggestedQuestion("What are common mistakes in these topics?")}
               >
                 <Typography variant="bodySmall" style={styles.suggestionText}>
                   What are common mistakes?
@@ -300,7 +424,7 @@ export default function SessionDetail() {
             <View style={styles.chatInputWrapper}>
               <TextInput
                 style={styles.chatInput}
-                placeholder="Ask about alkenes, stereochemistry, reactions..."
+                placeholder="Ask about your session..."
                 value={chatMessage}
                 onChangeText={setChatMessage}
                 multiline
@@ -313,61 +437,33 @@ export default function SessionDetail() {
           </View>
         </Card>
 
-        {/* Session Timeline - Commented out for now */}
-        {/* <Card style={styles.timelineSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionIcon}>📅</Text>
-            <Typography variant="titleMedium" style={styles.sectionTitle}>
-              Session Timeline
-            </Typography>
-          </View>
-
-          <View style={styles.timeline}>
-            {timelineEvents.map((event, index) => (
-              <View key={index} style={styles.timelineItem}>
-                <View style={styles.timelineTime}>
-                  <Typography variant="bodySmall" style={styles.timelineTimeText}>
-                    {event.time}
-                  </Typography>
-                </View>
-                <View style={styles.timelineContent}>
-                  <Typography variant="bodyMedium" style={styles.timelineTitle}>
-                    {event.title}
-                  </Typography>
-                  <Typography variant="bodySmall" color="secondary" style={styles.timelineDesc}>
-                    {event.description}
-                  </Typography>
-                </View>
-              </View>
-            ))}
-          </View>
-        </Card> */}
-
         {/* AI Insights */}
-        <Card style={styles.insightsSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionIcon}>💡</Text>
-            <Typography variant="titleMedium" style={styles.sectionTitle}>
-              AI Insights
-            </Typography>
-          </View>
+        {insights.length > 0 && (
+          <Card style={styles.insightsSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionIcon}>💡</Text>
+              <Typography variant="titleMedium" style={styles.sectionTitle}>
+                AI Insights
+              </Typography>
+            </View>
 
-          <View style={styles.insightsList}>
-            {insights.map((insight, index) => (
-              <View key={index} style={styles.insightItem}>
-                <View style={styles.insightHeader}>
-                  <Text style={styles.insightIcon}>{insight.icon}</Text>
-                  <Typography variant="bodyMedium" style={styles.insightTitle}>
-                    {insight.title}
+            <View style={styles.insightsList}>
+              {insights.map((insight, index) => (
+                <View key={index} style={styles.insightItem}>
+                  <View style={styles.insightHeader}>
+                    <Text style={styles.insightIcon}>{insight.icon}</Text>
+                    <Typography variant="bodyMedium" style={styles.insightTitle}>
+                      {insight.title}
+                    </Typography>
+                  </View>
+                  <Typography variant="bodySmall" color="secondary" style={styles.insightDesc}>
+                    {insight.description}
                   </Typography>
                 </View>
-                <Typography variant="bodySmall" color="secondary" style={styles.insightDesc}>
-                  {insight.description}
-                </Typography>
-              </View>
-            ))}
-          </View>
-        </Card>
+              ))}
+            </View>
+          </Card>
+        )}
       </ScrollView>
     </View>
   );

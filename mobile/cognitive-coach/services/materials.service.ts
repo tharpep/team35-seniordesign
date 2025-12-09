@@ -45,6 +45,14 @@ export interface MultipleChoiceContent {
   correct: number;
 }
 
+export interface InsightContent {
+  insights: Array<{
+    title: string;
+    takeaway: string;
+    category?: string;
+  }>;
+}
+
 class MaterialsService {
   /**
    * Get all materials for a specific session
@@ -137,6 +145,22 @@ class MaterialsService {
       insights: 'Insights'
     };
     return names[type] || type;
+  }
+
+  /**
+   * Generate artifact via gen-ai and inject into database
+   */
+  async generateArtifact(
+    sessionId: number,
+    type: 'flashcard' | 'mcq' | 'insights',
+    topic?: string
+  ): Promise<ApiResponse<MaterialDetailResponse>> {
+    return apiService.post<MaterialDetailResponse>(API_ENDPOINTS.MATERIALS.GENERATE, {
+      session_id: sessionId,
+      type: type,
+      topic: topic || undefined,
+      num_items: 1
+    });
   }
 }
 

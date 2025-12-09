@@ -8,3 +8,4 @@ export * from './api.service';
 export * from './auth.service';
 export * from './session.service';
 export * from './materials.service';
+export * from './genai.service';

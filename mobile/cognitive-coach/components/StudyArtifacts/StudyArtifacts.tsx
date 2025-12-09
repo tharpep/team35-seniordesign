@@ -1,35 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { Typography, Card } from '../ui';
 import { tokens } from '../../styles/theme';
-import mockFlashcards from '../../assets/data/mockFlashcards.json';
-import mockMCQ from '../../assets/data/mockMCQ.json';
+import { materialsService, Material, FlashcardContent, MultipleChoiceContent, EquationContent } from '../../services/materials.service';
 
 interface Artifact {
-  id: string;
+  id: number;
   type: 'flashcard' | 'MCQ' | 'equation';
   title: string;
   preview: string;
 }
 
 interface StudyArtifactsProps {
+  sessionId?: string;
+  artifacts?: Material[];
   onArtifactClick?: (artifactType: 'flashcard' | 'MCQ' | 'equation', artifactId: string) => void;
 }
-
-// Export artifact counts for use by parent components
-export const getArtifactCounts = () => {
-  const flashcardCount = mockFlashcards.cards.length;
-  const mcqCount = mockMCQ.questions.length;
-  const equationCount = 6; // Static count for equations
-  
-  return {
-    flashcard: flashcardCount,
-    MCQ: mcqCount,
-    equation: equationCount,
-    total: flashcardCount + mcqCount + equationCount
-  };
-};
 
 const getArtifactTypeStyle = (type: string) => {
   switch (type) {
@@ -66,62 +53,65 @@ const getArtifactTypeTextStyle = (type: string) => {
   }
 };
 
-export default function StudyArtifacts({ onArtifactClick }: StudyArtifactsProps) {
+export default function StudyArtifacts({ sessionId, artifacts = [], onArtifactClick }: StudyArtifactsProps) {
   const [activeTab, setActiveTab] = useState<'flashcard' | 'MCQ' | 'equation'>('flashcard');
 
-  // Create artifacts from mock data
-  const flashcardArtifacts: Artifact[] = mockFlashcards.cards.map((card, index) => ({
-    id: `fc_${index + 1}`,
-    type: 'flashcard' as const,
-    title: '',
-    preview: card.front
-  }));
+  // Parse real artifacts from API
+  const { flashcardArtifacts, mcqArtifacts, equationArtifacts, counts } = useMemo(() => {
+    const flashcards: Artifact[] = [];
+    const mcqs: Artifact[] = [];
+    const equations: Artifact[] = [];
 
-  const mcqArtifacts: Artifact[] = mockMCQ.questions.map((question, index) => ({
-    id: `mcq_${index + 1}`,
-    type: 'MCQ' as const,
-    title: '',
-    preview: question.stem
-  }));
+    artifacts.forEach((material) => {
+      try {
+        if (material.type === 'flashcard') {
+          const content = materialsService.parseContent<FlashcardContent>(material);
+          if (typeof content !== 'string') {
+            flashcards.push({
+              id: material.id,
+              type: 'flashcard',
+              title: material.title || '',
+              preview: content.question || 'No question available'
+            });
+          }
+        } else if (material.type === 'multiple_choice') {
+          const content = materialsService.parseContent<MultipleChoiceContent>(material);
+          if (typeof content !== 'string') {
+            mcqs.push({
+              id: material.id,
+              type: 'MCQ',
+              title: material.title || '',
+              preview: content.question || 'No question available'
+            });
+          }
+        } else if (material.type === 'equation') {
+          const content = materialsService.parseContent<EquationContent>(material);
+          if (typeof content !== 'string') {
+            equations.push({
+              id: material.id,
+              type: 'equation',
+              title: material.title || content.description || '',
+              preview: content.formula || 'No formula available'
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing material:', material.id, error);
+      }
+    });
 
-  const equationArtifacts: Artifact[] = [
-    {
-      id: 'eq_1',
-      type: 'equation' as const,
-      title: 'Henderson-Hasselbalch Equation',
-      preview: 'pH = pKa + log([A⁻]/[HA])'
-    },
-    {
-      id: 'eq_2',
-      type: 'equation' as const,
-      title: 'Arrhenius Equation',
-      preview: 'k = Ae^(-Ea/RT)'
-    },
-    {
-      id: 'eq_3',
-      type: 'equation' as const,
-      title: 'Beer-Lambert Law',
-      preview: 'A = εbc'
-    },
-    {
-      id: 'eq_4',
-      type: 'equation' as const,
-      title: 'Markovnikov Addition',
-      preview: 'R₂C=CH₂ + HX → R₂CH-CH₂X'
-    },
-    {
-      id: 'eq_5',
-      type: 'equation' as const,
-      title: 'E2 Elimination',
-      preview: 'R₃C-CHR-X + Base → R₂C=CR + HX + Base-H⁺'
-    },
-    {
-      id: 'eq_6',
-      type: 'equation' as const,
-      title: 'Ozonolysis',
-      preview: 'R₂C=CR₂ + O₃ → R₂C=O + O=CR₂'
-    }
-  ];
+    return {
+      flashcardArtifacts: flashcards,
+      mcqArtifacts: mcqs,
+      equationArtifacts: equations,
+      counts: {
+        flashcard: flashcards.length,
+        MCQ: mcqs.length,
+        equation: equations.length,
+        total: flashcards.length + mcqs.length + equations.length
+      }
+    };
+  }, [artifacts]);
 
   const getArtifactsForTab = () => {
     switch (activeTab) {
@@ -138,7 +128,7 @@ export default function StudyArtifacts({ onArtifactClick }: StudyArtifactsProps)
 
   const handleArtifactClick = (artifact: Artifact) => {
     if (onArtifactClick) {
-      onArtifactClick(artifact.type, artifact.id);
+      onArtifactClick(artifact.type, artifact.id.toString());
     } else {
       // Navigate to appropriate study page
       if (artifact.type === 'flashcard') {
@@ -147,15 +137,31 @@ export default function StudyArtifacts({ onArtifactClick }: StudyArtifactsProps)
         router.push('/mcq-study');
       } else if (artifact.type === 'equation') {
         router.push('/equation-study');
-      } else {
-        // For other types, show console log for now
-        console.log('Navigate to artifact:', artifact.type, artifact.id);
       }
     }
   };
 
-  const artifacts = getArtifactsForTab();
-  const counts = getArtifactCounts();
+  const displayArtifacts = getArtifactsForTab();
+
+  // Show empty state if no artifacts
+  if (artifacts.length === 0) {
+    return (
+      <Card style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerIcon}>✨</Text>
+          <Typography variant="titleMedium" style={styles.headerTitle}>
+            Study Artifacts
+          </Typography>
+        </View>
+        <View style={styles.emptyState}>
+          <Typography variant="bodyMedium" color="secondary" style={{ textAlign: 'center' }}>
+            No study artifacts yet.{'\n'}
+            They will appear here as you study.
+          </Typography>
+        </View>
+      </Card>
+    );
+  }
 
   return (
     <Card style={styles.container}>
@@ -207,7 +213,7 @@ export default function StudyArtifacts({ onArtifactClick }: StudyArtifactsProps)
         style={styles.artifactsScroll}
         contentContainerStyle={styles.artifactsContent}
       >
-        {artifacts.map((artifact) => (
+        {displayArtifacts.map((artifact) => (
           <TouchableOpacity
             key={artifact.id}
             style={styles.artifactCard}
@@ -319,5 +325,11 @@ const styles = StyleSheet.create({
     flex: 1,
     color: tokens.colors.onSurfaceVariant,
     lineHeight: 18,
+  },
+  emptyState: {
+    paddingVertical: tokens.spacing.xxl,
+    paddingHorizontal: tokens.spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

@@ -12,6 +12,7 @@ export interface Session {
   id: number;
   user_id: number;
   title: string;
+  context?: string; // Optional topic/context field
   start_time: string;
   end_time: string | null;
   duration: number | null;
@@ -28,6 +29,18 @@ export interface SessionDetailResponse {
   session: Session;
 }
 
+export interface SessionMetricsResponse {
+  timeSeries: Array<{
+    timestamp: string;
+    focus_score: number;
+  }>;
+  aggregated: {
+    avg_focus_score: number;
+    max_focus_score: number;
+    min_focus_score: number;
+  };
+}
+
 class SessionService {
   /**
    * Get all sessions for the logged-in user
@@ -41,6 +54,13 @@ class SessionService {
    */
   async getSessionById(sessionId: number): Promise<ApiResponse<SessionDetailResponse>> {
     return apiService.get<SessionDetailResponse>(API_ENDPOINTS.SESSIONS.GET(sessionId));
+  }
+
+  /**
+   * Get session metrics (focus analytics data)
+   */
+  async getSessionMetrics(sessionId: number): Promise<ApiResponse<SessionMetricsResponse>> {
+    return apiService.get<SessionMetricsResponse>(API_ENDPOINTS.SESSIONS.METRICS(sessionId));
   }
 
   /**
