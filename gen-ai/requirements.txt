@@ -1,6 +1,6 @@
 # Core dependencies for RAG system
 sentence-transformers>=2.2.2
-qdrant-client==1.15.1
+qdrant-client>=1.16.0
 httpx>=0.25.0
 
 # Optional dependencies for enhanced functionality

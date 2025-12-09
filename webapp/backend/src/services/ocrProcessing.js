@@ -44,6 +44,7 @@ async function processImage(imagePath, sessionId, source = 'screen') {
     const args = [...pythonCmd.slice(1), IMG2STUDY_SCRIPT, imagePath, sessionId.toString(), source];
     const command = pythonCmd[0];
 
+    console.log(`  PYTHON_PATH env var: ${PYTHON_PATH}`);
     console.log(`  Command: ${command} ${args.join(' ')}`);
 
     // Spawn Python process

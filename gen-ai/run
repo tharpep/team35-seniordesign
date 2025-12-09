@@ -53,6 +53,37 @@ def check_venv_health():
         print("❌ Pip not working")
         return False
     
+    # Check if package versions match requirements.txt
+    print("Checking package versions against requirements.txt...")
+    try:
+        # Use pip install --dry-run to check if packages need updating
+        # This will show if any packages don't match requirements.txt versions
+        result = subprocess.run(
+            [python_cmd, "-m", "pip", "install", "--dry-run", "-r", "requirements.txt"],
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        
+        # If dry-run would install/upgrade anything, versions are wrong
+        output = result.stdout + result.stderr
+        if "Would install" in output or "Would upgrade" in output or "Would reinstall" in output:
+            print("⚠️  Package versions don't match requirements.txt")
+            print("   Some packages need to be updated or reinstalled")
+            # Extract package names that would be changed
+            lines = output.split('\n')
+            for line in lines:
+                if "Would install" in line or "Would upgrade" in line or "Would reinstall" in line:
+                    print(f"   {line.strip()}")
+            return False
+        else:
+            print("✅ All package versions match requirements.txt")
+    except subprocess.TimeoutExpired:
+        print("⚠️  Package version check timed out (may still be correct)")
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        print(f"⚠️  Could not verify package versions: {e}")
+        # Don't fail on this - continue with import checks
+    
     # Only check essential packages for server startup (skip heavy optional ones)
     # torch and transformers are large and slow to import - skip them in health check
     # They're only needed when actually using models, not for server startup
@@ -69,17 +100,22 @@ def check_venv_health():
     
     for package_name, import_name in essential_packages:
         try:
-            # Use timeout to prevent hanging on slow imports
+            # Use longer timeout for sentence-transformers (it downloads models on first import)
+            timeout = 60 if package_name == "sentence-transformers" else 10
             result = subprocess.run(
                 [python_cmd, "-c", f"import {import_name}"], 
                 capture_output=True, 
                 text=True, 
                 check=True,
-                timeout=10  # 10 second timeout per package
+                timeout=timeout
             )
             print(f"✅ {package_name} is installed")
         except subprocess.TimeoutExpired:
-            print(f"⚠️  {package_name} import timed out (may still be installed)")
+            # For sentence-transformers, timeout is expected on first import (downloading models)
+            if package_name == "sentence-transformers":
+                print(f"⚠️  {package_name} import timed out (downloading models - this is normal on first run)")
+            else:
+                print(f"⚠️  {package_name} import timed out (may still be installed)")
         except subprocess.CalledProcessError:
             print(f"❌ {package_name} is missing")
             missing_packages.append(package_name)
