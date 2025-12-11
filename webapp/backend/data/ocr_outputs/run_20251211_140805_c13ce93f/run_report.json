@@ -1,0 +1,23 @@
+{
+  "run_id": "run_20251211_140805_c13ce93f",
+  "total_pages": 1,
+  "total_words": 202,
+  "total_tables": 0,
+  "total_equations": 5,
+  "flagged_pages": 0,
+  "average_page_confidence_mean": 0.9589515038899012,
+  "average_page_confidence_min": 0.5413974523544312,
+  "processing_time_seconds": 20.22782802581787,
+  "confidence_histogram": {
+    "0.9-1.0": 34,
+    "0.8-0.9": 0,
+    "0.0-0.8": 1
+  },
+  "timing_breakdown": {
+    "initialization": 2.591545581817627,
+    "ocr_processing": 14.126887321472168
+  },
+  "input_path": "C:\\Users\\aatha\\OneDrive\\Desktop\\Senior Design\\team35-seniordesign\\webapp\\uploads\\frames\\session_26\\screen\\frame_1765479869743.jpg",
+  "output_path": "C:\\Users\\aatha\\OneDrive\\Desktop\\Senior Design\\team35-seniordesign\\webapp\\backend\\data\\ocr_outputs\\run_20251211_140805_c13ce93f",
+  "language": "en"
+}
