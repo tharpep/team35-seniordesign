@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-import { router } from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Typography, Card } from '../components/ui';
 import { tokens } from '../styles/theme';
-import mockMCQ from '../assets/data/mockMCQ.json';
+import { materialsService, Material, MultipleChoiceContent } from '../services/materials.service';
 
 interface MCQState {
   currentIndex: number;
@@ -11,14 +11,87 @@ interface MCQState {
   showExplanation: boolean;
 }
 
+interface MCQData {
+  question: string;
+  options: string[];
+  correct: number;
+  explanation?: string;
+}
+
 export default function MCQStudy() {
+  const params = useLocalSearchParams();
+  const sessionId = params.sessionId as string;
+  
   const [state, setState] = useState<MCQState>({
     currentIndex: 0,
     selectedAnswer: null,
     showExplanation: false,
   });
+  const [questions, setQuestions] = useState<MCQData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const questions = mockMCQ.questions;
+  // Fetch MCQ questions from API
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      if (!sessionId) {
+        Alert.alert('Error', 'No session ID provided');
+        router.back();
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const response = await materialsService.getMaterialsBySession(Number(sessionId));
+        if (response.data?.materials) {
+          const mcqMaterials = response.data.materials
+            .filter(m => m.type === 'multiple_choice')
+            .map(material => {
+              const content = materialsService.parseContent<MultipleChoiceContent>(material);
+              if (typeof content !== 'string') {
+                return {
+                  question: content.question || 'No question available',
+                  options: content.options || [],
+                  correct: content.correct ?? 0,
+                  explanation: (content as any).explanation
+                };
+              }
+              return null;
+            })
+            .filter((q): q is MCQData => q !== null);
+
+          if (mcqMaterials.length === 0) {
+            Alert.alert('No Questions', 'No multiple choice questions found for this session.');
+            router.back();
+            return;
+          }
+
+          setQuestions(mcqMaterials);
+        }
+      } catch (error: any) {
+        console.error('Error fetching MCQ questions:', error);
+        Alert.alert('Error', 'Failed to load questions');
+        router.back();
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchQuestions();
+  }, [sessionId]);
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={tokens.colors.primary} />
+          <Typography variant="bodyMedium" style={{ marginTop: tokens.spacing.md }}>
+            Loading questions...
+          </Typography>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   const currentQuestion = questions[state.currentIndex];
   const totalQuestions = questions.length;
 
@@ -52,7 +125,7 @@ export default function MCQStudy() {
     }
   };
 
-  const isCorrect = state.selectedAnswer === currentQuestion?.answer_index;
+  const isCorrect = state.selectedAnswer === currentQuestion?.correct;
 
   if (!currentQuestion) {
     return (
@@ -85,7 +158,7 @@ export default function MCQStudy() {
             Question
           </Typography>
           <Typography variant="bodyLarge" style={styles.questionText}>
-            {currentQuestion.stem}
+            {currentQuestion.question}
           </Typography>
         </Card>
 
@@ -97,8 +170,8 @@ export default function MCQStudy() {
               style={[
                 styles.optionCard,
                 state.selectedAnswer === index && styles.selectedOption,
-                state.showExplanation && index === currentQuestion.answer_index && styles.correctOption,
-                state.showExplanation && state.selectedAnswer === index && index !== currentQuestion.answer_index && styles.incorrectOption
+                state.showExplanation && index === currentQuestion.correct && styles.correctOption,
+                state.showExplanation && state.selectedAnswer === index && index !== currentQuestion.correct && styles.incorrectOption
               ]}
               onPress={() => !state.showExplanation && handleAnswerSelect(index)}
               disabled={state.showExplanation}
@@ -108,14 +181,14 @@ export default function MCQStudy() {
                 <View style={[
                   styles.radioButton,
                   state.selectedAnswer === index && styles.radioButtonSelected,
-                  state.showExplanation && index === currentQuestion.answer_index && styles.radioButtonCorrect,
-                  state.showExplanation && state.selectedAnswer === index && index !== currentQuestion.answer_index && styles.radioButtonIncorrect
+                  state.showExplanation && index === currentQuestion.correct && styles.radioButtonCorrect,
+                  state.showExplanation && state.selectedAnswer === index && index !== currentQuestion.correct && styles.radioButtonIncorrect
                 ]}>
                   {state.selectedAnswer === index && (
                     <View style={[
                       styles.radioButtonInner,
-                      state.showExplanation && index === currentQuestion.answer_index && styles.radioButtonInnerCorrect,
-                      state.showExplanation && state.selectedAnswer === index && index !== currentQuestion.answer_index && styles.radioButtonInnerIncorrect
+                      state.showExplanation && index === currentQuestion.correct && styles.radioButtonInnerCorrect,
+                      state.showExplanation && state.selectedAnswer === index && index !== currentQuestion.correct && styles.radioButtonInnerIncorrect
                     ]} />
                   )}
                 </View>
@@ -123,8 +196,8 @@ export default function MCQStudy() {
                   variant="bodyMedium" 
                   style={{
                     ...styles.optionText,
-                    ...(state.showExplanation && index === currentQuestion.answer_index && styles.optionTextCorrect),
-                    ...(state.showExplanation && state.selectedAnswer === index && index !== currentQuestion.answer_index && styles.optionTextIncorrect)
+                    ...(state.showExplanation && index === currentQuestion.correct && styles.optionTextCorrect),
+                    ...(state.showExplanation && state.selectedAnswer === index && index !== currentQuestion.correct && styles.optionTextIncorrect)
                   }}
                 >
                   {option}
@@ -157,7 +230,7 @@ export default function MCQStudy() {
                 Explanation
               </Typography>
               <Typography variant="bodyMedium" style={styles.explanationText}>
-                {currentQuestion.rationale}
+                {currentQuestion.explanation || 'No explanation available'}
               </Typography>
             </View>
           </Card>
@@ -200,6 +273,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',

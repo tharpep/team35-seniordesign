@@ -327,9 +327,11 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
                         try {
                             const blob = await captureFrameFromStream(cameraStream.stream);
                             if (blob) {
+                                captureCountRef.current += 1;
                                 console.log(`⏳ Uploading ${cameraStream.type} frame (${(blob.size / 1024).toFixed(1)} KB)...`);
                                 await api.uploadFrame(currentSessionId.toString(), blob, cameraStream.type);
                                 console.log(`✓ Captured and uploaded from: ${cameraStream.type}`);
+                                setCaptureCount(captureCountRef.current);
                                 return true;
                             }
                             return false;

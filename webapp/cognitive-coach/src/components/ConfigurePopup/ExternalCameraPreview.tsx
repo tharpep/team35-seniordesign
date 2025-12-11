@@ -37,7 +37,12 @@ export default function ExternalCameraPreview({
     // Update video element when stream changes
     useEffect(() => {
         if (cameraVideoRef.current && cameraStream) {
+            console.log('Setting srcObject for external camera video element');
             cameraVideoRef.current.srcObject = cameraStream;
+            // Ensure video plays
+            cameraVideoRef.current.play().catch(err => {
+                console.error('Error playing video:', err);
+            });
         }
         if (onStreamChange) {
             onStreamChange(cameraStream);
@@ -61,11 +66,18 @@ export default function ExternalCameraPreview({
 
         setCameraState('requesting');
         try {
+            console.log('Requesting external camera stream with deviceId:', deviceId);
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { deviceId: { exact: deviceId } },
+                video: { 
+                    deviceId: { exact: deviceId },
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 },
+                    frameRate: { ideal: 30 }
+                },
                 audio: false
             });
             
+            console.log('External camera stream obtained:', stream.getVideoTracks()[0].getSettings());
             setCameraStream(stream);
             setCameraState('active');
 
@@ -76,6 +88,7 @@ export default function ExternalCameraPreview({
             });
         } catch (error) {
             console.error('Error accessing external camera:', error);
+            console.error('Device ID attempted:', deviceId);
             setCameraState('error');
             setTimeout(() => setCameraState('idle'), 3000);
         }
@@ -171,6 +184,7 @@ export default function ExternalCameraPreview({
                     <video
                         ref={cameraVideoRef}
                         autoPlay
+                        playsInline
                         muted
                         className="webcam-video"
                     />

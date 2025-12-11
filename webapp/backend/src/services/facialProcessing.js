@@ -300,6 +300,29 @@ async function checkDistraction(sessionId, latestMetrics) {
 }
 
 /**
+ * Get distraction events for a session
+ * @param {number} sessionId - Session ID
+ * @returns {Promise<Array>} Distraction events
+ */
+async function getDistractionEvents(sessionId) {
+  return await getAll(
+    `SELECT
+       id,
+       session_id,
+       timestamp,
+       distraction_type,
+       focus_score,
+       gaze_deviation,
+       duration_seconds,
+       data
+     FROM session_distraction_events
+     WHERE session_id = ?
+     ORDER BY timestamp ASC`,
+    [sessionId]
+  );
+}
+
+/**
  * Check if the facial processing API is available
  * @returns {Promise<boolean>} True if API is available
  */
@@ -323,6 +346,7 @@ module.exports = {
   getRecentMetrics,
   getSessionMetrics,
   getFocusTimeSeries,
+  getDistractionEvents,
   checkFatigue,
   checkDistraction,
   checkApiHealth,

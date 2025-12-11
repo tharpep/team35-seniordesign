@@ -1,70 +1,92 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
-import { router } from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Typography, Card } from '../components/ui';
 import { tokens } from '../styles/theme';
+import { materialsService, Material, EquationContent } from '../services/materials.service';
 
 interface Equation {
-  id: string;
   title: string;
-  preview: string;
-  content: string;
+  formula: string;
   description: string;
+  variables?: Record<string, string>;
 }
 
 interface EquationState {
   currentIndex: number;
 }
 
-const equations: Equation[] = [
-  {
-    id: 'eq1',
-    title: 'Henderson-Hasselbalch Equation',
-    preview: 'pH = pKa + log([A⁻]/[HA])',
-    content: 'pH = pKa + log([A⁻]/[HA])',
-    description: 'Used to calculate the pH of buffer solutions'
-  },
-  {
-    id: 'eq2', 
-    title: 'Arrhenius Equation',
-    preview: 'k = Ae^(-Ea/RT)',
-    content: 'k = Ae^(-Ea/RT)',
-    description: 'Describes the temperature dependence of reaction rates'
-  },
-  {
-    id: 'eq3',
-    title: 'Beer-Lambert Law',
-    preview: 'A = εbc',
-    content: 'A = εbc',
-    description: 'Relates the absorption of light to the properties of the material'
-  },
-  {
-    id: 'eq4',
-    title: 'Markovnikov Addition',
-    preview: 'R₂C=CH₂ + HX → R₂CH-CH₂X',
-    content: 'R₂C=CH₂ + HX → R₂CH-CH₂X',
-    description: 'In the addition of HX to alkenes, the hydrogen adds to the carbon with more hydrogens'
-  },
-  {
-    id: 'eq5',
-    title: 'E2 Elimination',
-    preview: 'R₃C-CHR-X + Base → R₂C=CR + HX + Base-H⁺',
-    content: 'R₃C-CHR-X + Base → R₂C=CR + HX + Base-H⁺',
-    description: 'Bimolecular elimination reaction mechanism for forming alkenes'
-  },
-  {
-    id: 'eq6',
-    title: 'Ozonolysis',
-    preview: 'R₂C=CR₂ + O₃ → R₂C=O + O=CR₂',
-    content: 'R₂C=CR₂ + O₃ → R₂C=O + O=CR₂',
-    description: 'Oxidative cleavage of alkenes using ozone to form carbonyl compounds'
-  }
-];
-
 export default function EquationStudy() {
+  const params = useLocalSearchParams();
+  const sessionId = params.sessionId as string;
+  
   const [state, setState] = useState<EquationState>({
     currentIndex: 0,
   });
+  const [equations, setEquations] = useState<Equation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch equations from API
+  useEffect(() => {
+    const fetchEquations = async () => {
+      if (!sessionId) {
+        Alert.alert('Error', 'No session ID provided');
+        router.back();
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const response = await materialsService.getMaterialsBySession(Number(sessionId));
+        if (response.data?.materials) {
+          const equationMaterials = response.data.materials
+            .filter(m => m.type === 'equation')
+            .map(material => {
+              const content = materialsService.parseContent<EquationContent>(material);
+              if (typeof content !== 'string') {
+                return {
+                  title: material.title || 'Equation',
+                  formula: content.formula || 'No formula available',
+                  description: content.description || 'No description available',
+                  variables: content.variables
+                };
+              }
+              return null;
+            })
+            .filter((eq): eq is Equation => eq !== null);
+
+          if (equationMaterials.length === 0) {
+            Alert.alert('No Equations', 'No equations found for this session.');
+            router.back();
+            return;
+          }
+
+          setEquations(equationMaterials);
+        }
+      } catch (error: any) {
+        console.error('Error fetching equations:', error);
+        Alert.alert('Error', 'Failed to load equations');
+        router.back();
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEquations();
+  }, [sessionId]);
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={tokens.colors.primary} />
+          <Typography variant="bodyMedium" style={{ marginTop: tokens.spacing.md }}>
+            Loading equations...
+          </Typography>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const totalEquations = equations.length;
   const currentEquation = equations[state.currentIndex];
@@ -122,7 +144,7 @@ export default function EquationStudy() {
           
           <Card style={styles.equationCard}>
             <Text style={styles.equationContent}>
-              {currentEquation.content}
+              {currentEquation.formula}
             </Text>
           </Card>
 
@@ -131,6 +153,25 @@ export default function EquationStudy() {
               {currentEquation.description}
             </Typography>
           </View>
+
+          {/* Variables Section (if available) */}
+          {currentEquation.variables && Object.keys(currentEquation.variables).length > 0 && (
+            <Card style={styles.variablesCard}>
+              <Typography variant="titleMedium" style={styles.variablesTitle}>
+                Variables
+              </Typography>
+              {Object.entries(currentEquation.variables).map(([key, value]) => (
+                <View key={key} style={styles.variableRow}>
+                  <Typography variant="bodyMedium" style={styles.variableKey}>
+                    {key}:
+                  </Typography>
+                  <Typography variant="bodyMedium" style={styles.variableValue}>
+                    {value}
+                  </Typography>
+                </View>
+              ))}
+            </Card>
+          )}
         </View>
       </ScrollView>
 
@@ -169,6 +210,12 @@ export default function EquationStudy() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: tokens.colors.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: tokens.colors.background,
   },
   header: {

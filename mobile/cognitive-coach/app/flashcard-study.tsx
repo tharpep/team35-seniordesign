@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ActivityIndicator, Alert } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Typography, Card, Button } from '../components/ui';
 import { tokens } from '../styles/theme';
-import mockFlashcards from '../assets/data/mockFlashcards.json';
+import { materialsService, Material, FlashcardContent } from '../services/materials.service';
 
 interface FlashcardState {
   currentIndex: number;
@@ -11,15 +11,85 @@ interface FlashcardState {
   showHint: boolean;
 }
 
+interface FlashcardData {
+  question: string;
+  answer: string;
+  hint?: string;
+}
+
 export default function FlashcardStudy() {
   const params = useLocalSearchParams();
+  const sessionId = params.sessionId as string;
+  
   const [state, setState] = useState<FlashcardState>({
     currentIndex: 0,
     showBack: false,
     showHint: false,
   });
+  const [cards, setCards] = useState<FlashcardData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const cards = mockFlashcards.cards;
+  // Fetch flashcards from API
+  useEffect(() => {
+    const fetchFlashcards = async () => {
+      if (!sessionId) {
+        Alert.alert('Error', 'No session ID provided');
+        router.back();
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const response = await materialsService.getMaterialsBySession(Number(sessionId));
+        if (response.data?.materials) {
+          const flashcardMaterials = response.data.materials
+            .filter(m => m.type === 'flashcard')
+            .map(material => {
+              const content = materialsService.parseContent<FlashcardContent>(material);
+              if (typeof content !== 'string') {
+                return {
+                  question: content.question || 'No question available',
+                  answer: content.answer || 'No answer available',
+                  hint: (content as any).hint
+                };
+              }
+              return null;
+            })
+            .filter((card): card is FlashcardData => card !== null);
+
+          if (flashcardMaterials.length === 0) {
+            Alert.alert('No Flashcards', 'No flashcards found for this session.');
+            router.back();
+            return;
+          }
+
+          setCards(flashcardMaterials);
+        }
+      } catch (error: any) {
+        console.error('Error fetching flashcards:', error);
+        Alert.alert('Error', 'Failed to load flashcards');
+        router.back();
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchFlashcards();
+  }, [sessionId]);
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={tokens.colors.primary} />
+          <Typography variant="bodyMedium" style={{ marginTop: tokens.spacing.md }}>
+            Loading flashcards...
+          </Typography>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   const currentCard = cards[state.currentIndex];
   const totalCards = cards.length;
 
@@ -100,11 +170,11 @@ export default function FlashcardStudy() {
               // Front Side
               <View style={styles.cardSide}>
                 <Typography variant="bodyLarge" style={styles.cardText}>
-                  {currentCard.front}
+                  {currentCard.question}
                 </Typography>
                 
                 {/* Hint Section */}
-                {currentCard.hints && currentCard.hints.length > 0 && !state.showBack && (
+                {currentCard.hint && !state.showBack && (
                   <TouchableOpacity
                     style={[styles.hintButton, state.showHint && styles.hintButtonExpanded]}
                     onPress={(e) => {
@@ -120,11 +190,9 @@ export default function FlashcardStudy() {
                     </View>
                     {state.showHint && (
                       <View style={styles.hintContent}>
-                        {currentCard.hints.map((hint: string, index: number) => (
-                          <Typography key={index} variant="bodySmall" style={styles.hintContentText}>
-                            {hint}
-                          </Typography>
-                        ))}
+                        <Typography variant="bodySmall" style={styles.hintContentText}>
+                          {currentCard.hint}
+                        </Typography>
                       </View>
                     )}
                   </TouchableOpacity>
@@ -141,7 +209,7 @@ export default function FlashcardStudy() {
               // Back Side
               <View style={styles.cardSide}>
                 <Typography variant="bodyLarge" style={styles.cardText}>
-                  {currentCard.back}
+                  {currentCard.answer}
                 </Typography>
                 <View style={styles.cardPrompt}>
                   <Text style={styles.promptIcon}>👆</Text>
@@ -191,6 +259,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',

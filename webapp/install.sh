@@ -9,7 +9,7 @@ echo ""
 
 set -e  # Exit on error
 
-TOTAL_STEPS=6
+TOTAL_STEPS=7
 CURRENT_STEP=0
 
 # Colors
@@ -200,6 +200,18 @@ cd "$SCRIPT_DIR/database"
 npm install
 echo -e "${GREEN}✅ Database dependencies installed successfully${NC}"
 
+# Install mobile dependencies
+show_progress "Installing Mobile Dependencies"
+MOBILE_DIR="$SCRIPT_DIR/../mobile/cognitive-coach"
+if [ -d "$MOBILE_DIR" ]; then
+    cd "$MOBILE_DIR"
+    npm install
+    echo -e "${GREEN}✅ Mobile dependencies installed successfully${NC}"
+    cd "$SCRIPT_DIR"
+else
+    echo -e "${YELLOW}⚠️  Mobile directory not found at: $MOBILE_DIR${NC}"
+fi
+
 # Return to original directory
 cd "$SCRIPT_DIR"
 
@@ -235,7 +247,7 @@ if [ -d "$GENAI_DIR" ]; then
             rm -rf venv
         fi
         # Create venv with correct Python version
-        $PYTHON_CMD -m venv venv
+        $PYTHON_CMD -m venv venv --upgrade-deps
         if [ $? -ne 0 ]; then
             echo -e "${RED}❌ Failed to create Gen-AI virtual environment${NC}"
             cd "$SCRIPT_DIR"
@@ -312,7 +324,7 @@ if [ -d "$FACIAL_DIR" ]; then
             if [ -d ".venv" ]; then
                 rm -rf .venv
             fi
-            $PYTHON_CMD -m venv .venv
+            $PYTHON_CMD -m venv .venv --upgrade-deps
             if [ $? -ne 0 ]; then
                 echo -e "${RED}❌ Failed to create Facial Processing virtual environment${NC}"
                 cd "$SCRIPT_DIR"
@@ -324,11 +336,10 @@ if [ -d "$FACIAL_DIR" ]; then
         VENV_PYTHON=$(get_venv_python ".venv")
         if [ -n "$VENV_ACTIVATE" ] && [ -f "$VENV_ACTIVATE" ]; then
             source "$VENV_ACTIVATE"
-            if [ "$venv_needs_recreation" = true ]; then
-                # Only upgrade pip if we just created the venv
-                echo "Upgrading pip in virtual environment..."
-                "$VENV_PYTHON" -m pip install --upgrade pip --quiet
-            fi
+            # Always ensure pip is available and up to date
+            echo "Ensuring pip is available in virtual environment..."
+            "$VENV_PYTHON" -m ensurepip --default-pip 2>/dev/null || true
+            "$VENV_PYTHON" -m pip install --upgrade pip --quiet
             "$VENV_PYTHON" -m pip install -e .
             if [ $? -eq 0 ]; then
                 echo -e "${GREEN}✅ Facial Processing dependencies installed successfully${NC}"
@@ -355,9 +366,32 @@ if [ -d "$IMG2STUDY_DIR" ]; then
     if [ -f "$REQUIREMENTS_FILE" ]; then
         cd "$IMG2STUDY_DIR"
         echo "Installing OCR dependencies (opencv-python, paddleocr, etc.)..."
-        echo "Using Python $PYTHON_VER for installation..."
+        
+        # Check if root .venv exists and use it, otherwise use system Python
+        ROOT_VENV_PYTHON="$SCRIPT_DIR/../.venv/bin/python"
+        if [ -f "$ROOT_VENV_PYTHON" ]; then
+            echo "Using root virtual environment Python for installation..."
+            IMG2STUDY_PYTHON="$ROOT_VENV_PYTHON"
+        else
+            echo "Using system Python $PYTHON_VER for installation..."
+            # Get absolute path to system Python to avoid venv interference
+            IMG2STUDY_PYTHON=$(command -v "$PYTHON_CMD" | head -1)
+            # Fallback to explicit system paths if needed
+            if [[ "$IMG2STUDY_PYTHON" == *".venv"* ]] || [[ "$IMG2STUDY_PYTHON" == *"venv"* ]]; then
+                for syspath in "/usr/local/bin/python$PYTHON_VER" "/Library/Frameworks/Python.framework/Versions/$PYTHON_VER/bin/python$PYTHON_VER" "/usr/bin/python3"; do
+                    if [ -f "$syspath" ]; then
+                        IMG2STUDY_PYTHON="$syspath"
+                        break
+                    fi
+                done
+            fi
+        fi
         echo "Note: PaddlePaddle may take several minutes to download..."
-        $PYTHON_CMD -m pip install -r requirements-working.txt
+        echo "Installing with: $IMG2STUDY_PYTHON"
+        # Use absolute path and unset any interfering environment variables
+        unset PYTHONPATH VIRTUAL_ENV PATH
+        export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+        "$IMG2STUDY_PYTHON" -m pip install --user -r requirements-working.txt
         if [ $? -eq 0 ]; then
             echo -e "${GREEN}✅ Img2study dependencies installed successfully${NC}"
             echo -e "${GREEN}   This fixes the OCR 'ModuleNotFoundError: No module named cv2' error${NC}"
@@ -388,7 +422,7 @@ echo -e "${CYAN}✅ Installation Complete!${NC}"
 echo -e "${CYAN}=================================${NC}"
 echo ""
 echo -e "${YELLOW}Installed components:${NC}"
-echo -e "${GREEN}  ✓ Node.js dependencies (backend, frontend, database)${NC}"
+echo -e "${GREEN}  ✓ Node.js dependencies (backend, frontend, database, mobile)${NC}"
 echo -e "${GREEN}  ✓ Gen-AI Python dependencies${NC}"
 echo -e "${GREEN}  ✓ Facial Processing Python dependencies${NC}"
 echo -e "${GREEN}  ✓ Img2study OCR dependencies (fixes OCR errors)${NC}"
