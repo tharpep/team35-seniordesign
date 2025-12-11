@@ -6,6 +6,9 @@ Handles Qdrant database operations for vector storage
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 from typing import List, Dict, Any, Tuple
+from logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 class VectorStore:
@@ -53,9 +56,17 @@ class VectorStore:
                         distance=Distance.COSINE
                     ),
                 )
+                # Log new SQL database (collection) created for ingestion
+                if self.use_persistent:
+                    # For persistent storage, Qdrant creates SQLite files in ./src/data/qdrant_db/collection/{collection_name}/
+                    db_path = f"./src/data/qdrant_db/collection/{collection_name}/storage.sqlite"
+                else:
+                    db_path = "in-memory (no persistent storage)"
+                logger.info(f"[GEN-AI] New SQL database created for ingestion: collection '{collection_name}'")
+                logger.info(f"[GEN-AI] Database location: {db_path}, embedding_dim: {embedding_dim}")
                 return True
             except Exception as e:
-                print(f"Error creating collection: {e}")
+                logger.error(f"Error creating collection: {e}")
                 return False
     
     def add_points(self, collection_name: str, points: List[PointStruct]) -> int:

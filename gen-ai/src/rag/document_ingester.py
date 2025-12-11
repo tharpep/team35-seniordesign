@@ -8,6 +8,9 @@ import glob
 from pathlib import Path
 from typing import List, Dict, Any, Union
 from .rag_setup import BasicRAG
+from logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 class DocumentIngester:
@@ -54,6 +57,10 @@ class DocumentIngester:
             
             # Index chunks
             count = self.rag.add_documents(chunks)
+            
+            # Log new file added to documents
+            logger.info(f"[GEN-AI] New file added to documents: {file_path}")
+            logger.info(f"[GEN-AI] File details: {len(chunks)} chunks indexed, {count} documents added to collection '{self.rag.collection_name}'")
             
             return {
                 "success": True,
