@@ -24,17 +24,26 @@ def _ingest_session_file_task(session_id: str, file_path: str):
     
     Args:
         session_id: Session ID
-        file_path: Relative path to file from gen-ai directory
+        file_path: Path to file - can be absolute or relative to gen-ai directory
     """
     try:
         logger.info(f"[Ingestion Task] Starting ingestion for session {session_id}, file: {file_path}")
         
-        # Resolve absolute path
-        gen_ai_root = Path(__file__).parent.parent.parent.parent
-        absolute_file_path = gen_ai_root / file_path
+        # Resolve absolute path - handle both absolute and relative paths
+        file_path_obj = Path(file_path)
+        if file_path_obj.is_absolute():
+            # Path is already absolute (e.g., from webapp/backend/data/ocr_outputs/)
+            absolute_file_path = file_path_obj
+            logger.info(f"[Ingestion Task] Using absolute path: {absolute_file_path}")
+        else:
+            # Path is relative to gen-ai directory
+            gen_ai_root = Path(__file__).parent.parent.parent.parent
+            absolute_file_path = gen_ai_root / file_path
+            logger.info(f"[Ingestion Task] Resolved relative path - gen_ai_root: {gen_ai_root}, absolute_file_path: {absolute_file_path}")
         
         if not absolute_file_path.exists():
             logger.error(f"[Ingestion Task] File not found: {absolute_file_path}")
+            logger.error(f"[Ingestion Task] file_path provided: {file_path}")
             return
         
         # Determine collection name
@@ -79,17 +88,27 @@ async def ingest_session_file(
     """
     logger.info(f"Queueing ingestion: session_id={request.session_id}, file_path={request.file_path}")
     
-    # Validate file path
-    gen_ai_root = Path(__file__).parent.parent.parent.parent
-    absolute_file_path = gen_ai_root / request.file_path
+    # Validate file path - handle both absolute and relative paths
+    file_path_obj = Path(request.file_path)
+    if file_path_obj.is_absolute():
+        # Path is already absolute (e.g., from webapp/backend/data/ocr_outputs/)
+        absolute_file_path = file_path_obj
+        logger.info(f"[Ingest API] Using absolute path: {absolute_file_path}")
+    else:
+        # Path is relative to gen-ai directory
+        gen_ai_root = Path(__file__).parent.parent.parent.parent
+        absolute_file_path = gen_ai_root / request.file_path
+        logger.info(f"[Ingest API] Resolved relative path - gen_ai_root: {gen_ai_root.absolute()}, absolute_file_path: {absolute_file_path.absolute()}")
     
     if not absolute_file_path.exists():
+        logger.error(f"[Ingest API] File not found - file_path: {request.file_path}, absolute_path: {absolute_file_path}")
         raise HTTPException(
             status_code=404,
             detail={
                 "error": "File not found",
                 "file_path": request.file_path,
-                "absolute_path": str(absolute_file_path)
+                "absolute_path": str(absolute_file_path.absolute()),
+                "is_absolute": file_path_obj.is_absolute()
             }
         )
     

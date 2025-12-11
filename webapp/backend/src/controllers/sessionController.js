@@ -561,14 +561,31 @@ const appendContext = async (req, res) => {
       });
     }
 
-    // Verify session belongs to user
-    const session = await getOne(
-      'SELECT * FROM sessions WHERE id = ? AND user_id = ?',
-      [sessionId, userId]
-    );
+    // Verify session exists (bypass user check for internal OCR calls if localhost)
+    let session;
+    const isLocalhost = req.ip === '127.0.0.1' || req.ip === '::1' || req.ip === '::ffff:127.0.0.1';
+    
+    if (userId) {
+      session = await getOne(
+        'SELECT * FROM sessions WHERE id = ? AND user_id = ?',
+        [sessionId, userId]
+      );
+    } else if (isLocalhost) {
+      // Internal call from OCR script
+      console.log(`[appendContext] Internal call from localhost for session ${sessionId}`);
+      session = await getOne(
+        'SELECT * FROM sessions WHERE id = ?',
+        [sessionId]
+      );
+    } else {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Authentication required'
+      });
+    }
 
     if (!session) {
-      console.error(`[appendContext] Session ${sessionId} not found for user ${userId}`);
+      console.error(`[appendContext] Session ${sessionId} not found`);
       return res.status(404).json({
         error: 'Not found',
         message: 'Session not found'
@@ -594,51 +611,91 @@ const appendContext = async (req, res) => {
       await fs.writeFile(filePath, markdown, 'utf8');
       console.log(`[appendContext] Wrote markdown file: ${filePath}`);
 
-      // Trigger Gen-AI ingestion (fire-and-forget, don't await)
+      // Helper function to queue ingestion requests (fire-and-forget)
+      const queueIngestion = (genAiUrl, payload, sessionId, description) => {
+        const reqOptions = {
+          hostname: genAiUrl.replace(/^https?:\/\//, '').split(':')[0] || '127.0.0.1',
+          port: genAiUrl.includes(':8000') ? 8000 : (genAiUrl.match(/:(\d+)/)?.[1] || 8000),
+          path: '/api/ingest/session_file',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(payload)
+          }
+        };
+
+        const ingestReq = http.request(reqOptions, (ingestRes) => {
+          let data = '';
+          ingestRes.on('data', (chunk) => { data += chunk; });
+          ingestRes.on('end', () => {
+            if (ingestRes.statusCode === 200) {
+              console.log(`[appendContext] Ingestion queued successfully for ${description} (session ${sessionId})`);
+            } else {
+              console.warn(`[appendContext] Ingestion request returned ${ingestRes.statusCode} for ${description}: ${data}`);
+            }
+          });
+        });
+
+        ingestReq.on('error', (err) => {
+          console.error(`[appendContext] Failed to trigger ingestion for ${description}: ${err.message}`);
+          // Don't fail the request - ingestion can happen later
+        });
+
+        ingestReq.write(payload);
+        ingestReq.end();
+      };
+
+      // Trigger Gen-AI ingestion for the file written to gen-ai location (fire-and-forget, don't await)
       const genAiUrl = process.env.GEN_AI_URL || 'http://127.0.0.1:8000';
 
-      // Use relative path from gen-ai directory
-      const relativePath = path.relative(
-        path.join(__dirname, '../../../gen-ai'),
-        filePath
-      ).replace(/\\/g, '/'); // Normalize path separators
+      // Use relative path from gen-ai directory for files in gen-ai location
+      const genAiDir = path.resolve(__dirname, '../../../gen-ai');
+      const absoluteFilePath = path.resolve(filePath);
+      const relativePath = path.relative(genAiDir, absoluteFilePath).replace(/\\/g, '/'); // Normalize path separators
+      
+      console.log(`[appendContext] Path calculation - genAiDir: ${genAiDir}, filePath: ${absoluteFilePath}, relativePath: ${relativePath}`);
 
       const ingestPayload = JSON.stringify({
         session_id: sessionId.toString(),
         file_path: relativePath
       });
 
-      // Fire-and-forget HTTP request
-      const reqOptions = {
-        hostname: genAiUrl.replace(/^https?:\/\//, '').split(':')[0] || '127.0.0.1',
-        port: genAiUrl.includes(':8000') ? 8000 : (genAiUrl.match(/:(\d+)/)?.[1] || 8000),
-        path: '/api/ingest/session_file',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(ingestPayload)
-        }
-      };
+      // Queue ingestion for gen-ai location file
+      queueIngestion(genAiUrl, ingestPayload, sessionId, 'gen-ai location');
 
-      const ingestReq = http.request(reqOptions, (ingestRes) => {
-        let data = '';
-        ingestRes.on('data', (chunk) => { data += chunk; });
-        ingestRes.on('end', () => {
-          if (ingestRes.statusCode === 200) {
-            console.log(`[appendContext] Ingestion queued successfully for session ${sessionId}`);
-          } else {
-            console.warn(`[appendContext] Ingestion request returned ${ingestRes.statusCode}: ${data}`);
+      // Helper function to queue ingestion requests
+      function queueIngestion(genAiUrl, payload, sessionId, description) {
+        const reqOptions = {
+          hostname: genAiUrl.replace(/^https?:\/\//, '').split(':')[0] || '127.0.0.1',
+          port: genAiUrl.includes(':8000') ? 8000 : (genAiUrl.match(/:(\d+)/)?.[1] || 8000),
+          path: '/api/ingest/session_file',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(payload)
           }
+        };
+
+        const ingestReq = http.request(reqOptions, (ingestRes) => {
+          let data = '';
+          ingestRes.on('data', (chunk) => { data += chunk; });
+          ingestRes.on('end', () => {
+            if (ingestRes.statusCode === 200) {
+              console.log(`[appendContext] Ingestion queued successfully for ${description} (session ${sessionId})`);
+            } else {
+              console.warn(`[appendContext] Ingestion request returned ${ingestRes.statusCode} for ${description}: ${data}`);
+            }
+          });
         });
-      });
 
-      ingestReq.on('error', (err) => {
-        console.error(`[appendContext] Failed to trigger ingestion: ${err.message}`);
-        // Don't fail the request - ingestion can happen later
-      });
+        ingestReq.on('error', (err) => {
+          console.error(`[appendContext] Failed to trigger ingestion for ${description}: ${err.message}`);
+          // Don't fail the request - ingestion can happen later
+        });
 
-      ingestReq.write(ingestPayload);
-      ingestReq.end();
+        ingestReq.write(payload);
+        ingestReq.end();
+      }
 
     } catch (fileError) {
       console.error(`[appendContext] Error writing file or triggering ingestion: ${fileError.message}`);

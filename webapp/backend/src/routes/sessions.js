@@ -67,6 +67,9 @@ const upload = multer({
   }
 });
 
+// POST /api/sessions/:id/context - Append markdown context to session (Public for internal OCR)
+router.post('/:id/context', appendContext);
+
 // All routes require authentication
 router.use(requireAuth);
 
@@ -95,7 +98,7 @@ router.post('/:id/frames', upload.single('frame'), uploadFrame);
 router.get('/:id/metrics', getSessionMetrics);
 
 // POST /api/sessions/:id/context - Append markdown context to session
-router.post('/:id/context', appendContext);
+// router.post('/:id/context', appendContext); - Moved to public routes above
 
 // GET /api/sessions/:sessionId/materials - Get all materials for a session
 router.get('/:sessionId/materials', getMaterialsBySession);
