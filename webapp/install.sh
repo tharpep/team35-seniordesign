@@ -359,56 +359,69 @@ else
 fi
 
 # Install Img2study Python dependencies (fixes OCR error)
-show_progress "Installing Img2study Python Dependencies"
+show_progress "Installing Img2study Python Dependencies (OCR)"
 IMG2STUDY_DIR="$SCRIPT_DIR/../img2study"
 if [ -d "$IMG2STUDY_DIR" ]; then
-    REQUIREMENTS_FILE="$IMG2STUDY_DIR/requirements-working.txt"
-    if [ -f "$REQUIREMENTS_FILE" ]; then
-        cd "$IMG2STUDY_DIR"
-        echo "Installing OCR dependencies (opencv-python, paddleocr, etc.)..."
+    cd "$IMG2STUDY_DIR"
+    echo "Setting up img2study OCR environment..."
+    echo "Note: PaddlePaddle requires conda for stable Apple Silicon support"
+    
+    # Check if conda is available
+    if command -v conda &> /dev/null; then
+        echo -e "${GREEN}✅ Conda detected, using conda environment${NC}"
         
-        # Check if root .venv exists and use it, otherwise use system Python
-        ROOT_VENV_PYTHON="$SCRIPT_DIR/../.venv/bin/python"
-        if [ -f "$ROOT_VENV_PYTHON" ]; then
-            echo "Using root virtual environment Python for installation..."
-            IMG2STUDY_PYTHON="$ROOT_VENV_PYTHON"
+        # Check if environment already exists
+        if conda env list | grep -q "paddle-ocr-py311"; then
+            echo "Conda environment 'paddle-ocr-py311' already exists"
+            echo "Updating packages..."
+            conda activate paddle-ocr-py311 2>/dev/null || source $(conda info --base)/etc/profile.d/conda.sh && conda activate paddle-ocr-py311
         else
-            echo "Using system Python $PYTHON_VER for installation..."
-            # Get absolute path to system Python to avoid venv interference
-            IMG2STUDY_PYTHON=$(command -v "$PYTHON_CMD" | head -1)
-            # Fallback to explicit system paths if needed
-            if [[ "$IMG2STUDY_PYTHON" == *".venv"* ]] || [[ "$IMG2STUDY_PYTHON" == *"venv"* ]]; then
-                for syspath in "/usr/local/bin/python$PYTHON_VER" "/Library/Frameworks/Python.framework/Versions/$PYTHON_VER/bin/python$PYTHON_VER" "/usr/bin/python3"; do
-                    if [ -f "$syspath" ]; then
-                        IMG2STUDY_PYTHON="$syspath"
-                        break
-                    fi
-                done
+            echo "Creating conda environment 'paddle-ocr-py311' with Python 3.11..."
+            conda create -n paddle-ocr-py311 python=3.11 -y
+            if [ $? -ne 0 ]; then
+                echo -e "${RED}❌ Failed to create conda environment${NC}"
+                cd "$SCRIPT_DIR"
+                continue
             fi
+            conda activate paddle-ocr-py311 2>/dev/null || source $(conda info --base)/etc/profile.d/conda.sh && conda activate paddle-ocr-py311
         fi
-        echo "Note: PaddlePaddle may take several minutes to download..."
-        echo "Installing with: $IMG2STUDY_PYTHON"
-        # Use absolute path and unset any interfering environment variables
-        unset PYTHONPATH VIRTUAL_ENV PATH
-        export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-        "$IMG2STUDY_PYTHON" -m pip install --user -r requirements-working.txt
-        if [ $? -eq 0 ]; then
-            echo -e "${GREEN}✅ Img2study dependencies installed successfully${NC}"
-            echo -e "${GREEN}   This fixes the OCR 'ModuleNotFoundError: No module named cv2' error${NC}"
+        
+        # Install dependencies via conda (better ARM64 support)
+        echo "Installing core dependencies via conda..."
+        conda install -c conda-forge numpy opencv pillow -y
+        
+        # Install OCR dependencies from requirements-working.txt
+        echo "Installing PaddlePaddle and OCR dependencies (this may take several minutes)..."
+        if [ -f "requirements-working.txt" ]; then
+            pip install -r requirements-working.txt
         else
-            echo -e "${RED}❌ Failed to install Img2study dependencies${NC}"
-            echo -e "${YELLOW}   Common issues:${NC}"
-            echo -e "${YELLOW}   - PaddlePaddle may not be available for your Python version/platform${NC}"
-            echo -e "${YELLOW}   - Try installing packages individually:${NC}"
-            echo -e "${YELLOW}     pip install opencv-python pillow numpy requests${NC}"
-            echo -e "${YELLOW}     pip install paddleocr==2.10.0${NC}"
-            echo -e "${YELLOW}     pip install paddlepaddle (may fail on some platforms)${NC}"
-            echo -e "${YELLOW}   OCR may still work without PaddlePaddle if other packages installed${NC}"
+            # Fallback if requirements file not found
+            pip install paddleocr==2.10.0 paddlepaddle opencv-python pillow numpy requests
         fi
-        cd "$SCRIPT_DIR"
+        
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}✅ Img2study OCR dependencies installed successfully${NC}"
+            echo -e "${GREEN}   Environment: paddle-ocr-py311 (conda)${NC}"
+            echo -e "${GREEN}   Python version: $(python --version 2>&1)${NC}"
+            echo -e "${GREEN}   Architecture: $(python -c 'import platform; print(platform.machine())')${NC}"
+        else
+            echo -e "${RED}❌ Failed to install img2study dependencies${NC}"
+        fi
     else
-        echo -e "${YELLOW}⚠️  requirements-working.txt not found in img2study directory${NC}"
+        echo -e "${YELLOW}⚠️  Conda not found!${NC}"
+        echo -e "${YELLOW}   PaddlePaddle on Apple Silicon requires conda for stability${NC}"
+        echo -e "${YELLOW}   Install conda from: https://docs.conda.io/en/latest/miniconda.html${NC}"
+        echo -e "${YELLOW}   Then run this install script again${NC}"
+        echo ""
+        echo -e "${YELLOW}   Attempting fallback pip installation (may cause SIGSEGV crashes)...${NC}"
+        $PYTHON_CMD -m pip install --user opencv-python pillow numpy paddleocr==2.10.0
+        if [ $? -eq 0 ]; then
+            echo -e "${YELLOW}⚠️  Img2study dependencies installed via pip (not recommended for Apple Silicon)${NC}"
+        else
+            echo -e "${RED}❌ Failed to install img2study dependencies${NC}"
+        fi
     fi
+    cd "$SCRIPT_DIR"
 else
     echo -e "${YELLOW}⚠️  Img2study directory not found at: $IMG2STUDY_DIR${NC}"
 fi

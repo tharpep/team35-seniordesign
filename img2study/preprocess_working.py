@@ -83,11 +83,11 @@ def main():
     run_hash = secrets.token_hex(4)
     run_id = f"run_{timestamp}_{run_hash}"
 
-    output_dir = Path("dataset/output")
-    run_output = output_dir / run_id
+    output_dir = Path("dataset/output/")
+    run_output = output_dir / session_id / run_id
+    markdown_dir = output_dir / session_id
 
     json_dir = run_output / "json"
-    markdown_dir = run_output / "markdown"
     tables_dir = run_output / "tables"
     artifacts_dir = run_output / "artifacts"
     crops_dir = run_output / "crops"

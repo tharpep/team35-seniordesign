@@ -36,28 +36,43 @@ FACIAL_DIR="$SCRIPT_DIR/../facial-processing"
 GENAI_VENV="$GENAI_DIR/venv"
 FACIAL_VENV="$FACIAL_DIR/.venv"
 
-# Determine Python path for backend (same logic as install script)
+# Determine Python path for backend OCR processing
 PYTHON_PATH="python3"
 
-# Check for root .venv first (preferred)
-ROOT_VENV_PYTHON="$SCRIPT_DIR/../.venv/bin/python"
-if [ -f "$ROOT_VENV_PYTHON" ]; then
-    PYTHON_PATH="$ROOT_VENV_PYTHON"
-    echo "✅ Using root virtual environment: $PYTHON_PATH"
-else
-    # Try python3.12, python3.11, python3.10 in order
-    for version in "3.12" "3.11" "3.10"; do
-        if command -v "python${version}" &> /dev/null; then
-            if "python${version}" --version 2>&1 | grep -q "Python ${version}"; then
-                PYTHON_PATH="python${version}"
-                break
-            fi
+# Check if conda environment for img2study exists (preferred for OCR)
+if command -v conda &> /dev/null; then
+    if conda env list | grep -q "paddle-ocr-py311"; then
+        # Get the conda environment's python path
+        CONDA_BASE=$(conda info --base)
+        CONDA_ENV_PYTHON="$CONDA_BASE/envs/paddle-ocr-py311/bin/python"
+        if [ -f "$CONDA_ENV_PYTHON" ]; then
+            PYTHON_PATH="$CONDA_ENV_PYTHON"
+            echo "✅ Using conda environment for OCR: paddle-ocr-py311"
         fi
-    done
-    # Fallback to python3 or python
-    if [ "$PYTHON_PATH" = "python3" ]; then
-        if ! command -v python3 &> /dev/null; then
-            PYTHON_PATH="python"
+    fi
+fi
+
+# Fallback: Check for root .venv
+if [ "$PYTHON_PATH" = "python3" ]; then
+    ROOT_VENV_PYTHON="$SCRIPT_DIR/../.venv/bin/python"
+    if [ -f "$ROOT_VENV_PYTHON" ]; then
+        PYTHON_PATH="$ROOT_VENV_PYTHON"
+        echo "✅ Using root virtual environment: $PYTHON_PATH"
+    else
+        # Try python3.12, python3.11, python3.10 in order
+        for version in "3.12" "3.11" "3.10"; do
+            if command -v "python${version}" &> /dev/null; then
+                if "python${version}" --version 2>&1 | grep -q "Python ${version}"; then
+                    PYTHON_PATH="python${version}"
+                    break
+                fi
+            fi
+        done
+        # Fallback to python3 or python
+        if [ "$PYTHON_PATH" = "python3" ]; then
+            if ! command -v python3 &> /dev/null; then
+                PYTHON_PATH="python"
+            fi
         fi
     fi
 fi
@@ -81,11 +96,24 @@ else
 fi
 
 # Quick check for img2study dependencies (optional but helpful)
-if $PYTHON_PATH -c "import cv2" 2>/dev/null; then
-    echo "✅ Img2study OCR dependencies found"
+if command -v conda &> /dev/null && conda env list | grep -q "paddle-ocr-py311"; then
+    # Check conda environment
+    CONDA_BASE=$(conda info --base)
+    if "$CONDA_BASE/envs/paddle-ocr-py311/bin/python" -c "import cv2, paddleocr" 2>/dev/null; then
+        echo "✅ Img2study OCR dependencies found (conda: paddle-ocr-py311)"
+    else
+        echo "⚠️  Img2study OCR conda environment exists but dependencies incomplete"
+        echo "   Run install script to fix: ./install.sh"
+    fi
 else
-    echo "⚠️  Img2study OCR dependencies may be missing (cv2 not found)"
-    echo "   OCR may fail. Run install script to fix: ./install.sh"
+    # Fallback check for system Python
+    if $PYTHON_PATH -c "import cv2" 2>/dev/null; then
+        echo "✅ Img2study OCR dependencies found (system Python)"
+        echo "⚠️  Note: conda environment recommended for Apple Silicon stability"
+    else
+        echo "⚠️  Img2study OCR dependencies missing"
+        echo "   Run install script with conda installed: ./install.sh"
+    fi
 fi
 
 if [ $VALIDATION_FAILED -eq 1 ]; then
