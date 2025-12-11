@@ -663,40 +663,6 @@ const appendContext = async (req, res) => {
       // Queue ingestion for gen-ai location file
       queueIngestion(genAiUrl, ingestPayload, sessionId, 'gen-ai location');
 
-      // Helper function to queue ingestion requests
-      function queueIngestion(genAiUrl, payload, sessionId, description) {
-        const reqOptions = {
-          hostname: genAiUrl.replace(/^https?:\/\//, '').split(':')[0] || '127.0.0.1',
-          port: genAiUrl.includes(':8000') ? 8000 : (genAiUrl.match(/:(\d+)/)?.[1] || 8000),
-          path: '/api/ingest/session_file',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(payload)
-          }
-        };
-
-        const ingestReq = http.request(reqOptions, (ingestRes) => {
-          let data = '';
-          ingestRes.on('data', (chunk) => { data += chunk; });
-          ingestRes.on('end', () => {
-            if (ingestRes.statusCode === 200) {
-              console.log(`[appendContext] Ingestion queued successfully for ${description} (session ${sessionId})`);
-            } else {
-              console.warn(`[appendContext] Ingestion request returned ${ingestRes.statusCode} for ${description}: ${data}`);
-            }
-          });
-        });
-
-        ingestReq.on('error', (err) => {
-          console.error(`[appendContext] Failed to trigger ingestion for ${description}: ${err.message}`);
-          // Don't fail the request - ingestion can happen later
-        });
-
-        ingestReq.write(payload);
-        ingestReq.end();
-      }
-
     } catch (fileError) {
       console.error(`[appendContext] Error writing file or triggering ingestion: ${fileError.message}`);
       // Don't fail the request - ingestion can happen later
