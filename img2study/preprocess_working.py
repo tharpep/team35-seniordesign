@@ -92,7 +92,7 @@ def main():
     run_output = backend_data_dir / run_id
 
     json_dir = run_output / "json"
-    markdown_dir = run_output / "markdown"
+    markdown_dir = backend_data_dir / session_id
     tables_dir = run_output / "tables"
     artifacts_dir = run_output / "artifacts"
     crops_dir = run_output / "crops"
