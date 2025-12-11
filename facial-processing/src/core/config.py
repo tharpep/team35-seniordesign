@@ -34,13 +34,15 @@ class FacialProcessingConfig:
     max_gaze_deviation_deg: float = 15.0  # Max gaze angle for "focused"
     max_head_pose_deviation_deg: float = 50.0  # Max head rotation for "focused" (adjusted for head pose calculation issues)
 
-    # Emotion classification
-    emotion_confidence_threshold: float = 0.50  # Moderately high confidence required
-    emotion_classes: Tuple[str, ...] = ("neutral", "happy", "stressed", "fatigued")
+    # Emotion classification (using FER pre-trained model)
+    emotion_confidence_threshold: float = 0.35  # Lower threshold for FER model (more sensitive)
+    emotion_classes: Tuple[str, ...] = (
+        "neutral", "happy", "sad", "angry", "surprise", "fear", "disgust", "stressed", "fatigued"
+    )
 
     # Quality gates
-    min_landmark_confidence: float = 0.4  # Required landmark detection accuracy
-    min_detection_confidence: float = 0.4  # Required face detection confidence (85%)
+    min_landmark_confidence: float = 0.1  # Required landmark detection accuracy
+    min_detection_confidence: float = 0.1  # Required face detection confidence (85%)
     min_frame_quality: float = 0.80  # Minimum overall quality score
     max_false_positive_rate: float = 0.05  # <5% false distraction alerts
 

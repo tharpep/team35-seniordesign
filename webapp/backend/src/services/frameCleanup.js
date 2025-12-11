@@ -8,14 +8,18 @@ const FRAME_RETENTION_MS = 10 * 60 * 1000; // 10 minutes in milliseconds
 const cleanupOldFrames = async () => {
   try {
     const tenMinutesAgo = new Date(Date.now() - FRAME_RETENTION_MS).toISOString();
-    
+    const cleanupTimestamp = new Date().toISOString();
+
     // Find all frames older than 10 minutes
     const oldFrames = await getAll(
       `SELECT id, file_path, session_id FROM captured_frames WHERE captured_at < ?`,
       [tenMinutesAgo]
     );
 
-    console.log(`🧹 Frame cleanup: Found ${oldFrames.length} frame(s) older than 10 minutes`);
+    if (oldFrames.length > 0) {
+      console.log(`\n[RAW-IMAGE-CLEANUP] ${cleanupTimestamp}`);
+      console.log(`🧹 Frame cleanup: Found ${oldFrames.length} raw image(s) older than ${FRAME_RETENTION_MS / 60000} minutes`);
+    }
 
     let deletedFiles = 0;
     let deletedRecords = 0;
@@ -26,9 +30,17 @@ const cleanupOldFrames = async () => {
       try {
         // Delete physical file if it exists
         if (fs.existsSync(frame.file_path)) {
+          const fileName = path.basename(frame.file_path);
+          const fileSize = fs.statSync(frame.file_path).size;
+
           fs.unlinkSync(frame.file_path);
           deletedFiles++;
-          
+
+          // Log each raw image deletion for audit/compliance proof
+          console.log(`[RAW-IMAGE-DELETE] ${cleanupTimestamp} | Session ${frame.session_id} | Deleted: ${fileName} (${(fileSize / 1024).toFixed(1)} KB)`);
+          console.log(`  └─ Path: ${frame.file_path}`);
+          console.log(`  └─ Reason: Raw image retention policy (>${FRAME_RETENTION_MS / 60000} min) - Only encrypted metrics retained in DB`);
+
           // Track session folder for cleanup check
           const sessionFolder = path.dirname(path.dirname(frame.file_path)); // Go up two levels (frameType folder -> session folder)
           sessionFolders.add(sessionFolder);
@@ -72,7 +84,9 @@ const cleanupOldFrames = async () => {
     }
 
     if (deletedFiles > 0 || deletedFolders > 0) {
-      console.log(`✓ Frame cleanup complete: ${deletedFiles} file(s) deleted, ${deletedRecords} record(s) removed${deletedFolders > 0 ? `, ${deletedFolders} empty folder(s) removed` : ''}${errors > 0 ? `, ${errors} error(s)` : ''}`);
+      console.log(`[RAW-IMAGE-CLEANUP-COMPLETE] ${new Date().toISOString()}`);
+      console.log(`✓ Cleanup summary: ${deletedFiles} raw image(s) permanently deleted, ${deletedRecords} DB record(s) removed${deletedFolders > 0 ? `, ${deletedFolders} empty folder(s) removed` : ''}${errors > 0 ? `, ${errors} error(s)` : ''}`);
+      console.log(`  └─ Privacy compliance: Raw images deleted after processing - Only metrics retained\n`);
     }
   } catch (error) {
     console.error('❌ Frame cleanup error:', error);

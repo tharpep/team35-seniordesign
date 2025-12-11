@@ -14,19 +14,23 @@ interface EmotionTimelineProps {
     sessionDuration?: number; // in minutes
 }
 
-// Emotion configuration with icons and colors
+// Emotion configuration with icons and colors (matching FER model output)
 const emotionConfig: Record<string, { icon: string; color: string; label: string }> = {
+    // FER model emotions
     happy: { icon: 'sentiment_very_satisfied', color: '#4CAF50', label: 'Happy' },
     sad: { icon: 'sentiment_very_dissatisfied', color: '#2196F3', label: 'Sad' },
     angry: { icon: 'mood_bad', color: '#f44336', label: 'Angry' },
+    surprise: { icon: 'sentiment_satisfied_alt', color: '#FF9800', label: 'Surprise' },
+    fear: { icon: 'sentiment_dissatisfied', color: '#9C27B0', label: 'Fear' },
+    disgust: { icon: 'sick', color: '#795548', label: 'Disgust' },
+    neutral: { icon: 'sentiment_neutral', color: '#607D8B', label: 'Neutral' },
+    // Additional mapped emotions
+    stressed: { icon: 'psychology_alt', color: '#E91E63', label: 'Stressed' },
+    fatigued: { icon: 'bedtime', color: '#673AB7', label: 'Fatigued' },
+    // Legacy emotion names (for backwards compatibility)
     surprised: { icon: 'sentiment_satisfied_alt', color: '#FF9800', label: 'Surprised' },
     fearful: { icon: 'sentiment_dissatisfied', color: '#9C27B0', label: 'Fearful' },
     disgusted: { icon: 'sick', color: '#795548', label: 'Disgusted' },
-    neutral: { icon: 'sentiment_neutral', color: '#607D8B', label: 'Neutral' },
-    focused: { icon: 'psychology', color: '#00BCD4', label: 'Focused' },
-    confused: { icon: 'help_outline', color: '#FF5722', label: 'Confused' },
-    fatigued: { icon: 'bedtime', color: '#673AB7', label: 'Fatigued' },
-    stressed: { icon: 'sentiment_dissatisfied', color: '#E91E63', label: 'Stressed' },
 };
 
 export default function EmotionTimeline({ emotions, sessionStartTime, sessionDuration }: EmotionTimelineProps) {

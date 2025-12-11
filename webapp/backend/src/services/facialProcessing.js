@@ -66,6 +66,7 @@ async function processFrame(framePath, sessionId) {
 async function storeMetrics(sessionId, metrics) {
   try {
     const result = metrics.result || metrics;
+    const timestamp = new Date().toISOString();
 
     await runQuery(
       `INSERT INTO facial_metrics (
@@ -98,6 +99,10 @@ async function storeMetrics(sessionId, metrics) {
         result.low_confidence_warning ? 1 : 0
       ]
     );
+
+    // Log successful database storage for audit/compliance
+    console.log(`[DB-STORE] ${timestamp} | Session ${sessionId} | Metrics stored to facial_metrics table:`);
+    console.log(`  └─ Focus: ${(result.focus_score * 100).toFixed(1)}% | Emotion: ${result.emotion} (${(result.emotion_confidence * 100).toFixed(1)}%) | Face: ${result.face_detected ? 'Yes' : 'No'}`);
 
     // Update session's running average focus score
     await updateSessionFocusScore(sessionId);
