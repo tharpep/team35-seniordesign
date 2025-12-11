@@ -169,18 +169,18 @@ echo -e "${GREEN}✅ Using Python version: $PYTHON_VERSION${NC}"
 echo -e "${GREEN}   Selected version: $PYTHON_VER (compatible with ML libraries)${NC}"
 
 # Check if pip is available and upgrade it
-if ! $PYTHON_CMD -m pip --version &> /dev/null; then
-    echo -e "${RED}❌ pip is not available!${NC}"
-    echo "Please ensure pip is installed with Python"
-    exit 1
-fi
-PIP_VERSION=$($PYTHON_CMD -m pip --version 2>&1)
-echo -e "${GREEN}✅ pip is available: $PIP_VERSION${NC}"
-echo "Upgrading pip to latest version..."
-$PYTHON_CMD -m pip install --upgrade pip --quiet
-echo -e "${GREEN}✅ pip upgraded successfully${NC}"
+# if ! $PYTHON_CMD -m pip --version &> /dev/null; then
+#     echo -e "${RED}❌ pip is not available!${NC}"
+#     echo "Please ensure pip is installed with Python"
+#     exit 1
+# fi
+# PIP_VERSION=$($PYTHON_CMD -m pip --version 2>&1)
+# echo -e "${GREEN}✅ pip is available: $PIP_VERSION${NC}"
+# echo "Upgrading pip to latest version..."
+# $PYTHON_CMD -m pip install --upgrade pip --quiet
+# echo -e "${GREEN}✅ pip upgraded successfully${NC}"
 
-echo ""
+# echo ""
 
 # Install backend dependencies
 show_progress "Installing Backend Dependencies"

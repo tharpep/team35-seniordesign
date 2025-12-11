@@ -9,6 +9,7 @@ require('dotenv').config();
 // Import database initialization
 const { initializeDatabase } = require('./config/initDatabase');
 const { startCleanupScheduler } = require('./services/frameCleanup');
+const uptimeTracker = require('./services/uptimeTracker');
 
 // Initialize Express app
 const app = express();
@@ -88,11 +89,16 @@ app.set('io', io);
 
 // Health check endpoint (registered early, before route loading)
 app.get('/api/health', (req, res) => {
-  res.json({ 
+  res.json({
     status: 'ok',
     message: 'Cognitive Coach backend is running',
     timestamp: new Date().toISOString()
   });
+});
+
+// Uptime and metrics endpoint for compliance reporting
+app.get('/api/uptime', (req, res) => {
+  res.json(uptimeTracker.getUptimeReport());
 });
 
 // Socket.IO connection handling
@@ -196,6 +202,9 @@ const startServer = async () => {
       
       // Start frame cleanup scheduler after server is running
       startCleanupScheduler();
+
+      // Start uptime tracking and periodic reporting
+      uptimeTracker.startPeriodicLogging(5 * 60 * 1000); // Report every 5 minutes
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error.message);

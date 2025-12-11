@@ -161,6 +161,9 @@ class FacialProcessor:
 
         # Step 4: Emotion classification
         emotion_start = time.perf_counter()
+        # Pass the ORIGINAL frame to the emotion classifier for FER-based detection
+        # FER's MTCNN face detection works better with original images (not CLAHE-normalized)
+        self.emotion_classifier.set_current_frame(image)
         emotion_result = self.emotion_classifier.classify(face_detection.landmarks)
         emotion_classification_ms = (time.perf_counter() - emotion_start) * 1000
 

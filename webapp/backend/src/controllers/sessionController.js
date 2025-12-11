@@ -5,6 +5,7 @@ const path = require('path');
 const http = require('http');
 const facialProcessing = require('../services/facialProcessing');
 const ocrQueue = require('../services/ocrQueue');
+const uptimeTracker = require('../services/uptimeTracker');
 
 // Get all sessions for logged-in user with artifact counts
 const getAllSessions = async (req, res) => {
@@ -350,6 +351,9 @@ const uploadFrame = async (req, res) => {
 
     console.log(`📸 Upload frame request - Session: ${sessionId}, Type: ${frameType}, File: ${req.file ? 'present' : 'missing'}`);
 
+    // Track frame received for uptime metrics
+    uptimeTracker.recordFrameReceived(sessionId);
+
     if (!req.file) {
       console.error('❌ No file in request');
       return res.status(400).json({
@@ -404,9 +408,13 @@ const uploadFrame = async (req, res) => {
         processingResult = await facialProcessing.processFrame(req.file.path, sessionId);
 
         if (processingResult && processingResult.success) {
-          // Store metrics in database
+          // Store metrics in database (raw image will be auto-deleted by cleanup scheduler)
           await facialProcessing.storeMetrics(sessionId, processingResult);
           console.log(`✓ Facial metrics stored - Focus: ${processingResult.result?.focus_score?.toFixed(2)}, Emotion: ${processingResult.result?.emotion}`);
+          console.log(`  └─ Raw image queued for deletion (auto-cleanup in <10 min): ${path.basename(req.file.path)}`);
+
+          // Track successful frame processing for uptime metrics
+          uptimeTracker.recordFrameProcessed(sessionId);
 
           // Check for fatigue and distraction events
           fatigueEvent = await facialProcessing.checkFatigue(sessionId, processingResult);
@@ -432,6 +440,8 @@ const uploadFrame = async (req, res) => {
       } catch (processingError) {
         // Log but don't fail the request if facial processing fails
         console.warn(`⚠️ Facial processing error (non-fatal): ${processingError.message}`);
+        // Track frame error for uptime metrics
+        uptimeTracker.recordFrameError(sessionId, processingError.message);
       }
     } else if (frameType === 'screen' || frameType === 'external') {
       // Queue screen and external frames for OCR processing
@@ -439,9 +449,12 @@ const uploadFrame = async (req, res) => {
         console.log(`📝 Queueing ${frameType} frame for OCR processing...`);
         ocrQueue.addToQueue(sessionId, req.file.path, frameType);
         console.log(`✓ Frame queued for OCR`);
+        // Track successful frame processing for uptime metrics
+        uptimeTracker.recordFrameProcessed(sessionId);
       } catch (queueError) {
         // Log but don't fail the request if queuing fails
         console.warn(`⚠️ OCR queue error (non-fatal): ${queueError.message}`);
+        uptimeTracker.recordFrameError(sessionId, queueError.message);
       }
     }
 

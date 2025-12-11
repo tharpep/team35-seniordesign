@@ -1,5 +1,6 @@
 """
 Emotion classification from facial landmarks and expressions
+Uses FER (Facial Expression Recognition) pre-trained model for accurate detection
 """
 
 import numpy as np
@@ -7,14 +8,23 @@ from typing import Dict, Tuple, Optional
 from dataclasses import dataclass
 from enum import Enum
 import time
+import logging
 
 from .config import FacialProcessingConfig
 
+logger = logging.getLogger(__name__)
+
 
 class EmotionClass(Enum):
-    """Emotion categories per design spec"""
+    """Emotion categories - expanded to match FER model output"""
     NEUTRAL = "neutral"
     HAPPY = "happy"
+    SAD = "sad"
+    ANGRY = "angry"
+    SURPRISE = "surprise"
+    FEAR = "fear"
+    DISGUST = "disgust"
+    # Mapped emotions (from rule-based features)
     STRESSED = "stressed"
     FATIGUED = "fatigued"
 
@@ -30,24 +40,68 @@ class EmotionResult:
 
 
 class EmotionClassifier:
-    """Classifies emotions from facial landmarks"""
+    """Classifies emotions from facial landmarks and images using FER model"""
 
-    # Landmark indices for facial features
+    # Landmark indices for facial features (used for fatigue detection)
     MOUTH_INDICES = [61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291, 308]
     LEFT_EYEBROW_INDICES = [70, 63, 105, 66, 107]
     RIGHT_EYEBROW_INDICES = [336, 296, 334, 293, 300]
     FOREHEAD_INDICES = [10, 338, 297, 332, 284, 251, 389, 356]
     CHEEK_INDICES = [205, 425]
 
+    # Mapping from FER emotions to our EmotionClass
+    FER_EMOTION_MAP = {
+        'angry': EmotionClass.ANGRY,
+        'disgust': EmotionClass.DISGUST,
+        'fear': EmotionClass.FEAR,
+        'happy': EmotionClass.HAPPY,
+        'sad': EmotionClass.SAD,
+        'surprise': EmotionClass.SURPRISE,
+        'neutral': EmotionClass.NEUTRAL,
+    }
+
     def __init__(self, config: FacialProcessingConfig):
         self.config = config
 
-        # Simple rule-based classifier (can be replaced with CNN/Transformer)
-        self.use_deep_model = False  # Set to True when deep model is available
+        # Use deep model by default (FER)
+        self.use_deep_model = True
+        self.fer_detector = None
+        self._fer_available = False
+
+        # Try to initialize FER detector
+        self._init_fer_detector()
+
+        # Store the current frame for FER processing
+        self._current_frame = None
+
+    def _init_fer_detector(self):
+        """Initialize the FER (Facial Expression Recognition) detector"""
+        try:
+            # Try new import path first (fer >= 25.x)
+            try:
+                from fer.fer import FER
+            except ImportError:
+                from fer import FER
+            # Use MTCNN for face detection within FER (more accurate)
+            self.fer_detector = FER(mtcnn=True)
+            self._fer_available = True
+            logger.info("FER emotion detector initialized successfully")
+        except ImportError as e:
+            logger.warning(f"FER library not available: {e}, falling back to rule-based classification")
+            self._fer_available = False
+            self.use_deep_model = False
+        except Exception as e:
+            logger.warning(f"Failed to initialize FER detector: {e}, falling back to rule-based")
+            self._fer_available = False
+            self.use_deep_model = False
+
+    def set_current_frame(self, frame: np.ndarray):
+        """Set the current frame for emotion detection (called by facial_processor)"""
+        self._current_frame = frame
 
     def classify(self, landmarks: np.ndarray) -> EmotionResult:
         """
-        Classify emotion from facial landmarks
+        Classify emotion from facial landmarks and/or image
 
         Args:
             landmarks: 468x3 array of facial landmarks
@@ -57,13 +111,14 @@ class EmotionClassifier:
         """
         timestamp = time.time()
 
-        # Extract facial features
+        # Extract facial features for fatigue detection
         features = self._extract_features(landmarks)
 
-        # Classify using rule-based or deep learning
-        if self.use_deep_model:
-            emotion, confidence, probabilities = self._classify_deep(features)
+        # Try deep learning (FER) first if available and we have a frame
+        if self.use_deep_model and self._fer_available and self._current_frame is not None:
+            emotion, confidence, probabilities = self._classify_with_fer(features)
         else:
+            # Fall back to rule-based classification
             emotion, confidence, probabilities = self._classify_rule_based(features)
 
         return EmotionResult(
@@ -261,18 +316,84 @@ class EmotionClassifier:
 
         return emotion, confidence, probabilities
 
+    def _classify_with_fer(self, features: Dict[str, float]) -> Tuple[
+        EmotionClass, float, Dict[str, float]
+    ]:
+        """
+        Classify emotions using the FER (Facial Expression Recognition) pre-trained model.
+        Also incorporates fatigue detection from landmark features.
+
+        The FER model is trained on the FER2013 dataset and can detect:
+        - angry, disgust, fear, happy, sad, surprise, neutral
+
+        We also add fatigue detection using eye openness from landmarks.
+        """
+        try:
+            # Run FER detection on the current frame
+            emotions = self.fer_detector.detect_emotions(self._current_frame)
+
+            if emotions and len(emotions) > 0:
+                # Get the first face's emotions (assuming single face)
+                emotion_scores = emotions[0]['emotions']
+
+                # Convert FER scores to our probability dict
+                probabilities = {}
+                for fer_emotion, score in emotion_scores.items():
+                    if fer_emotion in self.FER_EMOTION_MAP:
+                        emotion_class = self.FER_EMOTION_MAP[fer_emotion]
+                        probabilities[emotion_class.value] = float(score)
+
+                # Add fatigue detection based on eye openness (from landmarks)
+                fatigue_score = 0.0
+                if features['eye_openness'] < 0.25:
+                    # Eyes nearly closed - likely fatigued
+                    fatigue_score = 0.7 + (0.25 - features['eye_openness']) * 1.2
+                elif features['eye_openness'] < 0.35:
+                    # Eyes partially closed
+                    fatigue_score = 0.3 + (0.35 - features['eye_openness']) * 2.0
+
+                # Add stressed mapping (angry + fear combined indicate stress)
+                stress_score = (probabilities.get('angry', 0.0) * 0.6 +
+                               probabilities.get('fear', 0.0) * 0.4)
+
+                # Add fatigue and stressed to probabilities
+                probabilities[EmotionClass.FATIGUED.value] = min(fatigue_score, 1.0)
+                probabilities[EmotionClass.STRESSED.value] = min(stress_score, 1.0)
+
+                # Normalize probabilities
+                total = sum(probabilities.values())
+                if total > 0:
+                    probabilities = {k: v / total for k, v in probabilities.items()}
+
+                # Find the dominant emotion
+                dominant_emotion_str = max(probabilities.keys(), key=lambda k: probabilities[k])
+                confidence = probabilities[dominant_emotion_str]
+
+                # Map to EmotionClass
+                try:
+                    dominant_emotion = EmotionClass(dominant_emotion_str)
+                except ValueError:
+                    dominant_emotion = EmotionClass.NEUTRAL
+
+                # Apply confidence threshold
+                if confidence < self.config.emotion_confidence_threshold:
+                    dominant_emotion = EmotionClass.NEUTRAL
+                    confidence = probabilities.get(EmotionClass.NEUTRAL.value, 0.5)
+
+                return dominant_emotion, confidence, probabilities
+
+        except Exception as e:
+            logger.warning(f"FER classification failed: {e}, falling back to rule-based")
+
+        # Fall back to rule-based if FER fails
+        return self._classify_rule_based(features)
+
     def _classify_deep(self, features: Dict[str, float]) -> Tuple[
         EmotionClass, float, Dict[str, float]
     ]:
         """
-        Deep learning-based classification (placeholder)
-
-        To implement:
-        1. Load pretrained model (CNN/Transformer)
-        2. Convert features to model input
-        3. Run inference
-        4. Return predictions
+        Legacy method - redirects to FER classification
         """
-        # TODO: Implement when deep model is ready
-        # For now, fall back to rule-based
+        if self._fer_available and self._current_frame is not None:
+            return self._classify_with_fer(features)
         return self._classify_rule_based(features)
