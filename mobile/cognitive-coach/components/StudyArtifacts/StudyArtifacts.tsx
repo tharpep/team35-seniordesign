@@ -130,13 +130,14 @@ export default function StudyArtifacts({ sessionId, artifacts = [], onArtifactCl
     if (onArtifactClick) {
       onArtifactClick(artifact.type, artifact.id.toString());
     } else {
-      // Navigate to appropriate study page
+      // Navigate to appropriate study page with sessionId and type
+      const params = { sessionId: sessionId || '', type: artifact.type };
       if (artifact.type === 'flashcard') {
-        router.push('/flashcard-study');
+        router.push({ pathname: '/flashcard-study', params });
       } else if (artifact.type === 'MCQ') {
-        router.push('/mcq-study');
+        router.push({ pathname: '/mcq-study', params });
       } else if (artifact.type === 'equation') {
-        router.push('/equation-study');
+        router.push({ pathname: '/equation-study', params });
       }
     }
   };

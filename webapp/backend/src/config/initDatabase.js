@@ -134,7 +134,40 @@ const runMigrations = (dbPath) => {
             res({ migrated: true });
           });
         } else {
-          res({ migrated: false });
+          // Table exists, check if it has all required columns
+          db.all("PRAGMA table_info(session_distraction_events)", (err, columns) => {
+            if (err) return rej(err);
+            const columnNames = columns.map(col => col.name);
+            const requiredColumns = ['distraction_type', 'focus_score', 'gaze_deviation', 'duration_seconds'];
+            const missingColumns = requiredColumns.filter(col => !columnNames.includes(col));
+            
+            if (missingColumns.length > 0) {
+              console.log(`⚙️  Running migration: Recreating session_distraction_events table (missing columns: ${missingColumns.join(', ')})...`);
+              // Drop and recreate with correct schema
+              db.run("DROP TABLE session_distraction_events", (err) => {
+                if (err) return rej(err);
+                const createTableSQL = `
+                  CREATE TABLE session_distraction_events (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_id INTEGER NOT NULL,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    distraction_type TEXT,
+                    focus_score REAL,
+                    gaze_deviation REAL,
+                    duration_seconds REAL,
+                    data TEXT,
+                    FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+                  )`;
+                db.run(createTableSQL, (err) => {
+                  if (err) return rej(err);
+                  console.log('✓ Migration completed: session_distraction_events table recreated');
+                  res({ migrated: true });
+                });
+              });
+            } else {
+              res({ migrated: false });
+            }
+          });
         }
       });
     });

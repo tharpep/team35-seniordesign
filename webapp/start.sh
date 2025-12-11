@@ -22,6 +22,7 @@ check_port 3001
 check_port 5173
 check_port 8000
 check_port 8001
+check_port 8081
 echo ""
 
 # Get the directory where the script is located
@@ -37,19 +38,27 @@ FACIAL_VENV="$FACIAL_DIR/.venv"
 
 # Determine Python path for backend (same logic as install script)
 PYTHON_PATH="python3"
-# Try python3.12, python3.11, python3.10 in order
-for version in "3.12" "3.11" "3.10"; do
-    if command -v "python${version}" &> /dev/null; then
-        if "python${version}" --version 2>&1 | grep -q "Python ${version}"; then
-            PYTHON_PATH="python${version}"
-            break
+
+# Check for root .venv first (preferred)
+ROOT_VENV_PYTHON="$SCRIPT_DIR/../.venv/bin/python"
+if [ -f "$ROOT_VENV_PYTHON" ]; then
+    PYTHON_PATH="$ROOT_VENV_PYTHON"
+    echo "✅ Using root virtual environment: $PYTHON_PATH"
+else
+    # Try python3.12, python3.11, python3.10 in order
+    for version in "3.12" "3.11" "3.10"; do
+        if command -v "python${version}" &> /dev/null; then
+            if "python${version}" --version 2>&1 | grep -q "Python ${version}"; then
+                PYTHON_PATH="python${version}"
+                break
+            fi
         fi
-    fi
-done
-# Fallback to python3 or python
-if [ "$PYTHON_PATH" = "python3" ]; then
-    if ! command -v python3 &> /dev/null; then
-        PYTHON_PATH="python"
+    done
+    # Fallback to python3 or python
+    if [ "$PYTHON_PATH" = "python3" ]; then
+        if ! command -v python3 &> /dev/null; then
+            PYTHON_PATH="python"
+        fi
     fi
 fi
 
@@ -116,10 +125,10 @@ sleep 2
 echo "================================="
 echo "🤖 Starting Gen-AI API Server"
 echo "================================="
-osascript -e "tell app \"Terminal\" to do script \"cd '$GENAI_DIR' && echo '🤖 Gen-AI API Server' && python run start\"" 2>/dev/null || \
-gnome-terminal -- bash -c "cd '$GENAI_DIR' && echo '🤖 Gen-AI API Server' && python run start; exec bash" 2>/dev/null || \
-xterm -e "cd '$GENAI_DIR' && echo '🤖 Gen-AI API Server' && python run start" 2>/dev/null || \
-(cd "$GENAI_DIR" && python run start &)
+osascript -e "tell app \"Terminal\" to do script \"cd '$GENAI_DIR' && echo '🤖 Gen-AI API Server' && poetry shell && genai server\"" 2>/dev/null || \
+gnome-terminal -- bash -c "cd '$GENAI_DIR' && echo '🤖 Gen-AI API Server' && poetry run genai server; exec bash" 2>/dev/null || \
+xterm -e "cd '$GENAI_DIR' && echo '🤖 Gen-AI API Server' && poetry run genai server" 2>/dev/null || \
+(cd "$GENAI_DIR" && poetry run genai server &)
 
 # Wait for gen-ai to start
 sleep 2
@@ -134,6 +143,23 @@ xterm -e "cd '$FACIAL_DIR' && echo '👁️ Facial Processing Server' && source 
 (cd "$FACIAL_DIR" && source .venv/bin/activate && python -m src.api.server &)
 
 # Wait for facial processing to start
+sleep 2
+
+# Start Mobile app server
+echo "================================="
+echo "📱 Starting Mobile App Server"
+echo "================================="
+MOBILE_DIR="$SCRIPT_DIR/../mobile/cognitive-coach"
+if [ -d "$MOBILE_DIR" ]; then
+    osascript -e "tell app \"Terminal\" to do script \"cd '$MOBILE_DIR' && echo '📱 Mobile App Server' && npm start\"" 2>/dev/null || \
+    gnome-terminal -- bash -c "cd '$MOBILE_DIR' && echo '📱 Mobile App Server' && npm start; exec bash" 2>/dev/null || \
+    xterm -e "cd '$MOBILE_DIR' && echo '📱 Mobile App Server' && npm start" 2>/dev/null || \
+    (cd "$MOBILE_DIR" && npm start &)
+else
+    echo "⚠️  Mobile directory not found, skipping mobile server"
+fi
+
+# Wait for mobile to start
 sleep 2
 
 # Open the web browser
@@ -162,6 +188,7 @@ echo "Backend:          http://localhost:3001"
 echo "Frontend:         http://localhost:5173"
 echo "Gen-AI:           http://localhost:8000"
 echo "Facial Processing: http://localhost:8001"
+echo "Mobile:           http://localhost:8081"
 echo ""
 echo "New terminal windows have opened."
 echo "Close those windows to stop the servers."

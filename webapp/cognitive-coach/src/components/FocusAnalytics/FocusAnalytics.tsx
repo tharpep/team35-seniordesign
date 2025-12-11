@@ -17,6 +17,14 @@ interface EmotionEvent {
     confidence?: number;
 }
 
+interface DistractionEventData {
+    id: number;
+    timestamp: string;
+    distraction_type: string;
+    focus_score: number;
+    gaze_deviation: number;
+}
+
 interface FocusAnalyticsProps {
     focusScore: number | null;
     peakFocus?: number | null;
@@ -24,6 +32,7 @@ interface FocusAnalyticsProps {
     timeSeries?: FocusDataPoint[];
     sessionStartTime?: string;
     sessionDuration?: number; // in minutes
+    distractionEvents?: DistractionEventData[];
 }
 
 export default function FocusAnalytics({
@@ -32,7 +41,8 @@ export default function FocusAnalytics({
     lowestFocus,
     timeSeries,
     sessionStartTime,
-    sessionDuration
+    sessionDuration,
+    distractionEvents = []
 }: FocusAnalyticsProps) {
     const [activeTab, setActiveTab] = useState('focus');
 
@@ -98,6 +108,8 @@ export default function FocusAnalytics({
                     <DistractionTimeline
                         startTime={formatStartTime(sessionStartTime)}
                         sessionDuration={sessionDuration || 60}
+                        distractionEvents={distractionEvents}
+                        sessionStartTime={sessionStartTime}
                     />
                 )}
             </div>

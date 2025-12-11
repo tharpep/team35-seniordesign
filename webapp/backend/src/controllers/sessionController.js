@@ -503,12 +503,14 @@ const getSessionMetrics = async (req, res) => {
     const metrics = await facialProcessing.getSessionMetrics(sessionId);
     const recentMetrics = await facialProcessing.getRecentMetrics(sessionId, 20);
     const timeSeries = await facialProcessing.getFocusTimeSeries(sessionId);
+    const distractionEvents = await facialProcessing.getDistractionEvents(sessionId);
 
     res.json({
       session_id: sessionId,
       aggregated: metrics,
       recent: recentMetrics,
-      timeSeries: timeSeries
+      timeSeries: timeSeries,
+      distractionEvents: distractionEvents
     });
 
   } catch (error) {
