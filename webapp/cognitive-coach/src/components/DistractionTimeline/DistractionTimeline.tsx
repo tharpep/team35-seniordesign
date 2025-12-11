@@ -27,10 +27,11 @@ export default function DistractionTimeline({ startTime, sessionDuration, distra
     const [hoveredEvent, setHoveredEvent] = useState<DistractionEvent | null>(null);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-    // Convert SQLite datetime to ISO format (replace space with T)
+    // Convert SQLite datetime to Date object (local time, not UTC)
     const parseTimestamp = (timestamp: string): number => {
-        // SQLite format: "YYYY-MM-DD HH:MM:SS" -> ISO: "YYYY-MM-DDTHH:MM:SSZ"
-        const isoTimestamp = timestamp.replace(' ', 'T') + 'Z';
+        // SQLite format: "YYYY-MM-DD HH:MM:SS" - treat as local time, not UTC
+        // Just replace space with T, don't add Z (which would make it UTC)
+        const isoTimestamp = timestamp.replace(' ', 'T');
         return new Date(isoTimestamp).getTime();
     };
 

@@ -46,7 +46,6 @@ export default function CurrentSessionDetails({ sessionId, artifacts = [], focus
     const [peakFocus, setPeakFocus] = useState<number | null>(null);
     const [lowestFocus, setLowestFocus] = useState<number | null>(null);
     const [averageFocus, setAverageFocus] = useState<number | null>(null);
-    const [distractionEvents, setDistractionEvents] = useState<any[]>([]);
     const [sessionDuration, setSessionDuration] = useState<number>(0);
 
     // Calculate session duration dynamically
@@ -73,10 +72,6 @@ export default function CurrentSessionDetails({ sessionId, artifacts = [], focus
                         setLowestFocus(aggregated.min_focus_score ? Math.round(aggregated.min_focus_score * 100) : null);
                         setAverageFocus(aggregated.avg_focus_score ? Math.round(aggregated.avg_focus_score * 100) : null);
                     }
-                    if (response && response.distractionEvents) {
-                        setDistractionEvents(response.distractionEvents);
-                    }
-                    
                     // Get session start time
                     const session = await api.getSession(String(sessionId));
                     if (session && session.start_time) {
@@ -128,15 +123,6 @@ export default function CurrentSessionDetails({ sessionId, artifacts = [], focus
                 });
             }
 
-            // Add distraction event if detected
-            if (payload.distractionEvent) {
-                // Add timestamp from payload since DistractionEvent doesn't include it
-                const eventWithTimestamp = {
-                    ...payload.distractionEvent,
-                    timestamp: payload.timestamp
-                };
-                setDistractionEvents(prev => [...prev, eventWithTimestamp]);
-            }
         });
 
         return () => {
@@ -252,14 +238,13 @@ export default function CurrentSessionDetails({ sessionId, artifacts = [], focus
                 <div className="current-session-details-content">
                     {/* Focus Analytics */}
                     <div className="session-detail-card">
-                        <FocusAnalytics 
+                        <FocusAnalytics
                             focusScore={averageFocus ?? focusScore}
                             peakFocus={peakFocus}
                             lowestFocus={lowestFocus}
                             timeSeries={focusTimeSeries}
                             sessionStartTime={sessionStartTime}
                             sessionDuration={sessionDuration}
-                            distractionEvents={distractionEvents}
                         />
                     </div>
 

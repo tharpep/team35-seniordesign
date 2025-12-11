@@ -97,12 +97,17 @@ export const subscribeToFacialMetrics = (
   callback: (payload: FacialMetricsPayload) => void
 ) => {
   console.log(`[Socket] Subscribing to facial metrics for session ${sessionId}`);
+  console.log(`[Socket] Connection status: ${socket.connected ? 'connected' : 'disconnected'}, Socket ID: ${socket.id}`);
 
   // Join session room (if not already joined)
   socket.emit('join-session', { sessionId });
+  console.log(`[Socket] Emitted join-session for session-${sessionId}`);
 
   // Listen for facial metrics updates
-  socket.on('facial-metrics', callback);
+  socket.on('facial-metrics', (payload) => {
+    console.log(`[Socket] Received facial-metrics event:`, payload);
+    callback(payload);
+  });
 };
 
 // Unsubscribe from facial metrics updates

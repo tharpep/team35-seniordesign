@@ -207,11 +207,13 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
     useEffect(() => {
         if (currentSessionId && sessionState === 'active') {
             console.log(`[FacialMetrics] Subscribing to metrics for session ${currentSessionId}`);
+            console.log(`[FacialMetrics] Current state - focusScore: ${facialMetrics.focusScore}, emotion: ${facialMetrics.emotion}, faceDetected: ${facialMetrics.faceDetected}`);
 
             subscribeToFacialMetrics(currentSessionId.toString(), (payload: FacialMetricsPayload) => {
-                console.log('[FacialMetrics] Received:', payload);
+                console.log('[FacialMetrics] Received payload:', JSON.stringify(payload, null, 2));
 
                 if (payload.metrics) {
+                    console.log(`[FacialMetrics] Updating state - Focus: ${payload.metrics.focus_score}, Emotion: ${payload.metrics.emotion}, Face: ${payload.metrics.face_detected}`);
                     setFacialMetrics({
                         focusScore: payload.metrics.focus_score,
                         emotion: payload.metrics.emotion,
@@ -219,6 +221,8 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
                         blinkRate: payload.metrics.blink_rate,
                         lastUpdate: new Date()
                     });
+                } else {
+                    console.warn('[FacialMetrics] Payload received but no metrics field:', payload);
                 }
 
                 // Log events
@@ -231,6 +235,7 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
             });
 
             return () => {
+                console.log(`[FacialMetrics] Unsubscribing from session ${currentSessionId}`);
                 unsubscribeFromFacialMetrics(currentSessionId.toString());
                 // Reset metrics when unsubscribing
                 setFacialMetrics({
@@ -280,13 +285,27 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
                         captureCountRef.current += 1;
                         const timestamp = new Date().toLocaleTimeString();
                         console.log(`📸 Webcam capture at ${timestamp}`);
-                        
+
                         const blob = await captureFrameFromStream(webcamStream.stream);
                         if (blob) {
                             console.log(`⏳ Uploading webcam frame (${(blob.size / 1024).toFixed(1)} KB)...`);
-                            await api.uploadFrame(currentSessionId.toString(), blob, webcamStream.type);
+                            const response = await api.uploadFrame(currentSessionId.toString(), blob, webcamStream.type);
                             console.log(`✓ Captured and uploaded from: webcam`);
                             setCaptureCount(captureCountRef.current);
+
+                            // Update facial metrics directly from API response (fallback for socket)
+                            if (response?.processing?.success) {
+                                console.log(`[API Response] Updating metrics from API: Focus=${response.processing.focus_score}, Emotion=${response.processing.emotion}, Face=${response.processing.face_detected}`);
+                                setFacialMetrics({
+                                    focusScore: response.processing.focus_score,
+                                    emotion: response.processing.emotion,
+                                    faceDetected: response.processing.face_detected,
+                                    blinkRate: null,
+                                    lastUpdate: new Date()
+                                });
+                            } else {
+                                console.log(`[API Response] No processing result or unsuccessful:`, response?.processing);
+                            }
                         }
                     } catch (error) {
                         console.error(`✗ Failed to capture from webcam:`, error);
@@ -653,14 +672,20 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
         
         try {
             const endTime = new Date();
-            
+
             // Use the accumulated session time (which excludes paused time)
             const finalDuration = sessionTime;
-            
+
+            // Format end_time as local datetime string (YYYY-MM-DD HH:MM:SS) to match start_time format
+            const formatLocalDateTime = (date: Date) => {
+                const pad = (n: number) => n.toString().padStart(2, '0');
+                return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+            };
+
             // Update session as completed
             await api.updateSession(currentSessionId.toString(), {
                 status: 'completed',
-                end_time: endTime.toISOString(),
+                end_time: formatLocalDateTime(endTime),
                 duration: finalDuration
             });
             
@@ -698,6 +723,9 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
     };
 
     const getFocusLabel = (score: number | null, faceDetected: boolean): string => {
+        // If we haven't received any data yet, show "Waiting..."
+        if (!facialMetrics.lastUpdate && sessionState === 'active') return 'Waiting...';
+        // If we have data but no face detected, show "No Face"
         if (!faceDetected && sessionState === 'active') return 'No Face';
         if (score === null) return 'Waiting...';
         if (score >= 0.7) return 'Good';
@@ -717,6 +745,9 @@ export default function CurrentSession({ onConfigureClick, sessionSettings, onSe
     };
 
     const formatEmotion = (emotion: string | null, faceDetected: boolean): string => {
+        // If we haven't received any data yet, show "Waiting..."
+        if (!facialMetrics.lastUpdate && sessionState === 'active') return 'Waiting...';
+        // If we have data but no face detected, show "No Face"
         if (!faceDetected && sessionState === 'active') return 'No Face';
         if (!emotion) return 'Waiting...';
         // Capitalize first letter

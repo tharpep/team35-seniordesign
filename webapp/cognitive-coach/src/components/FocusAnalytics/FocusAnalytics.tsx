@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import FocusChart from '../FocusChart/FocusChart';
-import DistractionTimeline from '../DistractionTimeline/DistractionTimeline';
 import EmotionTimeline from '../EmotionTimeline/EmotionTimeline';
 
 interface FocusDataPoint {
@@ -17,14 +16,6 @@ interface EmotionEvent {
     confidence?: number;
 }
 
-interface DistractionEventData {
-    id: number;
-    timestamp: string;
-    distraction_type: string;
-    focus_score: number;
-    gaze_deviation: number;
-}
-
 interface FocusAnalyticsProps {
     focusScore: number | null;
     peakFocus?: number | null;
@@ -32,7 +23,6 @@ interface FocusAnalyticsProps {
     timeSeries?: FocusDataPoint[];
     sessionStartTime?: string;
     sessionDuration?: number; // in minutes
-    distractionEvents?: DistractionEventData[];
 }
 
 export default function FocusAnalytics({
@@ -41,17 +31,9 @@ export default function FocusAnalytics({
     lowestFocus,
     timeSeries,
     sessionStartTime,
-    sessionDuration,
-    distractionEvents = []
+    sessionDuration
 }: FocusAnalyticsProps) {
     const [activeTab, setActiveTab] = useState('focus');
-
-    // Format start time for distraction timeline
-    const formatStartTime = (isoString?: string) => {
-        if (!isoString) return '12:00 PM';
-        const date = new Date(isoString);
-        return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-    };
 
     // Extract emotion events from time series data
     const emotionEvents: EmotionEvent[] = (timeSeries || [])
@@ -81,12 +63,6 @@ export default function FocusAnalytics({
                 >
                     Emotions
                 </button>
-                <button
-                    className={`tab ${activeTab === 'distractions' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('distractions')}
-                >
-                    Distraction Events
-                </button>
             </div>
             <div className="focus-chart">
                 {activeTab === 'focus' && (
@@ -102,14 +78,6 @@ export default function FocusAnalytics({
                         emotions={emotionEvents}
                         sessionStartTime={sessionStartTime}
                         sessionDuration={sessionDuration}
-                    />
-                )}
-                {activeTab === 'distractions' && (
-                    <DistractionTimeline
-                        startTime={formatStartTime(sessionStartTime)}
-                        sessionDuration={sessionDuration || 60}
-                        distractionEvents={distractionEvents}
-                        sessionStartTime={sessionStartTime}
                     />
                 )}
             </div>

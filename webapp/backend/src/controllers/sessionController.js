@@ -155,7 +155,7 @@ const createSession = async (req, res) => {
 
     const result = await runQuery(
       `INSERT INTO sessions (user_id, title, start_time, status)
-       VALUES (?, ?, datetime('now'), 'active')`,
+       VALUES (?, ?, datetime('now', 'localtime'), 'active')`,
       [userId, title || 'Untitled Session']
     );
 
@@ -423,6 +423,7 @@ const uploadFrame = async (req, res) => {
           // Broadcast metrics to frontend via Socket.IO
           const io = req.app.get('io');
           if (io) {
+            const roomName = `session-${sessionId}`;
             const metricsPayload = {
               sessionId: parseInt(sessionId),
               timestamp: new Date().toISOString(),
@@ -431,8 +432,16 @@ const uploadFrame = async (req, res) => {
               distractionEvent
             };
 
-            io.to(`session-${sessionId}`).emit('facial-metrics', metricsPayload);
-            console.log(`📡 Broadcasted facial metrics to session-${sessionId}`);
+            // Log room membership before emitting
+            const room = io.sockets.adapter.rooms.get(roomName);
+            const roomSize = room ? room.size : 0;
+            console.log(`📡 Broadcasting facial-metrics to ${roomName} (${roomSize} clients in room)`);
+            console.log(`   └─ Metrics: Focus=${processingResult.result?.focus_score?.toFixed(2)}, Emotion=${processingResult.result?.emotion}, Face=${processingResult.result?.face_detected}`);
+
+            io.to(roomName).emit('facial-metrics', metricsPayload);
+            console.log(`✓ Emitted facial-metrics event to ${roomName}`);
+          } else {
+            console.warn(`⚠️ Socket.IO instance not available on req.app`);
           }
         } else {
           console.warn(`⚠️ Facial processing returned unsuccessful: ${processingResult?.error}`);

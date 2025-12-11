@@ -37,13 +37,22 @@ export default function EmotionTimeline({ emotions, sessionStartTime, sessionDur
     const [hoveredEvent, setHoveredEvent] = useState<EmotionEvent | null>(null);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
+    // Parse timestamp as local time (SQLite stores without timezone info)
+    const parseTimestamp = (timestamp: string): number => {
+        // If timestamp doesn't have timezone indicator, treat as local time
+        if (!timestamp.includes('Z') && !timestamp.includes('+') && !timestamp.includes('-', 10)) {
+            return new Date(timestamp.replace(' ', 'T')).getTime();
+        }
+        return new Date(timestamp).getTime();
+    };
+
     // Calculate timeline bounds dynamically based on actual emotion data
     const calculateSessionBounds = () => {
         if (emotions.length === 0) {
             return { startMs: Date.now(), durationMs: 60 * 60 * 1000 }; // Default 1 hour
         }
 
-        const timestamps = emotions.map(e => new Date(e.timestamp).getTime());
+        const timestamps = emotions.map(e => parseTimestamp(e.timestamp));
         const minTime = Math.min(...timestamps);
         const maxTime = Math.max(...timestamps);
 
@@ -64,27 +73,32 @@ export default function EmotionTimeline({ emotions, sessionStartTime, sessionDur
 
     // Calculate position of an event on the timeline (0-100%)
     const getEventPosition = (timestamp: string) => {
-        const eventMs = new Date(timestamp).getTime();
+        const eventMs = parseTimestamp(timestamp);
         const position = ((eventMs - startMs) / durationMs) * 100;
         return Math.max(0, Math.min(100, position));
     };
 
-    // Display every alternate emotion to reduce clutter
+    // Display all emotions on the timeline, evenly distributed to prevent overlap
     const getDisplayEvents = () => {
         if (emotions.length === 0) return [];
 
         const sortedEmotions = [...emotions].sort(
-            (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+            (a, b) => parseTimestamp(a.timestamp) - parseTimestamp(b.timestamp)
         );
 
-        // Skip every other frame
-        return sortedEmotions
-            .filter((_, index) => index % 2 === 0)
-            .map((event) => ({
-                ...event,
-                displayPosition: getEventPosition(event.timestamp),
-                verticalOffset: 0
-            }));
+        // Distribute events evenly across the timeline to prevent overlap
+        // Leave some padding at the edges (5% on each side)
+        const padding = 5;
+        const availableWidth = 100 - (padding * 2);
+
+        return sortedEmotions.map((event, index) => ({
+            ...event,
+            // Evenly space events across the timeline
+            displayPosition: sortedEmotions.length === 1
+                ? 50
+                : padding + (index / (sortedEmotions.length - 1)) * availableWidth,
+            verticalOffset: 0
+        }));
     };
 
     const displayEvents = getDisplayEvents();
@@ -266,7 +280,7 @@ export default function EmotionTimeline({ emotions, sessionStartTime, sessionDur
                     }}
                 >
                     <div className="tooltip-time">
-                        {new Date(hoveredEvent.timestamp).toLocaleTimeString([], {
+                        {new Date(parseTimestamp(hoveredEvent.timestamp)).toLocaleTimeString([], {
                             hour: 'numeric',
                             minute: '2-digit',
                             second: '2-digit'

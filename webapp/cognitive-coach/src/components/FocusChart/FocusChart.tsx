@@ -39,8 +39,15 @@ interface FocusChartProps {
 
 export default function FocusChart({ averageFocus, peakFocus, lowestFocus, timeSeries }: FocusChartProps) {
     // Format timestamp to readable time (HH:MM)
+    // SQLite stores timestamps without timezone info, so we treat them as local time
     const formatTime = (timestamp: string) => {
-        const date = new Date(timestamp);
+        // If timestamp doesn't have timezone indicator, treat as local time
+        // Replace space with T for ISO format, but don't add Z (which would make it UTC)
+        let dateStr = timestamp;
+        if (!timestamp.includes('Z') && !timestamp.includes('+') && !timestamp.includes('-', 10)) {
+            dateStr = timestamp.replace(' ', 'T');
+        }
+        const date = new Date(dateStr);
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
 

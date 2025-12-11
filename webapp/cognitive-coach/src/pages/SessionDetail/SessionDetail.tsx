@@ -133,21 +133,36 @@ export default function SessionDetail() {
 
                 // Format session data for display
                 if (sessionResponse) {
-                    const startTime = sessionResponse.start_time ? new Date(sessionResponse.start_time) : null;
-                    const endTime = sessionResponse.end_time ? new Date(sessionResponse.end_time) : null;
-                    const durationMinutes = sessionResponse.duration || 0;
-                    const durationHours = Math.floor(durationMinutes / 60);
-                    const durationMins = durationMinutes % 60;
-                    const durationStr = durationHours > 0 
-                        ? `${durationHours}h ${durationMins}m` 
-                        : `${durationMins}m`;
+                    // Parse timestamps - handle both ISO format (with Z) and SQLite format
+                    const parseTimestamp = (ts: string | null): Date | null => {
+                        if (!ts) return null;
+                        // If it doesn't have timezone info, treat as local time
+                        if (!ts.includes('Z') && !ts.includes('+') && !ts.includes('-', 10)) {
+                            return new Date(ts.replace(' ', 'T'));
+                        }
+                        return new Date(ts);
+                    };
+
+                    const startTime = parseTimestamp(sessionResponse.start_time);
+                    const endTime = parseTimestamp(sessionResponse.end_time);
+                    // Duration is stored in seconds, convert to minutes for display
+                    const durationSeconds = sessionResponse.duration || 0;
+                    const durationMinutes = Math.floor(durationSeconds / 60);
+                    const durationSecs = durationSeconds % 60;
+                    const durationStr = durationMinutes > 0
+                        ? `${durationMinutes}m ${durationSecs}s`
+                        : `${durationSecs}s`;
+
+                    // Format time display consistently
+                    const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const formatDate = (date: Date) => date.toLocaleDateString();
 
                     setSessionData({
                         title: sessionResponse.title || 'Untitled Session',
-                        date: startTime && endTime 
-                            ? `${startTime.toLocaleDateString()}, ${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                            : startTime 
-                                ? `${startTime.toLocaleDateString()}, ${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                        date: startTime && endTime
+                            ? `${formatDate(startTime)}, ${formatTime(startTime)} - ${formatTime(endTime)}`
+                            : startTime
+                                ? `${formatDate(startTime)}, ${formatTime(startTime)}`
                                 : 'Unknown date',
                         duration: durationStr,
                         sessionId: '#' + sessionId,

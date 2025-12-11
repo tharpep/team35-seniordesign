@@ -108,8 +108,13 @@ io.on('connection', (socket) => {
   // Join session room
   socket.on('join-session', (data) => {
     const { sessionId } = data;
-    socket.join(`session-${sessionId}`);
-    console.log(`[Socket.IO] Client ${socket.id} joined session-${sessionId}`);
+    const roomName = `session-${sessionId}`;
+    socket.join(roomName);
+    console.log(`[Socket.IO] Client ${socket.id} joined room: ${roomName}`);
+
+    // Log rooms this socket is in
+    const rooms = Array.from(socket.rooms);
+    console.log(`[Socket.IO] Client ${socket.id} is now in rooms: ${rooms.join(', ')}`);
   });
 
   // Leave session room
