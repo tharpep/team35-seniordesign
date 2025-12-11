@@ -1,7 +1,9 @@
-# Working PaddleOCR setup from Oct 16
+# Working PaddleOCR setup
 # PaddleOCR 2.x is much lighter - doesn't load UVDoc, PP-LCNet models
+# PaddlePaddle 3.0.0 has better Windows compatibility than 3.2.x
+setuptools>=65.0.0
 paddleocr==2.10.0
-paddlepaddle
+paddlepaddle==3.0.0
 opencv-python
 pillow
 numpy

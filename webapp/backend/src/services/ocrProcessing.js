@@ -39,8 +39,11 @@ async function processImage(imagePath, sessionId, source = 'screen') {
     const startTime = Date.now();
     
     // Prepare Python command
-    // If PYTHON_PATH is 'py -3.12', split it; otherwise use as-is
-    const pythonCmd = PYTHON_PATH.includes(' ') ? PYTHON_PATH.split(' ') : [PYTHON_PATH];
+    // Check if it's a file path (contains backslash/forward slash or ends with .exe) vs command with args
+    // Paths with spaces should NOT be split (e.g., "C:\Program Files\python.exe")
+    // Commands with args should be split (e.g., "py -3.12")
+    const isPath = PYTHON_PATH.includes('\\') || PYTHON_PATH.includes('/') || PYTHON_PATH.endsWith('.exe');
+    const pythonCmd = (PYTHON_PATH.includes(' ') && !isPath) ? PYTHON_PATH.split(' ') : [PYTHON_PATH];
     const args = [...pythonCmd.slice(1), IMG2STUDY_SCRIPT, imagePath, sessionId.toString(), source];
     const command = pythonCmd[0];
 
@@ -122,7 +125,9 @@ async function processImage(imagePath, sessionId, source = 'screen') {
  */
 async function validateEnvironment() {
   return new Promise((resolve) => {
-    const pythonCmd = PYTHON_PATH.includes(' ') ? PYTHON_PATH.split(' ') : [PYTHON_PATH];
+    // Use same logic as processImage to handle paths with spaces
+    const isPath = PYTHON_PATH.includes('\\') || PYTHON_PATH.includes('/') || PYTHON_PATH.endsWith('.exe');
+    const pythonCmd = (PYTHON_PATH.includes(' ') && !isPath) ? PYTHON_PATH.split(' ') : [PYTHON_PATH];
     const command = pythonCmd[0];
     const args = [...pythonCmd.slice(1), '--version'];
 

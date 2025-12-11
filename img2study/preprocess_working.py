@@ -9,6 +9,10 @@ import time
 import json
 import secrets
 import os
+
+# Force disable OneDNN/MKL-DNN BEFORE importing PaddlePaddle (Windows compatibility)
+os.environ['FLAGS_use_mkldnn'] = '0'
+
 from pathlib import Path
 from datetime import datetime
 import cv2
@@ -124,7 +128,9 @@ def main():
     ocr = PaddleOCR(
         use_textline_orientation=False,
         lang='en',
-        use_angle_cls=False
+        use_angle_cls=False,
+        enable_mkldnn=False,  # Disable OneDNN (Windows compatibility)
+        use_gpu=False  # CPU mode
     )
     init_time = time.time() - start
     print(f"  ✓ Initialized in {init_time:.2f}s")
@@ -133,10 +139,17 @@ def main():
     # Run OCR
     print("Running OCR (detection + recognition)...")
     start = time.time()
-    results = ocr.ocr(image, cls=False)
-    ocr_time = time.time() - start
-    print(f"  ✓ Completed in {ocr_time:.2f}s")
-    print()
+    try:
+        results = ocr.ocr(image, cls=False)
+        ocr_time = time.time() - start
+        print(f"  ✓ Completed in {ocr_time:.2f}s")
+        print()
+    except Exception as e:
+        print(f"  ✗ OCR FAILED with exception: {type(e).__name__}")
+        print(f"  Error message: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 
     # Parse results
     if not results or not results[0]:

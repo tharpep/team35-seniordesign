@@ -128,6 +128,15 @@ function getStatus() {
 }
 
 /**
+ * Check if a file path is currently in the queue
+ * @param {string} framePath - Absolute path to check
+ * @returns {boolean} True if file is queued, false otherwise
+ */
+function isFileQueued(framePath) {
+  return queue.some(task => task.framePath === framePath);
+}
+
+/**
  * Clear queue and reset stats (for testing)
  */
 function clearQueue() {
@@ -144,5 +153,6 @@ function clearQueue() {
 module.exports = {
   addToQueue,
   getStatus,
-  clearQueue
+  clearQueue,
+  isFileQueued
 };

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { getAll, runQuery } = require('../config/database');
+const ocrQueue = require('./ocrQueue');
 
 // Delete frames older than 10 minutes
 const FRAME_RETENTION_MS = 10 * 60 * 1000; // 10 minutes in milliseconds
@@ -23,11 +24,21 @@ const cleanupOldFrames = async () => {
 
     let deletedFiles = 0;
     let deletedRecords = 0;
+    let skippedFiles = 0;
     let errors = 0;
     const sessionFolders = new Set();
 
     for (const frame of oldFrames) {
       try {
+        // Check if file is currently queued for OCR processing
+        if (ocrQueue.isFileQueued(frame.file_path)) {
+          skippedFiles++;
+          console.log(`⏭️  [RAW-IMAGE-SKIP] ${cleanupTimestamp} | Session ${frame.session_id} | Skipped: ${path.basename(frame.file_path)}`);
+          console.log(`  └─ Path: ${frame.file_path}`);
+          console.log(`  └─ Reason: File is currently queued for OCR processing`);
+          continue; // Skip deletion, file is still being processed
+        }
+
         // Delete physical file if it exists
         if (fs.existsSync(frame.file_path)) {
           const fileName = path.basename(frame.file_path);
@@ -83,9 +94,9 @@ const cleanupOldFrames = async () => {
       }
     }
 
-    if (deletedFiles > 0 || deletedFolders > 0) {
+    if (deletedFiles > 0 || deletedFolders > 0 || skippedFiles > 0) {
       console.log(`[RAW-IMAGE-CLEANUP-COMPLETE] ${new Date().toISOString()}`);
-      console.log(`✓ Cleanup summary: ${deletedFiles} raw image(s) permanently deleted, ${deletedRecords} DB record(s) removed${deletedFolders > 0 ? `, ${deletedFolders} empty folder(s) removed` : ''}${errors > 0 ? `, ${errors} error(s)` : ''}`);
+      console.log(`✓ Cleanup summary: ${deletedFiles} raw image(s) permanently deleted, ${deletedRecords} DB record(s) removed${skippedFiles > 0 ? `, ${skippedFiles} skipped (queued for OCR)` : ''}${deletedFolders > 0 ? `, ${deletedFolders} empty folder(s) removed` : ''}${errors > 0 ? `, ${errors} error(s)` : ''}`);
       console.log(`  └─ Privacy compliance: Raw images deleted after processing - Only metrics retained\n`);
     }
   } catch (error) {

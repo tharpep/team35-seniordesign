@@ -1,0 +1,7176 @@
+{
+  "run_id": "run_20251211_133805_9baf6e43",
+  "image_path": "C:\\Users\\aatha\\OneDrive\\Desktop\\Senior Design\\team35-seniordesign\\webapp\\uploads\\frames\\session_21\\screen\\frame_1765478217918.jpg",
+  "image_shape": [
+    858,
+    1600,
+    3
+  ],
+  "lines": [
+    {
+      "text": "ytnon>Ehgllsr",
+      "confidence": 0.8305044174194336,
+      "bbox": [
+        [
+          57,
+          2
+        ],
+        [
+          168,
+          2
+        ],
+        [
+          168,
+          13
+        ],
+        [
+          57,
+          13
+        ]
+      ],
+      "words": [
+        {
+          "text": "ytnon>Ehgllsr",
+          "confidence": 0.8305044174194336,
+          "bbox": [
+            57,
+            2,
+            168,
+            13
+          ]
+        }
+      ],
+      "math_class": "simple",
+      "has_symbols": true,
+      "has_functions": false,
+      "word_count": 1,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "The Python Tutorial",
+      "confidence": 0.9999111294746399,
+      "bbox": [
+        [
+          428,
+          69
+        ],
+        [
+          733,
+          69
+        ],
+        [
+          733,
+          102
+        ],
+        [
+          428,
+          102
+        ]
+      ],
+      "words": [
+        {
+          "text": "The",
+          "confidence": 0.9999111294746399,
+          "bbox": [
+            428,
+            69,
+            481,
+            102
+          ]
+        },
+        {
+          "text": "Python",
+          "confidence": 0.9999111294746399,
+          "bbox": [
+            487,
+            69,
+            595,
+            102
+          ]
+        },
+        {
+          "text": "Tutorial",
+          "confidence": 0.9999111294746399,
+          "bbox": [
+            601,
+            69,
+            745,
+            102
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 3,
+      "visual_classification": "display_equation",
+      "visual_features": {
+        "centered": true,
+        "isolated": false,
+        "tall_narrow": false,
+        "stacked": false
+      },
+      "needs_mathpix": true,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "Previous topic",
+      "confidence": 0.998441755771637,
+      "bbox": [
+        [
+          25,
+          85
+        ],
+        [
+          150,
+          89
+        ],
+        [
+          150,
+          111
+        ],
+        [
+          25,
+          107
+        ]
+      ],
+      "words": [
+        {
+          "text": "Previous",
+          "confidence": 0.998441755771637,
+          "bbox": [
+            25,
+            85,
+            101,
+            111
+          ]
+        },
+        {
+          "text": "topic",
+          "confidence": 0.998441755771637,
+          "bbox": [
+            104,
+            85,
+            152,
+            111
+          ]
+        }
+      ],
+      "math_class": "ambiguous",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 2,
+      "visual_classification": "inline",
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "Changelog",
+      "confidence": 0.9984697699546814,
+      "bbox": [
+        [
+          37,
+          114
+        ],
+        [
+          112,
+          114
+        ],
+        [
+          112,
+          132
+        ],
+        [
+          37,
+          132
+        ]
+      ],
+      "words": [
+        {
+          "text": "Changelog",
+          "confidence": 0.9984697699546814,
+          "bbox": [
+            37,
+            114,
+            112,
+            132
+          ]
+        }
+      ],
+      "math_class": "ambiguous",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 1,
+      "visual_classification": "inline",
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "Tip: This tutorial is designed for programmers that are new to the Python language, not beginners who are",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        [
+          433,
+          139
+        ],
+        [
+          1280,
+          139
+        ],
+        [
+          1280,
+          161
+        ],
+        [
+          433,
+          161
+        ]
+      ],
+      "words": [
+        {
+          "text": "Tip:",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            433,
+            139,
+            471,
+            161
+          ]
+        },
+        {
+          "text": "This",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            488,
+            139,
+            526,
+            161
+          ]
+        },
+        {
+          "text": "tutorial",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            543,
+            139,
+            620,
+            161
+          ]
+        },
+        {
+          "text": "is",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            637,
+            139,
+            657,
+            161
+          ]
+        },
+        {
+          "text": "designed",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            674,
+            139,
+            751,
+            161
+          ]
+        },
+        {
+          "text": "for",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            767,
+            139,
+            796,
+            161
+          ]
+        },
+        {
+          "text": "programmers",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            813,
+            139,
+            919,
+            161
+          ]
+        },
+        {
+          "text": "that",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            936,
+            139,
+            975,
+            161
+          ]
+        },
+        {
+          "text": "are",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            992,
+            139,
+            1020,
+            161
+          ]
+        },
+        {
+          "text": "new",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            1037,
+            139,
+            1066,
+            161
+          ]
+        },
+        {
+          "text": "to",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            1083,
+            139,
+            1102,
+            161
+          ]
+        },
+        {
+          "text": "the",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            1119,
+            139,
+            1148,
+            161
+          ]
+        },
+        {
+          "text": "Python",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            1165,
+            139,
+            1223,
+            161
+          ]
+        },
+        {
+          "text": "language,",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            1240,
+            139,
+            1326,
+            161
+          ]
+        },
+        {
+          "text": "not",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            1343,
+            139,
+            1372,
+            161
+          ]
+        },
+        {
+          "text": "beginners",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            1389,
+            139,
+            1476,
+            161
+          ]
+        },
+        {
+          "text": "who",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            1493,
+            139,
+            1522,
+            161
+          ]
+        },
+        {
+          "text": "are",
+          "confidence": 0.9672544002532959,
+          "bbox": [
+            1539,
+            139,
+            1567,
+            161
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 18,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "Next topic",
+      "confidence": 0.9860040545463562,
+      "bbox": [
+        [
+          28,
+          163
+        ],
+        [
+          118,
+          163
+        ],
+        [
+          118,
+          181
+        ],
+        [
+          28,
+          181
+        ]
+      ],
+      "words": [
+        {
+          "text": "Next",
+          "confidence": 0.9860040545463562,
+          "bbox": [
+            28,
+            163,
+            68,
+            181
+          ]
+        },
+        {
+          "text": "topic",
+          "confidence": 0.9860040545463562,
+          "bbox": [
+            69,
+            163,
+            119,
+            181
+          ]
+        }
+      ],
+      "math_class": "ambiguous",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 2,
+      "visual_classification": "inline",
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "new to programming",
+      "confidence": 0.9830988645553589,
+      "bbox": [
+        [
+          432,
+          167
+        ],
+        [
+          605,
+          171
+        ],
+        [
+          605,
+          193
+        ],
+        [
+          431,
+          189
+        ]
+      ],
+      "words": [
+        {
+          "text": "new",
+          "confidence": 0.9830988645553589,
+          "bbox": [
+            431,
+            167,
+            463,
+            193
+          ]
+        },
+        {
+          "text": "to",
+          "confidence": 0.9830988645553589,
+          "bbox": [
+            467,
+            167,
+            488,
+            193
+          ]
+        },
+        {
+          "text": "programming",
+          "confidence": 0.9830988645553589,
+          "bbox": [
+            492,
+            167,
+            611,
+            193
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 3,
+      "visual_classification": "display_equation",
+      "visual_features": {
+        "centered": true,
+        "isolated": false,
+        "tall_narrow": false,
+        "stacked": false
+      },
+      "needs_mathpix": true,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "1. Whetting Your Appetite",
+      "confidence": 0.9624709486961365,
+      "bbox": [
+        [
+          38,
+          188
+        ],
+        [
+          210,
+          188
+        ],
+        [
+          210,
+          204
+        ],
+        [
+          38,
+          204
+        ]
+      ],
+      "words": [
+        {
+          "text": "1.",
+          "confidence": 0.9624709486961365,
+          "bbox": [
+            38,
+            188,
+            53,
+            204
+          ]
+        },
+        {
+          "text": "Whetting",
+          "confidence": 0.9624709486961365,
+          "bbox": [
+            57,
+            188,
+            119,
+            204
+          ]
+        },
+        {
+          "text": "Your",
+          "confidence": 0.9624709486961365,
+          "bbox": [
+            123,
+            188,
+            154,
+            204
+          ]
+        },
+        {
+          "text": "Appetite",
+          "confidence": 0.9624709486961365,
+          "bbox": [
+            157,
+            188,
+            220,
+            204
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 4,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "This page",
+      "confidence": 0.9917284846305847,
+      "bbox": [
+        [
+          27,
+          233
+        ],
+        [
+          120,
+          237
+        ],
+        [
+          119,
+          260
+        ],
+        [
+          26,
+          256
+        ]
+      ],
+      "words": [
+        {
+          "text": "This",
+          "confidence": 0.9917284846305847,
+          "bbox": [
+            26,
+            233,
+            73,
+            260
+          ]
+        },
+        {
+          "text": "page",
+          "confidence": 0.9917284846305847,
+          "bbox": [
+            74,
+            233,
+            121,
+            260
+          ]
+        }
+      ],
+      "math_class": "ambiguous",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 2,
+      "visual_classification": "inline",
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "Python is an easy to learn, powerful programming language. It has efficient high-level data structures and a sim-",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        [
+          425,
+          225
+        ],
+        [
+          1307,
+          225
+        ],
+        [
+          1307,
+          246
+        ],
+        [
+          425,
+          246
+        ]
+      ],
+      "words": [
+        {
+          "text": "Python",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            425,
+            225,
+            480,
+            246
+          ]
+        },
+        {
+          "text": "is",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            497,
+            225,
+            516,
+            246
+          ]
+        },
+        {
+          "text": "an",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            533,
+            225,
+            552,
+            246
+          ]
+        },
+        {
+          "text": "easy",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            569,
+            225,
+            606,
+            246
+          ]
+        },
+        {
+          "text": "to",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            624,
+            225,
+            642,
+            246
+          ]
+        },
+        {
+          "text": "learn,",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            660,
+            225,
+            715,
+            246
+          ]
+        },
+        {
+          "text": "powerful",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            732,
+            225,
+            806,
+            246
+          ]
+        },
+        {
+          "text": "programming",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            824,
+            225,
+            925,
+            246
+          ]
+        },
+        {
+          "text": "language.",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            942,
+            225,
+            1025,
+            246
+          ]
+        },
+        {
+          "text": "It",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            1043,
+            225,
+            1061,
+            246
+          ]
+        },
+        {
+          "text": "has",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            1079,
+            225,
+            1106,
+            246
+          ]
+        },
+        {
+          "text": "efficient",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            1124,
+            225,
+            1207,
+            246
+          ]
+        },
+        {
+          "text": "high-level",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            1224,
+            225,
+            1316,
+            246
+          ]
+        },
+        {
+          "text": "data",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            1334,
+            225,
+            1370,
+            246
+          ]
+        },
+        {
+          "text": "structures",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            1388,
+            225,
+            1480,
+            246
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            1498,
+            225,
+            1525,
+            246
+          ]
+        },
+        {
+          "text": "a",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            1543,
+            225,
+            1552,
+            246
+          ]
+        },
+        {
+          "text": "sim-",
+          "confidence": 0.9626937508583069,
+          "bbox": [
+            1570,
+            225,
+            1606,
+            246
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 18,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "ple but effective approach to object-oriented programming.Python's elegant syntax and dynamic typing,to-",
+      "confidence": 0.9761675596237183,
+      "bbox": [
+        [
+          423,
+          251
+        ],
+        [
+          1277,
+          251
+        ],
+        [
+          1277,
+          273
+        ],
+        [
+          423,
+          273
+        ]
+      ],
+      "words": [
+        {
+          "text": "ple",
+          "confidence": 0.9761675596237183,
+          "bbox": [
+            423,
+            251,
+            450,
+            273
+          ]
+        },
+        {
+          "text": "but",
+          "confidence": 0.9761675596237183,
+          "bbox": [
+            467,
+            251,
+            495,
+            273
+          ]
+        },
+        {
+          "text": "effective",
+          "confidence": 0.9761675596237183,
+          "bbox": [
+            512,
+            251,
+            594,
+            273
+          ]
+        },
+        {
+          "text": "approach",
+          "confidence": 0.9761675596237183,
+          "bbox": [
+            611,
+            251,
+            685,
+            273
+          ]
+        },
+        {
+          "text": "to",
+          "confidence": 0.9761675596237183,
+          "bbox": [
+            702,
+            251,
+            720,
+            273
+          ]
+        },
+        {
+          "text": "object-oriented",
+          "confidence": 0.9761675596237183,
+          "bbox": [
+            737,
+            251,
+            875,
+            273
+          ]
+        },
+        {
+          "text": "programming.Python's",
+          "confidence": 0.9761675596237183,
+          "bbox": [
+            892,
+            251,
+            1076,
+            273
+          ]
+        },
+        {
+          "text": "elegant",
+          "confidence": 0.9761675596237183,
+          "bbox": [
+            1093,
+            251,
+            1157,
+            273
+          ]
+        },
+        {
+          "text": "syntax",
+          "confidence": 0.9761675596237183,
+          "bbox": [
+            1174,
+            251,
+            1229,
+            273
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.9761675596237183,
+          "bbox": [
+            1247,
+            251,
+            1274,
+            273
+          ]
+        },
+        {
+          "text": "dynamic",
+          "confidence": 0.9761675596237183,
+          "bbox": [
+            1291,
+            251,
+            1355,
+            273
+          ]
+        },
+        {
+          "text": "typing,to-",
+          "confidence": 0.9761675596237183,
+          "bbox": [
+            1373,
+            251,
+            1464,
+            273
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 12,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "Report a bug",
+      "confidence": 0.9561387896537781,
+      "bbox": [
+        [
+          38,
+          266
+        ],
+        [
+          127,
+          266
+        ],
+        [
+          127,
+          285
+        ],
+        [
+          38,
+          285
+        ]
+      ],
+      "words": [
+        {
+          "text": "Report",
+          "confidence": 0.9561387896537781,
+          "bbox": [
+            38,
+            266,
+            91,
+            285
+          ]
+        },
+        {
+          "text": "a",
+          "confidence": 0.9561387896537781,
+          "bbox": [
+            93,
+            266,
+            102,
+            285
+          ]
+        },
+        {
+          "text": "bug",
+          "confidence": 0.9561387896537781,
+          "bbox": [
+            103,
+            266,
+            130,
+            285
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 3,
+      "visual_classification": "inline",
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "Show source",
+      "confidence": 0.9930163025856018,
+      "bbox": [
+        [
+          37,
+          287
+        ],
+        [
+          125,
+          287
+        ],
+        [
+          125,
+          305
+        ],
+        [
+          37,
+          305
+        ]
+      ],
+      "words": [
+        {
+          "text": "Show",
+          "confidence": 0.9930163025856018,
+          "bbox": [
+            37,
+            287,
+            72,
+            305
+          ]
+        },
+        {
+          "text": "source",
+          "confidence": 0.9930163025856018,
+          "bbox": [
+            73,
+            287,
+            126,
+            305
+          ]
+        }
+      ],
+      "math_class": "ambiguous",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 2,
+      "visual_classification": "inline",
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "gether with its interpreted nature, make it an ideal language for scripting and rapid application development in",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        [
+          427,
+          285
+        ],
+        [
+          1295,
+          285
+        ],
+        [
+          1295,
+          302
+        ],
+        [
+          427,
+          302
+        ]
+      ],
+      "words": [
+        {
+          "text": "gether",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            427,
+            285,
+            481,
+            302
+          ]
+        },
+        {
+          "text": "with",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            498,
+            285,
+            534,
+            302
+          ]
+        },
+        {
+          "text": "its",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            552,
+            285,
+            579,
+            302
+          ]
+        },
+        {
+          "text": "interpreted",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            596,
+            285,
+            696,
+            302
+          ]
+        },
+        {
+          "text": "nature,",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            713,
+            285,
+            776,
+            302
+          ]
+        },
+        {
+          "text": "make",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            794,
+            285,
+            830,
+            302
+          ]
+        },
+        {
+          "text": "it",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            847,
+            285,
+            865,
+            302
+          ]
+        },
+        {
+          "text": "an",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            883,
+            285,
+            901,
+            302
+          ]
+        },
+        {
+          "text": "ideal",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            918,
+            285,
+            963,
+            302
+          ]
+        },
+        {
+          "text": "language",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            981,
+            285,
+            1053,
+            302
+          ]
+        },
+        {
+          "text": "for",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            1070,
+            285,
+            1097,
+            302
+          ]
+        },
+        {
+          "text": "scripting",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            1115,
+            285,
+            1196,
+            302
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            1213,
+            285,
+            1241,
+            302
+          ]
+        },
+        {
+          "text": "rapid",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            1258,
+            285,
+            1303,
+            302
+          ]
+        },
+        {
+          "text": "application",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            1321,
+            285,
+            1420,
+            302
+          ]
+        },
+        {
+          "text": "development",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            1437,
+            285,
+            1537,
+            302
+          ]
+        },
+        {
+          "text": "in",
+          "confidence": 0.9544426798820496,
+          "bbox": [
+            1554,
+            285,
+            1572,
+            302
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 17,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "many areas on most platforms.",
+      "confidence": 0.9772313833236694,
+      "bbox": [
+        [
+          425,
+          313
+        ],
+        [
+          670,
+          313
+        ],
+        [
+          670,
+          330
+        ],
+        [
+          425,
+          330
+        ]
+      ],
+      "words": [
+        {
+          "text": "many",
+          "confidence": 0.9772313833236694,
+          "bbox": [
+            425,
+            313,
+            464,
+            330
+          ]
+        },
+        {
+          "text": "areas",
+          "confidence": 0.9772313833236694,
+          "bbox": [
+            469,
+            313,
+            518,
+            330
+          ]
+        },
+        {
+          "text": "on",
+          "confidence": 0.9772313833236694,
+          "bbox": [
+            523,
+            313,
+            542,
+            330
+          ]
+        },
+        {
+          "text": "most",
+          "confidence": 0.9772313833236694,
+          "bbox": [
+            547,
+            313,
+            586,
+            330
+          ]
+        },
+        {
+          "text": "platforms.",
+          "confidence": 0.9772313833236694,
+          "bbox": [
+            591,
+            313,
+            689,
+            330
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 5,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "The Python interpreter and the extensive standard library are freely available in source or binary form for all ma-",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        [
+          425,
+          357
+        ],
+        [
+          1303,
+          357
+        ],
+        [
+          1303,
+          379
+        ],
+        [
+          425,
+          379
+        ]
+      ],
+      "words": [
+        {
+          "text": "The",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            425,
+            357,
+            452,
+            379
+          ]
+        },
+        {
+          "text": "Python",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            469,
+            357,
+            524,
+            379
+          ]
+        },
+        {
+          "text": "interpreter",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            541,
+            357,
+            641,
+            379
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            658,
+            357,
+            685,
+            379
+          ]
+        },
+        {
+          "text": "the",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            703,
+            357,
+            730,
+            379
+          ]
+        },
+        {
+          "text": "extensive",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            748,
+            357,
+            829,
+            379
+          ]
+        },
+        {
+          "text": "standard",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            847,
+            357,
+            919,
+            379
+          ]
+        },
+        {
+          "text": "library",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            937,
+            357,
+            1000,
+            379
+          ]
+        },
+        {
+          "text": "are",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            1018,
+            357,
+            1045,
+            379
+          ]
+        },
+        {
+          "text": "freely",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            1062,
+            357,
+            1117,
+            379
+          ]
+        },
+        {
+          "text": "available",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            1134,
+            357,
+            1216,
+            379
+          ]
+        },
+        {
+          "text": "in",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            1233,
+            357,
+            1251,
+            379
+          ]
+        },
+        {
+          "text": "source",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            1269,
+            357,
+            1323,
+            379
+          ]
+        },
+        {
+          "text": "or",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            1341,
+            357,
+            1359,
+            379
+          ]
+        },
+        {
+          "text": "binary",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            1376,
+            357,
+            1431,
+            379
+          ]
+        },
+        {
+          "text": "form",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            1448,
+            357,
+            1484,
+            379
+          ]
+        },
+        {
+          "text": "for",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            1502,
+            357,
+            1529,
+            379
+          ]
+        },
+        {
+          "text": "all",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            1547,
+            357,
+            1574,
+            379
+          ]
+        },
+        {
+          "text": "ma-",
+          "confidence": 0.9849165678024292,
+          "bbox": [
+            1591,
+            357,
+            1619,
+            379
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 19,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": " jor platforms from the Python website, https://www.python.org/, and may be freely distributed.The same site",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        [
+          422,
+          385
+        ],
+        [
+          1285,
+          384
+        ],
+        [
+          1285,
+          406
+        ],
+        [
+          422,
+          407
+        ]
+      ],
+      "words": [
+        {
+          "text": "jor",
+          "confidence": 0.965643584728241,
+          "bbox": [
+            422,
+            384,
+            449,
+            407
+          ]
+        },
+        {
+          "text": "platforms",
+          "confidence": 0.965643584728241,
+          "bbox": [
+            466,
+            384,
+            549,
+            407
+          ]
+        },
+        {
+          "text": "from",
+          "confidence": 0.965643584728241,
+          "bbox": [
+            566,
+            384,
+            603,
+            407
+          ]
+        },
+        {
+          "text": "the",
+          "confidence": 0.965643584728241,
+          "bbox": [
+            620,
+            384,
+            648,
+            407
+          ]
+        },
+        {
+          "text": "Python",
+          "confidence": 0.965643584728241,
+          "bbox": [
+            665,
+            384,
+            720,
+            407
+          ]
+        },
+        {
+          "text": "website,",
+          "confidence": 0.965643584728241,
+          "bbox": [
+            737,
+            384,
+            811,
+            407
+          ]
+        },
+        {
+          "text": "https://www.python.org/,",
+          "confidence": 0.965643584728241,
+          "bbox": [
+            828,
+            384,
+            1048,
+            407
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.965643584728241,
+          "bbox": [
+            1066,
+            384,
+            1093,
+            407
+          ]
+        },
+        {
+          "text": "may",
+          "confidence": 0.965643584728241,
+          "bbox": [
+            1110,
+            384,
+            1138,
+            407
+          ]
+        },
+        {
+          "text": "be",
+          "confidence": 0.965643584728241,
+          "bbox": [
+            1155,
+            384,
+            1174,
+            407
+          ]
+        },
+        {
+          "text": "freely",
+          "confidence": 0.965643584728241,
+          "bbox": [
+            1191,
+            384,
+            1246,
+            407
+          ]
+        },
+        {
+          "text": "distributed.The",
+          "confidence": 0.965643584728241,
+          "bbox": [
+            1263,
+            384,
+            1401,
+            407
+          ]
+        },
+        {
+          "text": "same",
+          "confidence": 0.965643584728241,
+          "bbox": [
+            1418,
+            384,
+            1455,
+            407
+          ]
+        },
+        {
+          "text": "site",
+          "confidence": 0.965643584728241,
+          "bbox": [
+            1472,
+            384,
+            1509,
+            407
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 14,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "also contains distributions of and pointers to many free third party Python modules, programs and tools, and ad-",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        [
+          425,
+          414
+        ],
+        [
+          1312,
+          414
+        ],
+        [
+          1312,
+          436
+        ],
+        [
+          425,
+          436
+        ]
+      ],
+      "words": [
+        {
+          "text": "also",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            425,
+            414,
+            462,
+            436
+          ]
+        },
+        {
+          "text": "contains",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            480,
+            414,
+            554,
+            436
+          ]
+        },
+        {
+          "text": "distributions",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            572,
+            414,
+            693,
+            436
+          ]
+        },
+        {
+          "text": "of",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            711,
+            414,
+            730,
+            436
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            748,
+            414,
+            776,
+            436
+          ]
+        },
+        {
+          "text": "pointers",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            793,
+            414,
+            868,
+            436
+          ]
+        },
+        {
+          "text": "to",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            886,
+            414,
+            904,
+            436
+          ]
+        },
+        {
+          "text": "many",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            922,
+            414,
+            960,
+            436
+          ]
+        },
+        {
+          "text": "free",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            977,
+            414,
+            1015,
+            436
+          ]
+        },
+        {
+          "text": "third",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            1032,
+            414,
+            1079,
+            436
+          ]
+        },
+        {
+          "text": "party",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            1097,
+            414,
+            1143,
+            436
+          ]
+        },
+        {
+          "text": "Python",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            1161,
+            414,
+            1217,
+            436
+          ]
+        },
+        {
+          "text": "modules,",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            1235,
+            414,
+            1310,
+            436
+          ]
+        },
+        {
+          "text": "programs",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            1327,
+            414,
+            1402,
+            436
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            1420,
+            414,
+            1448,
+            436
+          ]
+        },
+        {
+          "text": "tools,",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            1466,
+            414,
+            1522,
+            436
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            1539,
+            414,
+            1567,
+            436
+          ]
+        },
+        {
+          "text": "ad-",
+          "confidence": 0.9796392321586609,
+          "bbox": [
+            1585,
+            414,
+            1613,
+            436
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 18,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "ditional documentation.",
+      "confidence": 0.9950534105300903,
+      "bbox": [
+        [
+          425,
+          442
+        ],
+        [
+          617,
+          444
+        ],
+        [
+          617,
+          463
+        ],
+        [
+          425,
+          461
+        ]
+      ],
+      "words": [
+        {
+          "text": "ditional",
+          "confidence": 0.9950534105300903,
+          "bbox": [
+            425,
+            442,
+            494,
+            463
+          ]
+        },
+        {
+          "text": "documentation.",
+          "confidence": 0.9950534105300903,
+          "bbox": [
+            498,
+            442,
+            620,
+            463
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 2,
+      "visual_classification": "display_equation",
+      "visual_features": {
+        "centered": true,
+        "isolated": false,
+        "tall_narrow": false,
+        "stacked": false
+      },
+      "needs_mathpix": true,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "The Python interpreter is easily extended with new functions and data types implemented in C or C++ (or other",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        [
+          425,
+          488
+        ],
+        [
+          1302,
+          488
+        ],
+        [
+          1302,
+          509
+        ],
+        [
+          425,
+          509
+        ]
+      ],
+      "words": [
+        {
+          "text": "The",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            425,
+            488,
+            453,
+            509
+          ]
+        },
+        {
+          "text": "Python",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            471,
+            488,
+            529,
+            509
+          ]
+        },
+        {
+          "text": "interpreter",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            546,
+            488,
+            652,
+            509
+          ]
+        },
+        {
+          "text": "is",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            670,
+            488,
+            689,
+            509
+          ]
+        },
+        {
+          "text": "easily",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            707,
+            488,
+            765,
+            509
+          ]
+        },
+        {
+          "text": "extended",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            782,
+            488,
+            859,
+            509
+          ]
+        },
+        {
+          "text": "with",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            877,
+            488,
+            915,
+            509
+          ]
+        },
+        {
+          "text": "new",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            933,
+            488,
+            962,
+            509
+          ]
+        },
+        {
+          "text": "functions",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            979,
+            488,
+            1066,
+            509
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            1084,
+            488,
+            1112,
+            509
+          ]
+        },
+        {
+          "text": "data",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            1130,
+            488,
+            1169,
+            509
+          ]
+        },
+        {
+          "text": "types",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            1186,
+            488,
+            1234,
+            509
+          ]
+        },
+        {
+          "text": "implemented",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            1252,
+            488,
+            1358,
+            509
+          ]
+        },
+        {
+          "text": "in",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            1375,
+            488,
+            1395,
+            509
+          ]
+        },
+        {
+          "text": "C",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            1412,
+            488,
+            1422,
+            509
+          ]
+        },
+        {
+          "text": "or",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            1439,
+            488,
+            1459,
+            509
+          ]
+        },
+        {
+          "text": "C++",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            1476,
+            488,
+            1505,
+            509
+          ]
+        },
+        {
+          "text": "(or",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            1523,
+            488,
+            1551,
+            509
+          ]
+        },
+        {
+          "text": "other",
+          "confidence": 0.9762025475502014,
+          "bbox": [
+            1569,
+            488,
+            1617,
+            509
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 19,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "languages callable from C).Python is also suitable as an extension language for customizable applications.",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        [
+          425,
+          519
+        ],
+        [
+          1258,
+          519
+        ],
+        [
+          1258,
+          536
+        ],
+        [
+          425,
+          536
+        ]
+      ],
+      "words": [
+        {
+          "text": "languages",
+          "confidence": 0.9677386283874512,
+          "bbox": [
+            425,
+            519,
+            505,
+            536
+          ]
+        },
+        {
+          "text": "callable",
+          "confidence": 0.9677386283874512,
+          "bbox": [
+            522,
+            519,
+            593,
+            536
+          ]
+        },
+        {
+          "text": "from",
+          "confidence": 0.9677386283874512,
+          "bbox": [
+            610,
+            519,
+            646,
+            536
+          ]
+        },
+        {
+          "text": "C).Python",
+          "confidence": 0.9677386283874512,
+          "bbox": [
+            663,
+            519,
+            743,
+            536
+          ]
+        },
+        {
+          "text": "is",
+          "confidence": 0.9677386283874512,
+          "bbox": [
+            760,
+            519,
+            778,
+            536
+          ]
+        },
+        {
+          "text": "also",
+          "confidence": 0.9677386283874512,
+          "bbox": [
+            794,
+            519,
+            830,
+            536
+          ]
+        },
+        {
+          "text": "suitable",
+          "confidence": 0.9677386283874512,
+          "bbox": [
+            847,
+            519,
+            919,
+            536
+          ]
+        },
+        {
+          "text": "as",
+          "confidence": 0.9677386283874512,
+          "bbox": [
+            935,
+            519,
+            953,
+            536
+          ]
+        },
+        {
+          "text": "an",
+          "confidence": 0.9677386283874512,
+          "bbox": [
+            970,
+            519,
+            988,
+            536
+          ]
+        },
+        {
+          "text": "extension",
+          "confidence": 0.9677386283874512,
+          "bbox": [
+            1004,
+            519,
+            1085,
+            536
+          ]
+        },
+        {
+          "text": "language",
+          "confidence": 0.9677386283874512,
+          "bbox": [
+            1102,
+            519,
+            1173,
+            536
+          ]
+        },
+        {
+          "text": "for",
+          "confidence": 0.9677386283874512,
+          "bbox": [
+            1190,
+            519,
+            1217,
+            536
+          ]
+        },
+        {
+          "text": "customizable",
+          "confidence": 0.9677386283874512,
+          "bbox": [
+            1233,
+            519,
+            1341,
+            536
+          ]
+        },
+        {
+          "text": "applications.",
+          "confidence": 0.9677386283874512,
+          "bbox": [
+            1358,
+            519,
+            1474,
+            536
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 14,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "This tutorial introduces the reader informally to the basic concepts and features of the Python language and sys-",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        [
+          427,
+          561
+        ],
+        [
+          1305,
+          561
+        ],
+        [
+          1305,
+          583
+        ],
+        [
+          427,
+          583
+        ]
+      ],
+      "words": [
+        {
+          "text": "This",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            427,
+            561,
+            463,
+            583
+          ]
+        },
+        {
+          "text": "tutorial",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            481,
+            561,
+            554,
+            583
+          ]
+        },
+        {
+          "text": "introduces",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            571,
+            561,
+            663,
+            583
+          ]
+        },
+        {
+          "text": "the",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            680,
+            561,
+            708,
+            583
+          ]
+        },
+        {
+          "text": "reader",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            725,
+            561,
+            780,
+            583
+          ]
+        },
+        {
+          "text": "informally",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            798,
+            561,
+            889,
+            583
+          ]
+        },
+        {
+          "text": "to",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            907,
+            561,
+            925,
+            583
+          ]
+        },
+        {
+          "text": "the",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            943,
+            561,
+            970,
+            583
+          ]
+        },
+        {
+          "text": "basic",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            988,
+            561,
+            1033,
+            583
+          ]
+        },
+        {
+          "text": "concepts",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            1051,
+            561,
+            1124,
+            583
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            1142,
+            561,
+            1169,
+            583
+          ]
+        },
+        {
+          "text": "features",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            1187,
+            561,
+            1260,
+            583
+          ]
+        },
+        {
+          "text": "of",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            1277,
+            561,
+            1296,
+            583
+          ]
+        },
+        {
+          "text": "the",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            1313,
+            561,
+            1341,
+            583
+          ]
+        },
+        {
+          "text": "Python",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            1358,
+            561,
+            1413,
+            583
+          ]
+        },
+        {
+          "text": "language",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            1431,
+            561,
+            1504,
+            583
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            1521,
+            561,
+            1549,
+            583
+          ]
+        },
+        {
+          "text": "sys-",
+          "confidence": 0.9853774309158325,
+          "bbox": [
+            1566,
+            561,
+            1603,
+            583
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 18,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "tem.Be aware that it expects you to have a basic understanding of programming in general. It helps to have a",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        [
+          423,
+          590
+        ],
+        [
+          1287,
+          590
+        ],
+        [
+          1287,
+          612
+        ],
+        [
+          423,
+          612
+        ]
+      ],
+      "words": [
+        {
+          "text": "tem.Be",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            423,
+            590,
+            481,
+            612
+          ]
+        },
+        {
+          "text": "aware",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            498,
+            590,
+            547,
+            612
+          ]
+        },
+        {
+          "text": "that",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            564,
+            590,
+            603,
+            612
+          ]
+        },
+        {
+          "text": "it",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            620,
+            590,
+            639,
+            612
+          ]
+        },
+        {
+          "text": "expects",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            657,
+            590,
+            725,
+            612
+          ]
+        },
+        {
+          "text": "you",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            742,
+            590,
+            771,
+            612
+          ]
+        },
+        {
+          "text": "to",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            788,
+            590,
+            808,
+            612
+          ]
+        },
+        {
+          "text": "have",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            825,
+            590,
+            864,
+            612
+          ]
+        },
+        {
+          "text": "a",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            881,
+            590,
+            891,
+            612
+          ]
+        },
+        {
+          "text": "basic",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            908,
+            590,
+            957,
+            612
+          ]
+        },
+        {
+          "text": "understanding",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            974,
+            590,
+            1100,
+            612
+          ]
+        },
+        {
+          "text": "of",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            1117,
+            590,
+            1137,
+            612
+          ]
+        },
+        {
+          "text": "programming",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            1154,
+            590,
+            1261,
+            612
+          ]
+        },
+        {
+          "text": "in",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            1278,
+            590,
+            1298,
+            612
+          ]
+        },
+        {
+          "text": "general.",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            1315,
+            590,
+            1393,
+            612
+          ]
+        },
+        {
+          "text": "It",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            1410,
+            590,
+            1429,
+            612
+          ]
+        },
+        {
+          "text": "helps",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            1446,
+            590,
+            1495,
+            612
+          ]
+        },
+        {
+          "text": "to",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            1512,
+            590,
+            1532,
+            612
+          ]
+        },
+        {
+          "text": "have",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            1549,
+            590,
+            1588,
+            612
+          ]
+        },
+        {
+          "text": "a",
+          "confidence": 0.9655343294143677,
+          "bbox": [
+            1605,
+            590,
+            1615,
+            612
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 20,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "Python interpreter handy for hands-on experience, but all examples are self-contained, so the tutorial can be",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        [
+          427,
+          622
+        ],
+        [
+          1278,
+          622
+        ],
+        [
+          1278,
+          638
+        ],
+        [
+          427,
+          638
+        ]
+      ],
+      "words": [
+        {
+          "text": "Python",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            427,
+            622,
+            481,
+            638
+          ]
+        },
+        {
+          "text": "interpreter",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            498,
+            622,
+            597,
+            638
+          ]
+        },
+        {
+          "text": "handy",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            614,
+            622,
+            660,
+            638
+          ]
+        },
+        {
+          "text": "for",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            677,
+            622,
+            704,
+            638
+          ]
+        },
+        {
+          "text": "hands-on",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            721,
+            622,
+            793,
+            638
+          ]
+        },
+        {
+          "text": "experience,",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            810,
+            622,
+            910,
+            638
+          ]
+        },
+        {
+          "text": "but",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            927,
+            622,
+            954,
+            638
+          ]
+        },
+        {
+          "text": "all",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            971,
+            622,
+            998,
+            638
+          ]
+        },
+        {
+          "text": "examples",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            1015,
+            622,
+            1088,
+            638
+          ]
+        },
+        {
+          "text": "are",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            1105,
+            622,
+            1132,
+            638
+          ]
+        },
+        {
+          "text": "self-contained,",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            1149,
+            622,
+            1285,
+            638
+          ]
+        },
+        {
+          "text": "so",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            1302,
+            622,
+            1320,
+            638
+          ]
+        },
+        {
+          "text": "the",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            1337,
+            622,
+            1364,
+            638
+          ]
+        },
+        {
+          "text": "tutorial",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            1381,
+            622,
+            1453,
+            638
+          ]
+        },
+        {
+          "text": "can",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            1471,
+            622,
+            1498,
+            638
+          ]
+        },
+        {
+          "text": "be",
+          "confidence": 0.9506538510322571,
+          "bbox": [
+            1515,
+            622,
+            1533,
+            638
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 16,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "read off-line as well.",
+      "confidence": 0.9771440029144287,
+      "bbox": [
+        [
+          423,
+          647
+        ],
+        [
+          588,
+          647
+        ],
+        [
+          588,
+          669
+        ],
+        [
+          423,
+          669
+        ]
+      ],
+      "words": [
+        {
+          "text": "read",
+          "confidence": 0.9771440029144287,
+          "bbox": [
+            423,
+            647,
+            457,
+            669
+          ]
+        },
+        {
+          "text": "off-line",
+          "confidence": 0.9771440029144287,
+          "bbox": [
+            461,
+            647,
+            530,
+            669
+          ]
+        },
+        {
+          "text": "as",
+          "confidence": 0.9771440029144287,
+          "bbox": [
+            533,
+            647,
+            551,
+            669
+          ]
+        },
+        {
+          "text": "well.",
+          "confidence": 0.9771440029144287,
+          "bbox": [
+            554,
+            647,
+            597,
+            669
+          ]
+        }
+      ],
+      "math_class": "simple",
+      "has_symbols": true,
+      "has_functions": false,
+      "word_count": 4,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "For a description of standard objects and modules, see Ihe Python Standard Library. Ihe Python Language",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        [
+          425,
+          694
+        ],
+        [
+          1263,
+          694
+        ],
+        [
+          1263,
+          716
+        ],
+        [
+          425,
+          716
+        ]
+      ],
+      "words": [
+        {
+          "text": "For",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            425,
+            694,
+            453,
+            716
+          ]
+        },
+        {
+          "text": "a",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            470,
+            694,
+            479,
+            716
+          ]
+        },
+        {
+          "text": "description",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            496,
+            694,
+            601,
+            716
+          ]
+        },
+        {
+          "text": "of",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            618,
+            694,
+            637,
+            716
+          ]
+        },
+        {
+          "text": "standard",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            653,
+            694,
+            730,
+            716
+          ]
+        },
+        {
+          "text": "objects",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            746,
+            694,
+            813,
+            716
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            830,
+            694,
+            858,
+            716
+          ]
+        },
+        {
+          "text": "modules,",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            875,
+            694,
+            951,
+            716
+          ]
+        },
+        {
+          "text": "see",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            968,
+            694,
+            997,
+            716
+          ]
+        },
+        {
+          "text": "Ihe",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            1013,
+            694,
+            1042,
+            716
+          ]
+        },
+        {
+          "text": "Python",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            1059,
+            694,
+            1116,
+            716
+          ]
+        },
+        {
+          "text": "Standard",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            1133,
+            694,
+            1209,
+            716
+          ]
+        },
+        {
+          "text": "Library.",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            1226,
+            694,
+            1302,
+            716
+          ]
+        },
+        {
+          "text": "Ihe",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            1318,
+            694,
+            1347,
+            716
+          ]
+        },
+        {
+          "text": "Python",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            1364,
+            694,
+            1421,
+            716
+          ]
+        },
+        {
+          "text": "Language",
+          "confidence": 0.9738211631774902,
+          "bbox": [
+            1438,
+            694,
+            1514,
+            716
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 16,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "Reference gives a more formal definition of the language. To write extensions in C or C++, read Extending and",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        [
+          425,
+          722
+        ],
+        [
+          1290,
+          722
+        ],
+        [
+          1290,
+          744
+        ],
+        [
+          425,
+          744
+        ]
+      ],
+      "words": [
+        {
+          "text": "Reference",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            425,
+            722,
+            510,
+            744
+          ]
+        },
+        {
+          "text": "gives",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            527,
+            722,
+            575,
+            744
+          ]
+        },
+        {
+          "text": "a",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            592,
+            722,
+            602,
+            744
+          ]
+        },
+        {
+          "text": "more",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            619,
+            722,
+            657,
+            744
+          ]
+        },
+        {
+          "text": "formal",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            674,
+            722,
+            731,
+            744
+          ]
+        },
+        {
+          "text": "definition",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            749,
+            722,
+            844,
+            744
+          ]
+        },
+        {
+          "text": "of",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            861,
+            722,
+            880,
+            744
+          ]
+        },
+        {
+          "text": "the",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            897,
+            722,
+            926,
+            744
+          ]
+        },
+        {
+          "text": "language.",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            943,
+            722,
+            1029,
+            744
+          ]
+        },
+        {
+          "text": "To",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            1046,
+            722,
+            1065,
+            744
+          ]
+        },
+        {
+          "text": "write",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            1082,
+            722,
+            1130,
+            744
+          ]
+        },
+        {
+          "text": "extensions",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            1147,
+            722,
+            1242,
+            744
+          ]
+        },
+        {
+          "text": "in",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            1259,
+            722,
+            1278,
+            744
+          ]
+        },
+        {
+          "text": "C",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            1296,
+            722,
+            1305,
+            744
+          ]
+        },
+        {
+          "text": "or",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            1323,
+            722,
+            1342,
+            744
+          ]
+        },
+        {
+          "text": "C++,",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            1359,
+            722,
+            1397,
+            744
+          ]
+        },
+        {
+          "text": "read",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            1414,
+            722,
+            1452,
+            744
+          ]
+        },
+        {
+          "text": "Extending",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            1470,
+            722,
+            1555,
+            744
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.9729011058807373,
+          "bbox": [
+            1572,
+            722,
+            1601,
+            744
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 19,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "Embedding the Python Interpreter and Python/C API Reference Manual. There are also several books covering",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        [
+          423,
+          749
+        ],
+        [
+          1288,
+          751
+        ],
+        [
+          1288,
+          773
+        ],
+        [
+          423,
+          771
+        ]
+      ],
+      "words": [
+        {
+          "text": "Embedding",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            423,
+            749,
+            508,
+            773
+          ]
+        },
+        {
+          "text": "the",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            525,
+            749,
+            554,
+            773
+          ]
+        },
+        {
+          "text": "Python",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            571,
+            749,
+            628,
+            773
+          ]
+        },
+        {
+          "text": "Interpreter",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            645,
+            749,
+            750,
+            773
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            767,
+            749,
+            796,
+            773
+          ]
+        },
+        {
+          "text": "Python/C",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            813,
+            749,
+            889,
+            773
+          ]
+        },
+        {
+          "text": "API",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            907,
+            749,
+            935,
+            773
+          ]
+        },
+        {
+          "text": "Reference",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            952,
+            749,
+            1038,
+            773
+          ]
+        },
+        {
+          "text": "Manual.",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            1055,
+            749,
+            1122,
+            773
+          ]
+        },
+        {
+          "text": "There",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            1139,
+            749,
+            1187,
+            773
+          ]
+        },
+        {
+          "text": "are",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            1204,
+            749,
+            1232,
+            773
+          ]
+        },
+        {
+          "text": "also",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            1250,
+            749,
+            1288,
+            773
+          ]
+        },
+        {
+          "text": "several",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            1305,
+            749,
+            1372,
+            773
+          ]
+        },
+        {
+          "text": "books",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            1389,
+            749,
+            1436,
+            773
+          ]
+        },
+        {
+          "text": "covering",
+          "confidence": 0.9754477143287659,
+          "bbox": [
+            1454,
+            749,
+            1530,
+            773
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 15,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "Python in depth.",
+      "confidence": 0.9697888493537903,
+      "bbox": [
+        [
+          427,
+          781
+        ],
+        [
+          557,
+          781
+        ],
+        [
+          557,
+          798
+        ],
+        [
+          427,
+          798
+        ]
+      ],
+      "words": [
+        {
+          "text": "Python",
+          "confidence": 0.9697888493537903,
+          "bbox": [
+            427,
+            781,
+            482,
+            798
+          ]
+        },
+        {
+          "text": "in",
+          "confidence": 0.9697888493537903,
+          "bbox": [
+            485,
+            781,
+            503,
+            798
+          ]
+        },
+        {
+          "text": "depth.",
+          "confidence": 0.9697888493537903,
+          "bbox": [
+            506,
+            781,
+            562,
+            798
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 3,
+      "visual_classification": "display_equation",
+      "visual_features": {
+        "centered": true,
+        "isolated": false,
+        "tall_narrow": false,
+        "stacked": false
+      },
+      "needs_mathpix": true,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    },
+    {
+      "text": "This tutorial does not attempt to be comprehensive and cover every single feature, or even every commonly used",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        [
+          425,
+          824
+        ],
+        [
+          1315,
+          824
+        ],
+        [
+          1315,
+          846
+        ],
+        [
+          425,
+          846
+        ]
+      ],
+      "words": [
+        {
+          "text": "This",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            425,
+            824,
+            463,
+            846
+          ]
+        },
+        {
+          "text": "tutorial",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            481,
+            824,
+            557,
+            846
+          ]
+        },
+        {
+          "text": "does",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            575,
+            824,
+            613,
+            846
+          ]
+        },
+        {
+          "text": "not",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            631,
+            824,
+            660,
+            846
+          ]
+        },
+        {
+          "text": "attempt",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            678,
+            824,
+            745,
+            846
+          ]
+        },
+        {
+          "text": "to",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            762,
+            824,
+            781,
+            846
+          ]
+        },
+        {
+          "text": "be",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            799,
+            824,
+            818,
+            846
+          ]
+        },
+        {
+          "text": "comprehensive",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            836,
+            824,
+            961,
+            846
+          ]
+        },
+        {
+          "text": "and",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            978,
+            824,
+            1007,
+            846
+          ]
+        },
+        {
+          "text": "cover",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            1025,
+            824,
+            1073,
+            846
+          ]
+        },
+        {
+          "text": "every",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            1091,
+            824,
+            1138,
+            846
+          ]
+        },
+        {
+          "text": "single",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            1156,
+            824,
+            1214,
+            846
+          ]
+        },
+        {
+          "text": "feature,",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            1231,
+            824,
+            1308,
+            846
+          ]
+        },
+        {
+          "text": "or",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            1326,
+            824,
+            1345,
+            846
+          ]
+        },
+        {
+          "text": "even",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            1363,
+            824,
+            1401,
+            846
+          ]
+        },
+        {
+          "text": "every",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            1419,
+            824,
+            1467,
+            846
+          ]
+        },
+        {
+          "text": "commonly",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            1484,
+            824,
+            1561,
+            846
+          ]
+        },
+        {
+          "text": "used",
+          "confidence": 0.9751555919647217,
+          "bbox": [
+            1579,
+            824,
+            1617,
+            846
+          ]
+        }
+      ],
+      "math_class": "none",
+      "has_symbols": false,
+      "has_functions": false,
+      "word_count": 18,
+      "needs_mathpix": false,
+      "mathpix_latex": null,
+      "mathpix_confidence": null,
+      "mathpix_used": false
+    }
+  ],
+  "words": [
+    {
+      "text": "ytnon>Ehgllsr",
+      "confidence": 0.8305044174194336,
+      "bbox": [
+        57,
+        2,
+        168,
+        13
+      ]
+    },
+    {
+      "text": "The",
+      "confidence": 0.9999111294746399,
+      "bbox": [
+        428,
+        69,
+        481,
+        102
+      ]
+    },
+    {
+      "text": "Python",
+      "confidence": 0.9999111294746399,
+      "bbox": [
+        487,
+        69,
+        595,
+        102
+      ]
+    },
+    {
+      "text": "Tutorial",
+      "confidence": 0.9999111294746399,
+      "bbox": [
+        601,
+        69,
+        745,
+        102
+      ]
+    },
+    {
+      "text": "Previous",
+      "confidence": 0.998441755771637,
+      "bbox": [
+        25,
+        85,
+        101,
+        111
+      ]
+    },
+    {
+      "text": "topic",
+      "confidence": 0.998441755771637,
+      "bbox": [
+        104,
+        85,
+        152,
+        111
+      ]
+    },
+    {
+      "text": "Changelog",
+      "confidence": 0.9984697699546814,
+      "bbox": [
+        37,
+        114,
+        112,
+        132
+      ]
+    },
+    {
+      "text": "Tip:",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        433,
+        139,
+        471,
+        161
+      ]
+    },
+    {
+      "text": "This",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        488,
+        139,
+        526,
+        161
+      ]
+    },
+    {
+      "text": "tutorial",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        543,
+        139,
+        620,
+        161
+      ]
+    },
+    {
+      "text": "is",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        637,
+        139,
+        657,
+        161
+      ]
+    },
+    {
+      "text": "designed",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        674,
+        139,
+        751,
+        161
+      ]
+    },
+    {
+      "text": "for",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        767,
+        139,
+        796,
+        161
+      ]
+    },
+    {
+      "text": "programmers",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        813,
+        139,
+        919,
+        161
+      ]
+    },
+    {
+      "text": "that",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        936,
+        139,
+        975,
+        161
+      ]
+    },
+    {
+      "text": "are",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        992,
+        139,
+        1020,
+        161
+      ]
+    },
+    {
+      "text": "new",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        1037,
+        139,
+        1066,
+        161
+      ]
+    },
+    {
+      "text": "to",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        1083,
+        139,
+        1102,
+        161
+      ]
+    },
+    {
+      "text": "the",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        1119,
+        139,
+        1148,
+        161
+      ]
+    },
+    {
+      "text": "Python",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        1165,
+        139,
+        1223,
+        161
+      ]
+    },
+    {
+      "text": "language,",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        1240,
+        139,
+        1326,
+        161
+      ]
+    },
+    {
+      "text": "not",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        1343,
+        139,
+        1372,
+        161
+      ]
+    },
+    {
+      "text": "beginners",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        1389,
+        139,
+        1476,
+        161
+      ]
+    },
+    {
+      "text": "who",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        1493,
+        139,
+        1522,
+        161
+      ]
+    },
+    {
+      "text": "are",
+      "confidence": 0.9672544002532959,
+      "bbox": [
+        1539,
+        139,
+        1567,
+        161
+      ]
+    },
+    {
+      "text": "Next",
+      "confidence": 0.9860040545463562,
+      "bbox": [
+        28,
+        163,
+        68,
+        181
+      ]
+    },
+    {
+      "text": "topic",
+      "confidence": 0.9860040545463562,
+      "bbox": [
+        69,
+        163,
+        119,
+        181
+      ]
+    },
+    {
+      "text": "new",
+      "confidence": 0.9830988645553589,
+      "bbox": [
+        431,
+        167,
+        463,
+        193
+      ]
+    },
+    {
+      "text": "to",
+      "confidence": 0.9830988645553589,
+      "bbox": [
+        467,
+        167,
+        488,
+        193
+      ]
+    },
+    {
+      "text": "programming",
+      "confidence": 0.9830988645553589,
+      "bbox": [
+        492,
+        167,
+        611,
+        193
+      ]
+    },
+    {
+      "text": "1.",
+      "confidence": 0.9624709486961365,
+      "bbox": [
+        38,
+        188,
+        53,
+        204
+      ]
+    },
+    {
+      "text": "Whetting",
+      "confidence": 0.9624709486961365,
+      "bbox": [
+        57,
+        188,
+        119,
+        204
+      ]
+    },
+    {
+      "text": "Your",
+      "confidence": 0.9624709486961365,
+      "bbox": [
+        123,
+        188,
+        154,
+        204
+      ]
+    },
+    {
+      "text": "Appetite",
+      "confidence": 0.9624709486961365,
+      "bbox": [
+        157,
+        188,
+        220,
+        204
+      ]
+    },
+    {
+      "text": "This",
+      "confidence": 0.9917284846305847,
+      "bbox": [
+        26,
+        233,
+        73,
+        260
+      ]
+    },
+    {
+      "text": "page",
+      "confidence": 0.9917284846305847,
+      "bbox": [
+        74,
+        233,
+        121,
+        260
+      ]
+    },
+    {
+      "text": "Python",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        425,
+        225,
+        480,
+        246
+      ]
+    },
+    {
+      "text": "is",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        497,
+        225,
+        516,
+        246
+      ]
+    },
+    {
+      "text": "an",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        533,
+        225,
+        552,
+        246
+      ]
+    },
+    {
+      "text": "easy",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        569,
+        225,
+        606,
+        246
+      ]
+    },
+    {
+      "text": "to",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        624,
+        225,
+        642,
+        246
+      ]
+    },
+    {
+      "text": "learn,",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        660,
+        225,
+        715,
+        246
+      ]
+    },
+    {
+      "text": "powerful",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        732,
+        225,
+        806,
+        246
+      ]
+    },
+    {
+      "text": "programming",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        824,
+        225,
+        925,
+        246
+      ]
+    },
+    {
+      "text": "language.",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        942,
+        225,
+        1025,
+        246
+      ]
+    },
+    {
+      "text": "It",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        1043,
+        225,
+        1061,
+        246
+      ]
+    },
+    {
+      "text": "has",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        1079,
+        225,
+        1106,
+        246
+      ]
+    },
+    {
+      "text": "efficient",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        1124,
+        225,
+        1207,
+        246
+      ]
+    },
+    {
+      "text": "high-level",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        1224,
+        225,
+        1316,
+        246
+      ]
+    },
+    {
+      "text": "data",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        1334,
+        225,
+        1370,
+        246
+      ]
+    },
+    {
+      "text": "structures",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        1388,
+        225,
+        1480,
+        246
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        1498,
+        225,
+        1525,
+        246
+      ]
+    },
+    {
+      "text": "a",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        1543,
+        225,
+        1552,
+        246
+      ]
+    },
+    {
+      "text": "sim-",
+      "confidence": 0.9626937508583069,
+      "bbox": [
+        1570,
+        225,
+        1606,
+        246
+      ]
+    },
+    {
+      "text": "ple",
+      "confidence": 0.9761675596237183,
+      "bbox": [
+        423,
+        251,
+        450,
+        273
+      ]
+    },
+    {
+      "text": "but",
+      "confidence": 0.9761675596237183,
+      "bbox": [
+        467,
+        251,
+        495,
+        273
+      ]
+    },
+    {
+      "text": "effective",
+      "confidence": 0.9761675596237183,
+      "bbox": [
+        512,
+        251,
+        594,
+        273
+      ]
+    },
+    {
+      "text": "approach",
+      "confidence": 0.9761675596237183,
+      "bbox": [
+        611,
+        251,
+        685,
+        273
+      ]
+    },
+    {
+      "text": "to",
+      "confidence": 0.9761675596237183,
+      "bbox": [
+        702,
+        251,
+        720,
+        273
+      ]
+    },
+    {
+      "text": "object-oriented",
+      "confidence": 0.9761675596237183,
+      "bbox": [
+        737,
+        251,
+        875,
+        273
+      ]
+    },
+    {
+      "text": "programming.Python's",
+      "confidence": 0.9761675596237183,
+      "bbox": [
+        892,
+        251,
+        1076,
+        273
+      ]
+    },
+    {
+      "text": "elegant",
+      "confidence": 0.9761675596237183,
+      "bbox": [
+        1093,
+        251,
+        1157,
+        273
+      ]
+    },
+    {
+      "text": "syntax",
+      "confidence": 0.9761675596237183,
+      "bbox": [
+        1174,
+        251,
+        1229,
+        273
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.9761675596237183,
+      "bbox": [
+        1247,
+        251,
+        1274,
+        273
+      ]
+    },
+    {
+      "text": "dynamic",
+      "confidence": 0.9761675596237183,
+      "bbox": [
+        1291,
+        251,
+        1355,
+        273
+      ]
+    },
+    {
+      "text": "typing,to-",
+      "confidence": 0.9761675596237183,
+      "bbox": [
+        1373,
+        251,
+        1464,
+        273
+      ]
+    },
+    {
+      "text": "Report",
+      "confidence": 0.9561387896537781,
+      "bbox": [
+        38,
+        266,
+        91,
+        285
+      ]
+    },
+    {
+      "text": "a",
+      "confidence": 0.9561387896537781,
+      "bbox": [
+        93,
+        266,
+        102,
+        285
+      ]
+    },
+    {
+      "text": "bug",
+      "confidence": 0.9561387896537781,
+      "bbox": [
+        103,
+        266,
+        130,
+        285
+      ]
+    },
+    {
+      "text": "Show",
+      "confidence": 0.9930163025856018,
+      "bbox": [
+        37,
+        287,
+        72,
+        305
+      ]
+    },
+    {
+      "text": "source",
+      "confidence": 0.9930163025856018,
+      "bbox": [
+        73,
+        287,
+        126,
+        305
+      ]
+    },
+    {
+      "text": "gether",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        427,
+        285,
+        481,
+        302
+      ]
+    },
+    {
+      "text": "with",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        498,
+        285,
+        534,
+        302
+      ]
+    },
+    {
+      "text": "its",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        552,
+        285,
+        579,
+        302
+      ]
+    },
+    {
+      "text": "interpreted",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        596,
+        285,
+        696,
+        302
+      ]
+    },
+    {
+      "text": "nature,",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        713,
+        285,
+        776,
+        302
+      ]
+    },
+    {
+      "text": "make",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        794,
+        285,
+        830,
+        302
+      ]
+    },
+    {
+      "text": "it",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        847,
+        285,
+        865,
+        302
+      ]
+    },
+    {
+      "text": "an",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        883,
+        285,
+        901,
+        302
+      ]
+    },
+    {
+      "text": "ideal",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        918,
+        285,
+        963,
+        302
+      ]
+    },
+    {
+      "text": "language",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        981,
+        285,
+        1053,
+        302
+      ]
+    },
+    {
+      "text": "for",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        1070,
+        285,
+        1097,
+        302
+      ]
+    },
+    {
+      "text": "scripting",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        1115,
+        285,
+        1196,
+        302
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        1213,
+        285,
+        1241,
+        302
+      ]
+    },
+    {
+      "text": "rapid",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        1258,
+        285,
+        1303,
+        302
+      ]
+    },
+    {
+      "text": "application",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        1321,
+        285,
+        1420,
+        302
+      ]
+    },
+    {
+      "text": "development",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        1437,
+        285,
+        1537,
+        302
+      ]
+    },
+    {
+      "text": "in",
+      "confidence": 0.9544426798820496,
+      "bbox": [
+        1554,
+        285,
+        1572,
+        302
+      ]
+    },
+    {
+      "text": "many",
+      "confidence": 0.9772313833236694,
+      "bbox": [
+        425,
+        313,
+        464,
+        330
+      ]
+    },
+    {
+      "text": "areas",
+      "confidence": 0.9772313833236694,
+      "bbox": [
+        469,
+        313,
+        518,
+        330
+      ]
+    },
+    {
+      "text": "on",
+      "confidence": 0.9772313833236694,
+      "bbox": [
+        523,
+        313,
+        542,
+        330
+      ]
+    },
+    {
+      "text": "most",
+      "confidence": 0.9772313833236694,
+      "bbox": [
+        547,
+        313,
+        586,
+        330
+      ]
+    },
+    {
+      "text": "platforms.",
+      "confidence": 0.9772313833236694,
+      "bbox": [
+        591,
+        313,
+        689,
+        330
+      ]
+    },
+    {
+      "text": "The",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        425,
+        357,
+        452,
+        379
+      ]
+    },
+    {
+      "text": "Python",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        469,
+        357,
+        524,
+        379
+      ]
+    },
+    {
+      "text": "interpreter",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        541,
+        357,
+        641,
+        379
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        658,
+        357,
+        685,
+        379
+      ]
+    },
+    {
+      "text": "the",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        703,
+        357,
+        730,
+        379
+      ]
+    },
+    {
+      "text": "extensive",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        748,
+        357,
+        829,
+        379
+      ]
+    },
+    {
+      "text": "standard",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        847,
+        357,
+        919,
+        379
+      ]
+    },
+    {
+      "text": "library",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        937,
+        357,
+        1000,
+        379
+      ]
+    },
+    {
+      "text": "are",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        1018,
+        357,
+        1045,
+        379
+      ]
+    },
+    {
+      "text": "freely",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        1062,
+        357,
+        1117,
+        379
+      ]
+    },
+    {
+      "text": "available",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        1134,
+        357,
+        1216,
+        379
+      ]
+    },
+    {
+      "text": "in",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        1233,
+        357,
+        1251,
+        379
+      ]
+    },
+    {
+      "text": "source",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        1269,
+        357,
+        1323,
+        379
+      ]
+    },
+    {
+      "text": "or",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        1341,
+        357,
+        1359,
+        379
+      ]
+    },
+    {
+      "text": "binary",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        1376,
+        357,
+        1431,
+        379
+      ]
+    },
+    {
+      "text": "form",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        1448,
+        357,
+        1484,
+        379
+      ]
+    },
+    {
+      "text": "for",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        1502,
+        357,
+        1529,
+        379
+      ]
+    },
+    {
+      "text": "all",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        1547,
+        357,
+        1574,
+        379
+      ]
+    },
+    {
+      "text": "ma-",
+      "confidence": 0.9849165678024292,
+      "bbox": [
+        1591,
+        357,
+        1619,
+        379
+      ]
+    },
+    {
+      "text": "jor",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        422,
+        384,
+        449,
+        407
+      ]
+    },
+    {
+      "text": "platforms",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        466,
+        384,
+        549,
+        407
+      ]
+    },
+    {
+      "text": "from",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        566,
+        384,
+        603,
+        407
+      ]
+    },
+    {
+      "text": "the",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        620,
+        384,
+        648,
+        407
+      ]
+    },
+    {
+      "text": "Python",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        665,
+        384,
+        720,
+        407
+      ]
+    },
+    {
+      "text": "website,",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        737,
+        384,
+        811,
+        407
+      ]
+    },
+    {
+      "text": "https://www.python.org/,",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        828,
+        384,
+        1048,
+        407
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        1066,
+        384,
+        1093,
+        407
+      ]
+    },
+    {
+      "text": "may",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        1110,
+        384,
+        1138,
+        407
+      ]
+    },
+    {
+      "text": "be",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        1155,
+        384,
+        1174,
+        407
+      ]
+    },
+    {
+      "text": "freely",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        1191,
+        384,
+        1246,
+        407
+      ]
+    },
+    {
+      "text": "distributed.The",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        1263,
+        384,
+        1401,
+        407
+      ]
+    },
+    {
+      "text": "same",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        1418,
+        384,
+        1455,
+        407
+      ]
+    },
+    {
+      "text": "site",
+      "confidence": 0.965643584728241,
+      "bbox": [
+        1472,
+        384,
+        1509,
+        407
+      ]
+    },
+    {
+      "text": "also",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        425,
+        414,
+        462,
+        436
+      ]
+    },
+    {
+      "text": "contains",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        480,
+        414,
+        554,
+        436
+      ]
+    },
+    {
+      "text": "distributions",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        572,
+        414,
+        693,
+        436
+      ]
+    },
+    {
+      "text": "of",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        711,
+        414,
+        730,
+        436
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        748,
+        414,
+        776,
+        436
+      ]
+    },
+    {
+      "text": "pointers",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        793,
+        414,
+        868,
+        436
+      ]
+    },
+    {
+      "text": "to",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        886,
+        414,
+        904,
+        436
+      ]
+    },
+    {
+      "text": "many",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        922,
+        414,
+        960,
+        436
+      ]
+    },
+    {
+      "text": "free",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        977,
+        414,
+        1015,
+        436
+      ]
+    },
+    {
+      "text": "third",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        1032,
+        414,
+        1079,
+        436
+      ]
+    },
+    {
+      "text": "party",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        1097,
+        414,
+        1143,
+        436
+      ]
+    },
+    {
+      "text": "Python",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        1161,
+        414,
+        1217,
+        436
+      ]
+    },
+    {
+      "text": "modules,",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        1235,
+        414,
+        1310,
+        436
+      ]
+    },
+    {
+      "text": "programs",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        1327,
+        414,
+        1402,
+        436
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        1420,
+        414,
+        1448,
+        436
+      ]
+    },
+    {
+      "text": "tools,",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        1466,
+        414,
+        1522,
+        436
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        1539,
+        414,
+        1567,
+        436
+      ]
+    },
+    {
+      "text": "ad-",
+      "confidence": 0.9796392321586609,
+      "bbox": [
+        1585,
+        414,
+        1613,
+        436
+      ]
+    },
+    {
+      "text": "ditional",
+      "confidence": 0.9950534105300903,
+      "bbox": [
+        425,
+        442,
+        494,
+        463
+      ]
+    },
+    {
+      "text": "documentation.",
+      "confidence": 0.9950534105300903,
+      "bbox": [
+        498,
+        442,
+        620,
+        463
+      ]
+    },
+    {
+      "text": "The",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        425,
+        488,
+        453,
+        509
+      ]
+    },
+    {
+      "text": "Python",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        471,
+        488,
+        529,
+        509
+      ]
+    },
+    {
+      "text": "interpreter",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        546,
+        488,
+        652,
+        509
+      ]
+    },
+    {
+      "text": "is",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        670,
+        488,
+        689,
+        509
+      ]
+    },
+    {
+      "text": "easily",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        707,
+        488,
+        765,
+        509
+      ]
+    },
+    {
+      "text": "extended",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        782,
+        488,
+        859,
+        509
+      ]
+    },
+    {
+      "text": "with",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        877,
+        488,
+        915,
+        509
+      ]
+    },
+    {
+      "text": "new",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        933,
+        488,
+        962,
+        509
+      ]
+    },
+    {
+      "text": "functions",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        979,
+        488,
+        1066,
+        509
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        1084,
+        488,
+        1112,
+        509
+      ]
+    },
+    {
+      "text": "data",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        1130,
+        488,
+        1169,
+        509
+      ]
+    },
+    {
+      "text": "types",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        1186,
+        488,
+        1234,
+        509
+      ]
+    },
+    {
+      "text": "implemented",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        1252,
+        488,
+        1358,
+        509
+      ]
+    },
+    {
+      "text": "in",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        1375,
+        488,
+        1395,
+        509
+      ]
+    },
+    {
+      "text": "C",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        1412,
+        488,
+        1422,
+        509
+      ]
+    },
+    {
+      "text": "or",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        1439,
+        488,
+        1459,
+        509
+      ]
+    },
+    {
+      "text": "C++",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        1476,
+        488,
+        1505,
+        509
+      ]
+    },
+    {
+      "text": "(or",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        1523,
+        488,
+        1551,
+        509
+      ]
+    },
+    {
+      "text": "other",
+      "confidence": 0.9762025475502014,
+      "bbox": [
+        1569,
+        488,
+        1617,
+        509
+      ]
+    },
+    {
+      "text": "languages",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        425,
+        519,
+        505,
+        536
+      ]
+    },
+    {
+      "text": "callable",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        522,
+        519,
+        593,
+        536
+      ]
+    },
+    {
+      "text": "from",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        610,
+        519,
+        646,
+        536
+      ]
+    },
+    {
+      "text": "C).Python",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        663,
+        519,
+        743,
+        536
+      ]
+    },
+    {
+      "text": "is",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        760,
+        519,
+        778,
+        536
+      ]
+    },
+    {
+      "text": "also",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        794,
+        519,
+        830,
+        536
+      ]
+    },
+    {
+      "text": "suitable",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        847,
+        519,
+        919,
+        536
+      ]
+    },
+    {
+      "text": "as",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        935,
+        519,
+        953,
+        536
+      ]
+    },
+    {
+      "text": "an",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        970,
+        519,
+        988,
+        536
+      ]
+    },
+    {
+      "text": "extension",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        1004,
+        519,
+        1085,
+        536
+      ]
+    },
+    {
+      "text": "language",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        1102,
+        519,
+        1173,
+        536
+      ]
+    },
+    {
+      "text": "for",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        1190,
+        519,
+        1217,
+        536
+      ]
+    },
+    {
+      "text": "customizable",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        1233,
+        519,
+        1341,
+        536
+      ]
+    },
+    {
+      "text": "applications.",
+      "confidence": 0.9677386283874512,
+      "bbox": [
+        1358,
+        519,
+        1474,
+        536
+      ]
+    },
+    {
+      "text": "This",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        427,
+        561,
+        463,
+        583
+      ]
+    },
+    {
+      "text": "tutorial",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        481,
+        561,
+        554,
+        583
+      ]
+    },
+    {
+      "text": "introduces",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        571,
+        561,
+        663,
+        583
+      ]
+    },
+    {
+      "text": "the",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        680,
+        561,
+        708,
+        583
+      ]
+    },
+    {
+      "text": "reader",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        725,
+        561,
+        780,
+        583
+      ]
+    },
+    {
+      "text": "informally",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        798,
+        561,
+        889,
+        583
+      ]
+    },
+    {
+      "text": "to",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        907,
+        561,
+        925,
+        583
+      ]
+    },
+    {
+      "text": "the",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        943,
+        561,
+        970,
+        583
+      ]
+    },
+    {
+      "text": "basic",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        988,
+        561,
+        1033,
+        583
+      ]
+    },
+    {
+      "text": "concepts",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        1051,
+        561,
+        1124,
+        583
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        1142,
+        561,
+        1169,
+        583
+      ]
+    },
+    {
+      "text": "features",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        1187,
+        561,
+        1260,
+        583
+      ]
+    },
+    {
+      "text": "of",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        1277,
+        561,
+        1296,
+        583
+      ]
+    },
+    {
+      "text": "the",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        1313,
+        561,
+        1341,
+        583
+      ]
+    },
+    {
+      "text": "Python",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        1358,
+        561,
+        1413,
+        583
+      ]
+    },
+    {
+      "text": "language",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        1431,
+        561,
+        1504,
+        583
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        1521,
+        561,
+        1549,
+        583
+      ]
+    },
+    {
+      "text": "sys-",
+      "confidence": 0.9853774309158325,
+      "bbox": [
+        1566,
+        561,
+        1603,
+        583
+      ]
+    },
+    {
+      "text": "tem.Be",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        423,
+        590,
+        481,
+        612
+      ]
+    },
+    {
+      "text": "aware",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        498,
+        590,
+        547,
+        612
+      ]
+    },
+    {
+      "text": "that",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        564,
+        590,
+        603,
+        612
+      ]
+    },
+    {
+      "text": "it",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        620,
+        590,
+        639,
+        612
+      ]
+    },
+    {
+      "text": "expects",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        657,
+        590,
+        725,
+        612
+      ]
+    },
+    {
+      "text": "you",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        742,
+        590,
+        771,
+        612
+      ]
+    },
+    {
+      "text": "to",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        788,
+        590,
+        808,
+        612
+      ]
+    },
+    {
+      "text": "have",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        825,
+        590,
+        864,
+        612
+      ]
+    },
+    {
+      "text": "a",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        881,
+        590,
+        891,
+        612
+      ]
+    },
+    {
+      "text": "basic",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        908,
+        590,
+        957,
+        612
+      ]
+    },
+    {
+      "text": "understanding",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        974,
+        590,
+        1100,
+        612
+      ]
+    },
+    {
+      "text": "of",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        1117,
+        590,
+        1137,
+        612
+      ]
+    },
+    {
+      "text": "programming",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        1154,
+        590,
+        1261,
+        612
+      ]
+    },
+    {
+      "text": "in",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        1278,
+        590,
+        1298,
+        612
+      ]
+    },
+    {
+      "text": "general.",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        1315,
+        590,
+        1393,
+        612
+      ]
+    },
+    {
+      "text": "It",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        1410,
+        590,
+        1429,
+        612
+      ]
+    },
+    {
+      "text": "helps",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        1446,
+        590,
+        1495,
+        612
+      ]
+    },
+    {
+      "text": "to",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        1512,
+        590,
+        1532,
+        612
+      ]
+    },
+    {
+      "text": "have",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        1549,
+        590,
+        1588,
+        612
+      ]
+    },
+    {
+      "text": "a",
+      "confidence": 0.9655343294143677,
+      "bbox": [
+        1605,
+        590,
+        1615,
+        612
+      ]
+    },
+    {
+      "text": "Python",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        427,
+        622,
+        481,
+        638
+      ]
+    },
+    {
+      "text": "interpreter",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        498,
+        622,
+        597,
+        638
+      ]
+    },
+    {
+      "text": "handy",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        614,
+        622,
+        660,
+        638
+      ]
+    },
+    {
+      "text": "for",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        677,
+        622,
+        704,
+        638
+      ]
+    },
+    {
+      "text": "hands-on",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        721,
+        622,
+        793,
+        638
+      ]
+    },
+    {
+      "text": "experience,",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        810,
+        622,
+        910,
+        638
+      ]
+    },
+    {
+      "text": "but",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        927,
+        622,
+        954,
+        638
+      ]
+    },
+    {
+      "text": "all",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        971,
+        622,
+        998,
+        638
+      ]
+    },
+    {
+      "text": "examples",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        1015,
+        622,
+        1088,
+        638
+      ]
+    },
+    {
+      "text": "are",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        1105,
+        622,
+        1132,
+        638
+      ]
+    },
+    {
+      "text": "self-contained,",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        1149,
+        622,
+        1285,
+        638
+      ]
+    },
+    {
+      "text": "so",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        1302,
+        622,
+        1320,
+        638
+      ]
+    },
+    {
+      "text": "the",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        1337,
+        622,
+        1364,
+        638
+      ]
+    },
+    {
+      "text": "tutorial",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        1381,
+        622,
+        1453,
+        638
+      ]
+    },
+    {
+      "text": "can",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        1471,
+        622,
+        1498,
+        638
+      ]
+    },
+    {
+      "text": "be",
+      "confidence": 0.9506538510322571,
+      "bbox": [
+        1515,
+        622,
+        1533,
+        638
+      ]
+    },
+    {
+      "text": "read",
+      "confidence": 0.9771440029144287,
+      "bbox": [
+        423,
+        647,
+        457,
+        669
+      ]
+    },
+    {
+      "text": "off-line",
+      "confidence": 0.9771440029144287,
+      "bbox": [
+        461,
+        647,
+        530,
+        669
+      ]
+    },
+    {
+      "text": "as",
+      "confidence": 0.9771440029144287,
+      "bbox": [
+        533,
+        647,
+        551,
+        669
+      ]
+    },
+    {
+      "text": "well.",
+      "confidence": 0.9771440029144287,
+      "bbox": [
+        554,
+        647,
+        597,
+        669
+      ]
+    },
+    {
+      "text": "For",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        425,
+        694,
+        453,
+        716
+      ]
+    },
+    {
+      "text": "a",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        470,
+        694,
+        479,
+        716
+      ]
+    },
+    {
+      "text": "description",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        496,
+        694,
+        601,
+        716
+      ]
+    },
+    {
+      "text": "of",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        618,
+        694,
+        637,
+        716
+      ]
+    },
+    {
+      "text": "standard",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        653,
+        694,
+        730,
+        716
+      ]
+    },
+    {
+      "text": "objects",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        746,
+        694,
+        813,
+        716
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        830,
+        694,
+        858,
+        716
+      ]
+    },
+    {
+      "text": "modules,",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        875,
+        694,
+        951,
+        716
+      ]
+    },
+    {
+      "text": "see",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        968,
+        694,
+        997,
+        716
+      ]
+    },
+    {
+      "text": "Ihe",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        1013,
+        694,
+        1042,
+        716
+      ]
+    },
+    {
+      "text": "Python",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        1059,
+        694,
+        1116,
+        716
+      ]
+    },
+    {
+      "text": "Standard",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        1133,
+        694,
+        1209,
+        716
+      ]
+    },
+    {
+      "text": "Library.",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        1226,
+        694,
+        1302,
+        716
+      ]
+    },
+    {
+      "text": "Ihe",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        1318,
+        694,
+        1347,
+        716
+      ]
+    },
+    {
+      "text": "Python",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        1364,
+        694,
+        1421,
+        716
+      ]
+    },
+    {
+      "text": "Language",
+      "confidence": 0.9738211631774902,
+      "bbox": [
+        1438,
+        694,
+        1514,
+        716
+      ]
+    },
+    {
+      "text": "Reference",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        425,
+        722,
+        510,
+        744
+      ]
+    },
+    {
+      "text": "gives",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        527,
+        722,
+        575,
+        744
+      ]
+    },
+    {
+      "text": "a",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        592,
+        722,
+        602,
+        744
+      ]
+    },
+    {
+      "text": "more",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        619,
+        722,
+        657,
+        744
+      ]
+    },
+    {
+      "text": "formal",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        674,
+        722,
+        731,
+        744
+      ]
+    },
+    {
+      "text": "definition",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        749,
+        722,
+        844,
+        744
+      ]
+    },
+    {
+      "text": "of",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        861,
+        722,
+        880,
+        744
+      ]
+    },
+    {
+      "text": "the",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        897,
+        722,
+        926,
+        744
+      ]
+    },
+    {
+      "text": "language.",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        943,
+        722,
+        1029,
+        744
+      ]
+    },
+    {
+      "text": "To",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        1046,
+        722,
+        1065,
+        744
+      ]
+    },
+    {
+      "text": "write",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        1082,
+        722,
+        1130,
+        744
+      ]
+    },
+    {
+      "text": "extensions",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        1147,
+        722,
+        1242,
+        744
+      ]
+    },
+    {
+      "text": "in",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        1259,
+        722,
+        1278,
+        744
+      ]
+    },
+    {
+      "text": "C",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        1296,
+        722,
+        1305,
+        744
+      ]
+    },
+    {
+      "text": "or",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        1323,
+        722,
+        1342,
+        744
+      ]
+    },
+    {
+      "text": "C++,",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        1359,
+        722,
+        1397,
+        744
+      ]
+    },
+    {
+      "text": "read",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        1414,
+        722,
+        1452,
+        744
+      ]
+    },
+    {
+      "text": "Extending",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        1470,
+        722,
+        1555,
+        744
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.9729011058807373,
+      "bbox": [
+        1572,
+        722,
+        1601,
+        744
+      ]
+    },
+    {
+      "text": "Embedding",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        423,
+        749,
+        508,
+        773
+      ]
+    },
+    {
+      "text": "the",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        525,
+        749,
+        554,
+        773
+      ]
+    },
+    {
+      "text": "Python",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        571,
+        749,
+        628,
+        773
+      ]
+    },
+    {
+      "text": "Interpreter",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        645,
+        749,
+        750,
+        773
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        767,
+        749,
+        796,
+        773
+      ]
+    },
+    {
+      "text": "Python/C",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        813,
+        749,
+        889,
+        773
+      ]
+    },
+    {
+      "text": "API",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        907,
+        749,
+        935,
+        773
+      ]
+    },
+    {
+      "text": "Reference",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        952,
+        749,
+        1038,
+        773
+      ]
+    },
+    {
+      "text": "Manual.",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        1055,
+        749,
+        1122,
+        773
+      ]
+    },
+    {
+      "text": "There",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        1139,
+        749,
+        1187,
+        773
+      ]
+    },
+    {
+      "text": "are",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        1204,
+        749,
+        1232,
+        773
+      ]
+    },
+    {
+      "text": "also",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        1250,
+        749,
+        1288,
+        773
+      ]
+    },
+    {
+      "text": "several",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        1305,
+        749,
+        1372,
+        773
+      ]
+    },
+    {
+      "text": "books",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        1389,
+        749,
+        1436,
+        773
+      ]
+    },
+    {
+      "text": "covering",
+      "confidence": 0.9754477143287659,
+      "bbox": [
+        1454,
+        749,
+        1530,
+        773
+      ]
+    },
+    {
+      "text": "Python",
+      "confidence": 0.9697888493537903,
+      "bbox": [
+        427,
+        781,
+        482,
+        798
+      ]
+    },
+    {
+      "text": "in",
+      "confidence": 0.9697888493537903,
+      "bbox": [
+        485,
+        781,
+        503,
+        798
+      ]
+    },
+    {
+      "text": "depth.",
+      "confidence": 0.9697888493537903,
+      "bbox": [
+        506,
+        781,
+        562,
+        798
+      ]
+    },
+    {
+      "text": "This",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        425,
+        824,
+        463,
+        846
+      ]
+    },
+    {
+      "text": "tutorial",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        481,
+        824,
+        557,
+        846
+      ]
+    },
+    {
+      "text": "does",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        575,
+        824,
+        613,
+        846
+      ]
+    },
+    {
+      "text": "not",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        631,
+        824,
+        660,
+        846
+      ]
+    },
+    {
+      "text": "attempt",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        678,
+        824,
+        745,
+        846
+      ]
+    },
+    {
+      "text": "to",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        762,
+        824,
+        781,
+        846
+      ]
+    },
+    {
+      "text": "be",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        799,
+        824,
+        818,
+        846
+      ]
+    },
+    {
+      "text": "comprehensive",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        836,
+        824,
+        961,
+        846
+      ]
+    },
+    {
+      "text": "and",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        978,
+        824,
+        1007,
+        846
+      ]
+    },
+    {
+      "text": "cover",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        1025,
+        824,
+        1073,
+        846
+      ]
+    },
+    {
+      "text": "every",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        1091,
+        824,
+        1138,
+        846
+      ]
+    },
+    {
+      "text": "single",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        1156,
+        824,
+        1214,
+        846
+      ]
+    },
+    {
+      "text": "feature,",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        1231,
+        824,
+        1308,
+        846
+      ]
+    },
+    {
+      "text": "or",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        1326,
+        824,
+        1345,
+        846
+      ]
+    },
+    {
+      "text": "even",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        1363,
+        824,
+        1401,
+        846
+      ]
+    },
+    {
+      "text": "every",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        1419,
+        824,
+        1467,
+        846
+      ]
+    },
+    {
+      "text": "commonly",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        1484,
+        824,
+        1561,
+        846
+      ]
+    },
+    {
+      "text": "used",
+      "confidence": 0.9751555919647217,
+      "bbox": [
+        1579,
+        824,
+        1617,
+        846
+      ]
+    }
+  ],
+  "stats": {
+    "total_lines": 30,
+    "total_words": 308,
+    "avg_confidence": 0.9717530767122905,
+    "high_confidence_lines": 29,
+    "medium_confidence_lines": 0,
+    "low_confidence_lines": 1,
+    "preprocessing_time": 26.06044030189514
+  }
+}
