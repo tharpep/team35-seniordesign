@@ -592,22 +592,21 @@ const appendContext = async (req, res) => {
       });
     }
 
-    // Write markdown file to session directory for RAG ingestion
-    // Note: We no longer store markdown in SQL sessions.context - it goes to file system and vector DB only
+    // OCR script writes markdown files to backend/data/ocr_outputs/{session_id}/{filename}.md
+    // We need to find the most recent markdown file for this session and ingest it
     const timestamp = new Date().toISOString();
-    const genAiBasePath = path.join(__dirname, '../../../gen-ai/src/data/documents/sessions');
-    const sessionDir = path.join(genAiBasePath, sessionId.toString());
+    const ocrOutputBasePath = path.join(__dirname, '../../data/ocr_outputs');
+    const sessionDir = path.join(ocrOutputBasePath, sessionId.toString());
     const fileName = `${timestamp.replace(/[:.]/g, '-')}_${source || 'unknown'}.md`;
     const filePath = path.join(sessionDir, fileName);
 
     try {
-      // Ensure session directory exists
+      // Write markdown file to OCR outputs directory
       if (!fsSync.existsSync(sessionDir)) {
         fsSync.mkdirSync(sessionDir, { recursive: true });
-        console.log(`[appendContext] Created session directory: ${sessionDir}`);
+        console.log(`[appendContext] Created OCR output directory: ${sessionDir}`);
       }
 
-      // Write markdown file
       await fs.writeFile(filePath, markdown, 'utf8');
       console.log(`[appendContext] Wrote markdown file: ${filePath}`);
 
@@ -645,23 +644,19 @@ const appendContext = async (req, res) => {
         ingestReq.end();
       };
 
-      // Trigger Gen-AI ingestion for the file written to gen-ai location (fire-and-forget, don't await)
+      // Trigger Gen-AI ingestion using absolute path to OCR output file
       const genAiUrl = process.env.GEN_AI_URL || 'http://127.0.0.1:8000';
-
-      // Use relative path from gen-ai directory for files in gen-ai location
-      const genAiDir = path.resolve(__dirname, '../../../gen-ai');
       const absoluteFilePath = path.resolve(filePath);
-      const relativePath = path.relative(genAiDir, absoluteFilePath).replace(/\\/g, '/'); // Normalize path separators
       
-      console.log(`[appendContext] Path calculation - genAiDir: ${genAiDir}, filePath: ${absoluteFilePath}, relativePath: ${relativePath}`);
+      console.log(`[appendContext] Queueing ingestion - sessionId: ${sessionId}, absolutePath: ${absoluteFilePath}`);
 
       const ingestPayload = JSON.stringify({
         session_id: sessionId.toString(),
-        file_path: relativePath
+        file_path: absoluteFilePath  // Send absolute path - Gen-AI will handle it
       });
 
-      // Queue ingestion for gen-ai location file
-      queueIngestion(genAiUrl, ingestPayload, sessionId, 'gen-ai location');
+      // Queue ingestion for OCR output file
+      queueIngestion(genAiUrl, ingestPayload, sessionId, 'OCR output');
 
     } catch (fileError) {
       console.error(`[appendContext] Error writing file or triggering ingestion: ${fileError.message}`);
