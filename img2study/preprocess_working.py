@@ -83,11 +83,16 @@ def main():
     run_hash = secrets.token_hex(4)
     run_id = f"run_{timestamp}_{run_hash}"
 
-    output_dir = Path("dataset/output/")
-    run_output = output_dir / session_id / run_id
-    markdown_dir = output_dir / session_id
+    # Calculate paths relative to workspace root
+    # img2study is at workspace/img2study, so go up one level to workspace root
+    workspace_root = Path(__file__).parent.parent
+    backend_data_dir = workspace_root / "webapp" / "backend" / "data" / "ocr_outputs"
+
+    # Primary output location: backend/data/ocr_outputs
+    run_output = backend_data_dir / run_id
 
     json_dir = run_output / "json"
+    markdown_dir = run_output / "markdown"
     tables_dir = run_output / "tables"
     artifacts_dir = run_output / "artifacts"
     crops_dir = run_output / "crops"
@@ -339,10 +344,10 @@ def main():
     print(f"Cache: {cache_file}")
     print(f"Artifact: {image_artifact}")
     print()
-    print(f"✓ Ready for live demo! Run: python ocr_live_demo.py {run_output}")
+    print(f"✓ Files saved to backend: {run_output}")
     print("=" * 60)
 
-    # Send results to middleware for GenAI context
+    # Send results to middleware for GenAI context (triggers ingestion)
     try:
         from src.middleware_integration import send_markdown_to_middleware
         send_markdown_to_middleware(
