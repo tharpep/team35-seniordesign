@@ -53,6 +53,7 @@ async function processImage(imagePath, sessionId, source = 'screen') {
       env: {
         ...process.env,
         MIDDLEWARE_URL: process.env.MIDDLEWARE_URL || 'http://localhost:3001',
+        PYTHONIOENCODING: 'utf-8', // Force UTF-8 output to avoid Windows console encoding issues
         // Disable oneDNN for Windows PaddlePaddle compatibility
         FLAGS_use_mkldnn: '0',
         PADDLE_INFERENCE_PASS_ENABLE: '0',

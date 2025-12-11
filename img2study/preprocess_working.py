@@ -118,7 +118,8 @@ def main():
     start = time.time()
     ocr = PaddleOCR(
         use_textline_orientation=False,
-        lang='en'
+        lang='en',
+        use_angle_cls=False
     )
     init_time = time.time() - start
     print(f"  ✓ Initialized in {init_time:.2f}s")

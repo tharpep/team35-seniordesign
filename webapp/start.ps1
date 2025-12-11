@@ -35,42 +35,50 @@ $facialVenv = Join-Path $facialPath ".venv"
 # Determine Python path for backend (same logic as install script)
 # Resolve to actual Python executable path instead of 'py -3.12' format
 $PYTHON_PATH = "python"
-try {
-    $pyList = py --list 2>&1
-    if ($LASTEXITCODE -eq 0) {
-        $versions = @()
-        foreach ($line in $pyList) {
-            $line = $line.Trim()
-            if ($line -match "-V:(\d+)\.(\d+)") {
-                $major = [int]$matches[1]
-                $minor = [int]$matches[2]
-                if ($major -eq 3 -and $minor -ge 10 -and $minor -le 12) {
-                    $versionStr = "$major.$minor"
-                    if ($versions -notcontains $versionStr) {
-                        $versions += $versionStr
+
+# Check for root .venv first (preferred)
+$rootVenvPython = Join-Path $PSScriptRoot "..\.venv\Scripts\python.exe"
+if (Test-Path $rootVenvPython) {
+    $PYTHON_PATH = $rootVenvPython
+    Write-Host "✅ Using root virtual environment: $PYTHON_PATH" -ForegroundColor Green
+} else {
+    try {
+        $pyList = py --list 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            $versions = @()
+            foreach ($line in $pyList) {
+                $line = $line.Trim()
+                if ($line -match "-V:(\d+)\.(\d+)") {
+                    $major = [int]$matches[1]
+                    $minor = [int]$matches[2]
+                    if ($major -eq 3 -and $minor -ge 10 -and $minor -le 12) {
+                        $versionStr = "$major.$minor"
+                        if ($versions -notcontains $versionStr) {
+                            $versions += $versionStr
+                        }
                     }
                 }
             }
-        }
-        if ($versions.Count -gt 0) {
-            $bestVersion = ($versions | Sort-Object { [version]$_ } -Descending)[0]
-            # Resolve 'py -3.12' to actual Python executable path
-            try {
-                $pythonPath = py -$bestVersion -c "import sys; print(sys.executable)" 2>&1
-                if ($LASTEXITCODE -eq 0 -and $pythonPath) {
-                    $PYTHON_PATH = $pythonPath.Trim()
-                } else {
+            if ($versions.Count -gt 0) {
+                $bestVersion = ($versions | Sort-Object { [version]$_ } -Descending)[0]
+                # Resolve 'py -3.12' to actual Python executable path
+                try {
+                    $pythonPath = py -$bestVersion -c "import sys; print(sys.executable)" 2>&1
+                    if ($LASTEXITCODE -eq 0 -and $pythonPath) {
+                        $PYTHON_PATH = $pythonPath.Trim()
+                    } else {
+                        # Fallback to py -3.12 format if resolution fails
+                        $PYTHON_PATH = "py -$bestVersion"
+                    }
+                } catch {
                     # Fallback to py -3.12 format if resolution fails
                     $PYTHON_PATH = "py -$bestVersion"
                 }
-            } catch {
-                # Fallback to py -3.12 format if resolution fails
-                $PYTHON_PATH = "py -$bestVersion"
             }
         }
+    } catch {
+        # Fallback to python
     }
-} catch {
-    # Fallback to python
 }
 
 $validationFailed = $false
